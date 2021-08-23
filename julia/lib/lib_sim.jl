@@ -201,25 +201,11 @@ function DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
 end # DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
 
 """
-    yolo_normalize(x::Real)
-
-Normalize the data from approximately [-0.2, 1.8] to the range [0, 1].
-
-This function is a linear transformation and does not truly limit the range of x.
-"""
-function yolo_normalize(x::Real)
-    # return (x - 0.2) / 2.0
-    # return (x - 0.8)
-    return (x + 0.2) / 2.0
-end #
-
-"""
     sigmoid(x::Real)
 
 Return the sigmoid function on x.
 """
 function sigmoid(x::Real)
-    # return 1.0 / (1.0 + exp(-x))
     return one(x) / (one(x) + exp(-x))
 end
 
@@ -232,10 +218,6 @@ function feature_preprocess!(data_split::DataSplit)
     dt_test = fit(ZScoreTransform, data_split.test_x, dims=2)
     data_split.train_x = StatsBase.transform(dt_train, data_split.train_x)
     data_split.test_x = StatsBase.transform(dt_test, data_split.test_x)
-
-    # Normalize the data according to typical yolo activation ranges (-0.2 - 0.8)
-    # data_split.train_x = yolo_normalize.(data_split.train_x)
-    # data_split.test_x = yolo_normalize.(data_split.test_x)
 
     # Squash the data sigmoidally in case of outliers
     data_split.train_x = sigmoid.(data_split.train_x)
