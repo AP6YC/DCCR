@@ -1,6 +1,4 @@
 [deps]
-AdaptiveResonance = "3d72adc0-63d3-4141-bf9b-84450dd0395b"
-ClusterValidityIndices = "2fefd308-f647-4698-a2f0-e90cfcbca9ad"
 ConfParser = "88353bc9-fd38-507d-a820-d3b43837d6b9"
 DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
 L2MTaskDetector = "e1f8c086-c188-4758-ba75-49b1a6107320"
