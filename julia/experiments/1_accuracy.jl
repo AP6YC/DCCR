@@ -11,10 +11,9 @@ using MLDataUtils
 using Printf            # Formatted number printing
 # using JSON
 
-# using
-# -----------------------------------------
+# -----------------------------------------------------------------------------
 # SETUP
-# -----------------------------------------
+# -----------------------------------------------------------------------------
 
 # Set the logging level to Info and standardize the random seed
 LogLevel(Logging.Info)
@@ -26,25 +25,24 @@ sim_datetime = Dates.format(now(), "yyyy-mm-dd_HH-MM-SS")
 # Load source files
 include(projectdir("julia", "lib_c3.jl"))
 
-# -----------------------------------------
+# -----------------------------------------------------------------------------
 # OPTIONS
-# -----------------------------------------
+# -----------------------------------------------------------------------------
 
 # Create the DDVFA options
-opts = opts_DDVFA()
-opts.gamma = 5.0
-opts.gamma_ref = 1.0
-opts.rho = 0.45
-opts.rho_lb = 0.45
-opts.rho_ub = 0.7
-opts.method = "average"
+opts = opts_DDVFA(
+    gamma = 5.0,
+    gamma_ref = 1.0,
+    # rho=0.45,
+    rho_lb = 0.45,
+    rho_ub = 0.7,
+    method = "single"
+)
 
-scaling = 3
+# Sigmoid input scaling
+scaling = 2.0
 
-data_dir = "E:\\dev\\mount\\data\\dist\\M18_Data_Drop_3_PR\\Data\\activations_yolov3"
-train_dir = joinpath(data_dir, "LBs")
-test_dir = joinpath(data_dir, "EBs")
-
+# Data directories to train/test on
 data_dirs = [
     "dot_dusk",
     "dot_morning",
@@ -56,6 +54,12 @@ data_dirs = [
     "pr_morning"
 ]
 
+data_dir = "E:\\dev\\mount\\data\\dist\\M18_Data_Drop_3_PR\\Data\\activations_yolov3"
+
+train_dir = joinpath(data_dir, "LBs")
+test_dir = joinpath(data_dir, "EBs")
+
+
 train_data_dirs = [joinpath(train_dir, data_dir) for data_dir in data_dirs]
 test_data_dirs = [joinpath(test_dir, data_dir) for data_dir in data_dirs]
 
@@ -63,12 +67,15 @@ test_data_dirs = [joinpath(test_dir, data_dir) for data_dir in data_dirs]
 X_train, y_train, train_labels = collect_all_activations_labeled(train_data_dirs, 1)
 X_test, y_test, test_labels = collect_all_activations_labeled(test_data_dirs, 1)
 
-# data_split = DataSplit(data, targets, 0.8)
-
 dt = get_dist(X_train)
 
 X_train = feature_preprocess(dt, scaling, X_train)
 X_test = feature_preprocess(dt, scaling, X_test)
+
+
+# i_train = randperm(length(y_train))
+# X_train = X_train[:, i_train]
+# y_train = y_train[i_train]
 
 # (X_train, y_train), (X_test, y_test) = stratifiedobs((data, targets))
 

@@ -137,11 +137,11 @@ function collect_all_activations(data_dirs::Array, cell::Int)
 end
 
 """
-    collect_all_activations_labeled(data_dirs::Vector, cell::Int)
+    collect_all_activations_labeled(data_dirs::Vector{String}, cell::Int)
 
 Return the yolo activations, training targets, and condensed labels list from a list of data directories.
 """
-function collect_all_activations_labeled(data_dirs::Vector, cell::Int)
+function collect_all_activations_labeled(data_dirs::Vector{String}, cell::Int)
     top_dim = 128*cell
     data_grand = Matrix{Float64}(undef, top_dim, 0)
     targets = Vector{Int64}()
@@ -151,8 +151,6 @@ function collect_all_activations_labeled(data_dirs::Vector, cell::Int)
         # Get the full local data directory
         data_dir = data_dirs[i]
         data_dir_full = joinpath(data_dir, string(cell))
-        # data_dir_full = joinpath(data_dir, string(cell), "average_features.csv")
-        # println(data_dir_full)
 
         # Assign the directory as the label
         push!(labels, basename(data_dir))
@@ -163,12 +161,10 @@ function collect_all_activations_labeled(data_dirs::Vector, cell::Int)
 
         # If the full data struct is empty, initialize with the size of the data
         if isempty(data_grand)
-            # data_grand = Array{Float64}(undef, size(data_full)[1], 1)
             data_grand = Array{Float64}(undef, dim, 0)
         end
 
         # Set the labeled targets
-        # targets = vcat(targets, repeat([i], size(data_full)[2]))
         for j = 1:n_samples
             push!(targets, i)
         end
@@ -179,9 +175,11 @@ function collect_all_activations_labeled(data_dirs::Vector, cell::Int)
     return data_grand, targets, labels
 end
 
-function get_dist(data)
-    dt = fit(ZScoreTransform, data, dims=2)
-    return dt
+"""
+    get_dist(data::RealMatrix)
+"""
+function get_dist(data::RealMatrix)
+    return fit(ZScoreTransform, data, dims=2)
 end
 
 """
