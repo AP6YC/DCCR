@@ -75,7 +75,7 @@ function sigmoid(x::Real)
 end
 
 """
-feature_preprocess!(data_split::DataSplit)
+    feature_preprocess!(data_split::DataSplit)
 """
 function feature_preprocess!(data_split::DataSplit)
     # Standardize
@@ -201,7 +201,7 @@ function FLIRL2MSplit(data_dir::String, extractor::String)
 end # FLIRL2MSplit(data_dir::String, extractor::String)
 
 """
-FLIRL2MSplitCombined
+    FLIRL2MSplitCombined
 """
 mutable struct FLIRL2MSplitCombined
     train_x::Vector{Matrix{AbstractFloat}}
