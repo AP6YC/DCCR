@@ -8,6 +8,34 @@ using Logging
 
 using DelimitedFiles
 
+# -------------------------------------------
+# Aliases
+# -------------------------------------------
+#   **Taken from StatsBase.jl**
+#
+#  These types signficantly reduces the need of using
+#  type parameters in functions (which are often just
+#  for the purpose of restricting the arrays to real)
+#
+# These could be removed when the Base supports
+# covariant type notation, i.e. AbstractVector{<:Real}
+
+# Real-numbered aliases
+const RealArray{T<:Real, N} = AbstractArray{T, N}
+const RealVector{T<:Real} = AbstractArray{T, 1}
+const RealMatrix{T<:Real} = AbstractArray{T, 2}
+
+# Integered aliases
+const IntegerArray{T<:Integer, N} = AbstractArray{T, N}
+const IntegerVector{T<:Integer} = AbstractArray{T, 1}
+const IntegerMatrix{T<:Integer} = AbstractArray{T, 2}
+
+# Specifically floating-point aliases
+const RealFP = Union{Float32, Float64}
+
+# System's largest native floating point variable
+const Float = (Sys.WORD_SIZE == 64 ? Float64 : Float32)
+
 """
     DataSplit
 
@@ -80,43 +108,12 @@ function sigmoid(x::Real)
 end
 
 """
-    feature_preprocess!(data_split::DataSplit)
-"""
-function feature_preprocess!(data_split::DataSplit)
-    # Standardize
-    dt_train = fit(ZScoreTransform, data_split.train_x, dims=2)
-    dt_test = fit(ZScoreTransform, data_split.test_x, dims=2)
-    data_split.train_x = StatsBase.transform(dt_train, data_split.train_x)
-    data_split.test_x = StatsBase.transform(dt_test, data_split.test_x)
-
-    # Squash the data sigmoidally in case of outliers
-    data_split.train_x = sigmoid.(data_split.train_x)
-    data_split.test_x = sigmoid.(data_split.test_x)
-end
-
-"""
     collect_activations(data_dir::String)
 
 Return the activations from a single directory
 """
 function collect_activations(data_dir::String)
-    data_full = []
-    files = readdir(data_dir)
-    for i_file in 1:1:length(files)
-        local_data_raw = readdlm(joinpath(data_dir, files[i_file]), ',')
-        # Permute the data to column-major format
-        local_data = permutedims(local_data_raw)
-        # Reshape the array to a single column if there are multiple
-        if size(local_data)[2] > 1
-            local_data = reshape(local_data, :, 1)
-        end
-        if isempty(data_full)
-            data_full = Array{Float64}(undef, size(local_data)[1], 1)
-            data_full[:, 1] = local_data
-        else
-            data_full = hcat(data_full, local_data)
-        end
-    end
+    data_full = readdlm(joinpath(data_dir, "average_features.csv"), ',')
     return data_full
 end
 
@@ -140,67 +137,22 @@ function collect_all_activations(data_dirs::Array, cell::Int)
 end
 
 """
-    collect_all_activations_labeled_sequential(data_dirs::Array, cell::Int)
-
-Return the yolo activations, training targets, and condensed labels list from a list of data directories along with the category indices.
-"""
-function collect_all_activations_labeled_sequential(data_dirs::Array, cell::Int)
-    data_grand = []
-    labels = []
-    targets = []
-    seq_ind = []
-    # for data_dir in data_dirs
-    for i = 1:length(data_dirs)
-        # Get the full local data directory
-        data_dir = data_dirs[i]
-        data_dir_full = joinpath(data_dir, string(cell))
-
-        # Assign the directory as the label
-        push!(labels, basename(data_dir))
-
-        # Get all of the data from the full data directory
-        data_full = collect_activations(data_dir_full)
-        dim, n_samples = size(data_full)
-
-        # If the full data struct is empty, initialize with the size of the data
-        if isempty(data_grand)
-            # data_grand = Array{Float64}(undef, size(data_full)[1], 1)
-            data_grand = Array{Float64}(undef, dim, 0)
-        end
-
-        # Set the labeled targets
-        # targets = vcat(targets, repeat([i], size(data_full)[2]))
-        for j = 1:n_samples
-            push!(targets, i)
-        end
-
-        # Set the "ranges" of the indices
-        if i == 1
-            push!(seq_ind, [1, n_samples])
-        else
-            start_ind = seq_ind[i-1][2] + 1
-            push!(seq_ind, [start_ind, start_ind + n_samples - 1])
-        end
-        # Concatenate the most recent batch with the grand dataset
-        data_grand = [data_grand data_full]
-    end
-    return data_grand, targets, labels, seq_ind
-end
-
-"""
-    collect_all_activations_labeled(data_dirs::Array, cell::Int)
+    collect_all_activations_labeled(data_dirs::Vector, cell::Int)
 
 Return the yolo activations, training targets, and condensed labels list from a list of data directories.
 """
-function collect_all_activations_labeled(data_dirs::Array, cell::Int)
-    data_grand = []
-    labels = []
-    targets = []
+function collect_all_activations_labeled(data_dirs::Vector, cell::Int)
+    top_dim = 128*cell
+    data_grand = Matrix{Float64}(undef, top_dim, 0)
+    targets = Vector{Int64}()
+    labels = Vector{String}()
     # for data_dir in data_dirs
     for i = 1:length(data_dirs)
         # Get the full local data directory
         data_dir = data_dirs[i]
         data_dir_full = joinpath(data_dir, string(cell))
+        # data_dir_full = joinpath(data_dir, string(cell), "average_features.csv")
+        # println(data_dir_full)
 
         # Assign the directory as the label
         push!(labels, basename(data_dir))
@@ -227,31 +179,17 @@ function collect_all_activations_labeled(data_dirs::Array, cell::Int)
     return data_grand, targets, labels
 end
 
-function load_sim_data(data_dirs, cell, use_alt)
-
-    split_ratio = 0.8
-
-    # Gather the data, training targets, and condensed label list
-    data, targets, labels, seq_ind = collect_all_activations_labeled_sequential(data_dirs, cell)
-
-    # Create a training split
-    data_split = DataSplit(data, targets, split_ratio, seq_ind)
-
-    # Standardize
-    feature_preprocess!(data_split)
-
-    # If using the altitude, manipulate the final features
-    if use_alt
-        alt_map = Dict(
-            1 => 0,
-            2 => 0.5,
-            3 => 1
-        )
-        alt_train = [alt_map[x] for x in data_split.train_y]
-        alt_test = [alt_map[x] for x in data_split.test_y]
-        data_split.train_x = [data_split.train_x; alt_train']
-        data_split.test_x = [data_split.test_x; alt_test']
-    end
-
-    return data_split
+function get_dist(data)
+    dt = fit(ZScoreTransform, data, dims=2)
+    return dt
 end
+
+"""
+    function_preprocess(dt::ZScoreTransform, scaling::Real, data::RealMatrix)
+"""
+function feature_preprocess(dt::ZScoreTransform, scaling::Real, data::RealMatrix)
+    new_data = StatsBase.transform(dt, data)
+    new_data = sigmoid.(scaling*new_data)
+    return new_data
+end
+

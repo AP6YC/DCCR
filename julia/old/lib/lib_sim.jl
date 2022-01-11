@@ -113,7 +113,9 @@ function collect_all_activations_labeled(data_dirs::Array, cell::Int)
     for i = 1:length(data_dirs)
         # Get the full local data directory
         data_dir = data_dirs[i]
-        data_dir_full = joinpath(data_dir, string(cell))
+        # data_dir_full = joinpath(data_dir, string(cell))
+        data_dir_full = joinpath(data_dir, string(cell), "average_features")
+        println(data_dir_full)
 
         # Assign the directory as the label
         push!(labels, basename(data_dir))
