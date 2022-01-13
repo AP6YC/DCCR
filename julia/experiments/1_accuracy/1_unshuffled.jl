@@ -21,6 +21,9 @@ using DataFrames
 # FILE SETUP
 # -----------------------------------------------------------------------------
 
+# Experiment save directory name
+experiment_top = "1_accuracy"
+
 # Run the common setup methods (data paths, etc.)
 include(projectdir("julia", "setup.jl"))
 
@@ -45,12 +48,10 @@ data_selection = [
     "pr_morning",
 ]
 
-
 # Create the DDVFA options
 opts = opts_DDVFA(
     gamma = 5.0,
     gamma_ref = 1.0,
-    # rho=0.45,
     rho_lb = 0.45,
     rho_ub = 0.7,
     method = "single"
@@ -72,7 +73,7 @@ data_dirs, class_labels = get_orbit_names(data_selection)
 # Number of classes
 n_classes = length(data_dirs)
 
-# X_train, y_train, train_labels, X_test, y_test, test_labels = load_orbits(data_dir, scaling)
+# Load the data
 data = load_orbits(data_dir, scaling)
 
 # i_train = randperm(length(y_train))
@@ -88,9 +89,8 @@ ddvfa.config = DataConfig(0, 1, 128)
 # TRAIN/TEST
 # -----------------------------------------------------------------------------
 
-# We can train in batch with a simple supervised mode by passing the labels as a keyword argument.
+# Train in batch
 y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
-# println("Training labels: ",  size(y_hat_batch_train), " ", typeof(y_hat_batch_train))
 y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
 
 # Calculate performance on training data, testing data, and with get_bmu
@@ -165,6 +165,7 @@ end
 
 df = DataFrame(F2 = n_F2, Total = n_categories)
 table = latexify(df, env=:table)
+
 
 open(results_dir(n_cat_name), "w") do io
     write(io, table)

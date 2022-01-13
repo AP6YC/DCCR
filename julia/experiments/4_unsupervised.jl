@@ -71,9 +71,8 @@ data_dirs, class_labels = get_orbit_names(data_selection)
 # Load the data
 data = load_orbits(data_dir, scaling)
 
+# Sort/reload the data as indexed components
 data_indexed = get_indexed_data(data)
-
-
 
 
 # # X_train, y_train, train_labels, X_test, y_test, test_labels = load_orbits(data_dir, scaling)
@@ -85,8 +84,8 @@ data_indexed = get_indexed_data(data)
 
 # # (X_train, y_train), (X_test, y_test) = stratifiedobs((data, targets))
 
-# ddvfa = DDVFA(opts)
-# ddvfa.config = DataConfig(0, 1, 128)
+ddvfa = DDVFA(opts)
+ddvfa.config = DataConfig(0, 1, 128)
 
 # # -----------------------------------------------------------------------------
 # # TRAIN/TEST

@@ -243,7 +243,6 @@ end
 A basic struct for encapsulating the components of supervised training.
 """
 mutable struct DataSplitIndexed
-
     train_x::Vector{RealMatrix}
     train_y::Vector{IntegerVector}
     train_labels::Vector{String}
@@ -255,49 +254,7 @@ mutable struct DataSplitIndexed
     test_x::Vector{RealMatrix}
     test_y::Vector{IntegerVector}
     test_labels::Vector{String}
-
-    # DataSplit(
-    #     train_x,
-    #     train_y,
-    #     train_labels,
-    #     val_x,
-    #     val_y,
-    #     val_labels,
-    #     test_x,
-    #     test_y,
-    #     test_labels
-    # ) = new(
-    #     train_x,
-    #     train_y,
-    #     train_labels,
-    #     val_x,
-    #     val_y,
-    #     val_labels,
-    #     test_x,
-    #     test_y,
-    #     test_labels
-    # )
 end
-
-# function DataSplitIndexed()
-#     DataSplitIndexed(
-#         # Vector{Array{Float}(undef, 0, 0)},
-#         # Vector{Vector{Int}(undef, 0)},
-#         Vector{RealMatrix}[],
-#         Vector{IntegerVector}[],
-#         Vector{String}[],
-#         Vector{RealMatrix}[],
-#         Vector{IntegerVector}[],
-#         Vector{String}[],
-#         Vector{RealMatrix}[],
-#         Vector{IntegerVector}[],
-#         Vector{String}[]
-#     )
-#     # Array{Int}(undef,0),            # labels
-#     # Array{Float}(undef, 0),         # T
-#     # Array{Float}(undef, 0),         # M
-#     # Array{Float}(undef, 0, 0),      # W
-# end
 
 """
     load_orbits(data_dir::String, scaling::Real)
@@ -337,7 +294,6 @@ function load_orbits(data_dir::String, scaling::Real)
     return data_struct
     # return X_train, y_train, train_labels, X_test, y_test, test_labels
 end
-
 
 function get_indexed_data(data::DataSplit)
     # Assume the same number of classes in each category
@@ -388,56 +344,6 @@ function get_indexed_data(data::DataSplit)
     return data_indexed
 end
 
-# """
-#     collect_all_activations_labeled_sequential(data_dirs::Array, cell::Int)
-
-# Return the yolo activations, training targets, and condensed labels list from a list of data directories along with the category indices.
-# """
-# function collect_all_activations_labeled_sequential(data_dirs::Array, cell::Int)
-#     data_grand = []
-#     labels = []
-#     targets = []
-#     seq_ind = []
-#     # for data_dir in data_dirs
-#     for i = 1:length(data_dirs)
-#         # Get the full local data directory
-#         data_dir = data_dirs[i]
-#         data_dir_full = joinpath(data_dir, string(cell))
-
-#         # Assign the directory as the label
-#         push!(labels, basename(data_dir))
-
-#         # Get all of the data from the full data directory
-#         data_full = collect_activations(data_dir_full)
-#         dim, n_samples = size(data_full)
-
-#         # If the full data struct is empty, initialize with the size of the data
-#         if isempty(data_grand)
-#             # data_grand = Array{Float64}(undef, size(data_full)[1], 1)
-#             data_grand = Array{Float64}(undef, dim, 0)
-#         end
-
-#         # Set the labeled targets
-#         # targets = vcat(targets, repeat([i], size(data_full)[2]))
-#         for j = 1:n_samples
-#             push!(targets, i)
-#         end
-
-#         # Set the "ranges" of the indices
-#         if i == 1
-#             push!(seq_ind, [1, n_samples])
-#         else
-#             start_ind = seq_ind[i-1][2] + 1
-#             push!(seq_ind, [start_ind, start_ind + n_samples - 1])
-#         end
-#         # Concatenate the most recent batch with the grand dataset
-#         data_grand = [data_grand data_full]
-#     end
-#     return data_grand, targets, labels, seq_ind
-# end
-
-
-
 function get_orbit_names(selection::Vector{String})
     # Data directories to train/test on
     data_dirs = Dict(
@@ -470,4 +376,83 @@ function get_orbit_names(selection::Vector{String})
     end
 
     return out_data_dirs, out_class_labels
+end
+
+
+# --------------------------------------------------------------------------- #
+# Linear example
+# --------------------------------------------------------------------------- #
+function accuracy_sim(d::Dict{String, Any}, data_split::DataSplit)
+
+    # Set the DDVFA options
+    ddvfa_opts = opts_DDVFA()
+    ddvfa_opts.method = d["method"]
+    ddvfa_opts.gamma = d["gamma"]
+    ddvfa_opts.rho_ub = d["rho_ub"]
+    ddvfa_opts.rho_lb = d["rho_lb"]
+    # ddvfa_opts.rho = d["rho"]
+    ddvfa_opts.rho = d["rho_lb"]
+    ddvfa_opts.display = false
+
+    # Create the ART modules
+    art_ddvfa = DDVFA(ddvfa_opts)
+
+    # Get the data stats
+    dim, n_samples = size(data_split.train_x)
+
+    # Set the DDVFA config Manually
+    art_ddvfa.config = DataConfig(0.0, 1.0, dim)
+    @info "dim: $dim"
+
+    # Train the DDVFA model and time it
+    train_stats = @timed train!(art_ddvfa, data_split.train_x, y=data_split.train_y)
+    y_hat_train = train_stats.value
+
+    # Training performance
+    local_train_y = convert(Array{Int}, data_split.train_y)
+    train_perf = NaN
+    try
+        train_perf = performance(y_hat_train, local_train_y)
+    catch
+        @info "Performance error!"
+    end
+    @info "Training Performance: $(train_perf)"
+
+    # Testing performance, timed
+    test_stats = @timed classify(art_ddvfa, data_split.test_x)
+    y_hat_test = test_stats.value
+    local_test_y = convert(Array{Int}, data_split.test_y)
+    test_perf = NaN
+    try
+        test_perf = performance(y_hat_test, local_test_y)
+    catch
+        @info "Performance error!"
+    end
+    @info "Testing Performance: $(test_perf)"
+
+    # Get the number of weights and categories
+    total_vec = [art_ddvfa.F2[i].n_categories for i = 1:art_ddvfa.n_categories]
+    total_cat = sum(total_vec)
+    # @info "Categories: $(art_ddvfa.n_categories)"
+    # @info "Weights: $(total_cat)"
+
+    # Store all of the results of interest
+    fulld = copy(d)
+    # Performances
+    fulld["p_tr"] = train_perf
+    fulld["p_te"] = test_perf
+    # ART statistics
+    fulld["n_cat"] = art_ddvfa.n_categories
+    fulld["n_wt"] = total_cat
+    fulld["m_wt"] = mean(total_vec)
+    fulld["s_wt"] = std(total_vec)
+    # Timing statistics
+    fulld["t_tr"] = train_stats.time
+    fulld["gc_tr"] = train_stats.gctime
+    fulld["b_tr"] = train_stats.bytes
+    fulld["t_te"] = test_stats.time
+    fulld["gc_te"] = test_stats.gctime
+    fulld["b_te"] = test_stats.bytes
+    # Return the results
+    return fulld
 end
