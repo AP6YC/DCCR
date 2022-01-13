@@ -36,7 +36,8 @@ results_dir(args...) = projectdir("work", "results", args...)
 # -----------------------------------------------------------------------------
 
 # Saving names
-plot_name = "1_accuracy.png"
+plot_name_1 = "5_unsupervised_1.png"
+plot_name_2 = "5_unsupervised_2.png"
 
 # Top data directory
 data_dir = "E:\\dev\\mount\\data\\dist\\M18_Data_Drop_3_PR\\Data\\activations_yolov3"

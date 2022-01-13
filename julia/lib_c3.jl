@@ -36,65 +36,65 @@ const RealFP = Union{Float32, Float64}
 # System's largest native floating point variable
 const Float = (Sys.WORD_SIZE == 64 ? Float64 : Float32)
 
-"""
-    DataSplit
+# """
+#     DataSplit
 
-A basic struct for encapsulating the four components of supervised training.
-"""
-mutable struct DataSplit
-    train_x::Array
-    test_x::Array
-    train_y::Array
-    test_y::Array
-    DataSplit(train_x, test_x, train_y, test_y) = new(train_x, test_x, train_y, test_y)
-end
+# A basic struct for encapsulating the four components of supervised training.
+# """
+# mutable struct DataSplit
+#     train_x::Array
+#     test_x::Array
+#     train_y::Array
+#     test_y::Array
+#     DataSplit(train_x, test_x, train_y, test_y) = new(train_x, test_x, train_y, test_y)
+# end
 
-"""
-    DataSplit(data_x::Array, data_y::Array, ratio::Float)
+# """
+#     DataSplit(data_x::Array, data_y::Array, ratio::Float)
 
-Return a DataSplit struct that is split by the ratio (e.g. 0.8).
-"""
-function DataSplit(data_x::Array, data_y::Array, ratio::Real)
-    dim, n_data = size(data_x)
-    split_ind = Int(floor(n_data * ratio))
+# Return a DataSplit struct that is split by the ratio (e.g. 0.8).
+# """
+# function DataSplit(data_x::Array, data_y::Array, ratio::Real)
+#     dim, n_data = size(data_x)
+#     split_ind = Int(floor(n_data * ratio))
 
-    train_x = data_x[:, 1:split_ind]
-    test_x = data_x[:, split_ind + 1:end]
-    train_y = data_y[1:split_ind]
-    test_y = data_y[split_ind + 1:end]
+#     train_x = data_x[:, 1:split_ind]
+#     test_x = data_x[:, split_ind + 1:end]
+#     train_y = data_y[1:split_ind]
+#     test_y = data_y[split_ind + 1:end]
 
-    return DataSplit(train_x, test_x, train_y, test_y)
-end
+#     return DataSplit(train_x, test_x, train_y, test_y)
+# end
 
-"""
-    DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
+# """
+#     DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
 
-Sequential loading and ratio split of the data.
-"""
-function DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
-    dim, n_data = size(data_x)
-    n_splits = length(seq_ind)
+# Sequential loading and ratio split of the data.
+# """
+# function DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
+#     dim, n_data = size(data_x)
+#     n_splits = length(seq_ind)
 
-    train_x = Array{Float64}(undef, dim, 0)
-    train_y = Array{Float64}(undef, 0)
-    test_x = Array{Float64}(undef, dim, 0)
-    test_y = Array{Float64}(undef, 0)
+#     train_x = Array{Float64}(undef, dim, 0)
+#     train_y = Array{Float64}(undef, 0)
+#     test_x = Array{Float64}(undef, dim, 0)
+#     test_y = Array{Float64}(undef, 0)
 
-    # Iterate over all splits
-    for ind in seq_ind
-        local_x = data_x[:, ind[1]:ind[2]]
-        local_y = data_y[ind[1]:ind[2]]
-        # n_data = ind[2] - ind[1] + 1
-        n_data = size(local_x)[2]
-        split_ind = Int(floor(n_data * ratio))
+#     # Iterate over all splits
+#     for ind in seq_ind
+#         local_x = data_x[:, ind[1]:ind[2]]
+#         local_y = data_y[ind[1]:ind[2]]
+#         # n_data = ind[2] - ind[1] + 1
+#         n_data = size(local_x)[2]
+#         split_ind = Int(floor(n_data * ratio))
 
-        train_x = [train_x local_x[:, 1:split_ind]]
-        test_x = [test_x local_x[:, split_ind + 1:end]]
-        train_y = [train_y; local_y[1:split_ind]]
-        test_y = [test_y; local_y[split_ind + 1:end]]
-    end
-    return DataSplit(train_x, test_x, train_y, test_y)
-end # DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
+#         train_x = [train_x local_x[:, 1:split_ind]]
+#         test_x = [test_x local_x[:, split_ind + 1:end]]
+#         train_y = [train_y; local_y[1:split_ind]]
+#         test_y = [test_y; local_y[split_ind + 1:end]]
+#     end
+#     return DataSplit(train_x, test_x, train_y, test_y)
+# end # DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
 
 
 """
@@ -177,6 +177,8 @@ end
 
 """
     get_dist(data::RealMatrix)
+
+Get the distribution parameters for preprocessing.
 """
 function get_dist(data::RealMatrix)
     return fit(ZScoreTransform, data, dims=2)
@@ -184,6 +186,8 @@ end
 
 """
     function_preprocess(dt::ZScoreTransform, scaling::Real, data::RealMatrix)
+
+Preprocesses one dataset of features, scaling and squashing along the feature axes.
 """
 function feature_preprocess(dt::ZScoreTransform, scaling::Real, data::RealMatrix)
     new_data = StatsBase.transform(dt, data)
@@ -191,3 +195,118 @@ function feature_preprocess(dt::ZScoreTransform, scaling::Real, data::RealMatrix
     return new_data
 end
 
+"""
+    DataSplit
+
+A basic struct for encapsulating the components of supervised training.
+"""
+mutable struct DataSplit
+
+    train_x::RealMatrix
+    train_y::IntegerVector
+    train_labels::Vector{String}
+
+    val_x::RealMatrix
+    val_y::IntegerVector
+    val_labels::Vector{String}
+
+    test_x::RealMatrix
+    test_y::RealVector
+    test_labels::Vector{String}
+
+    DataSplit(
+        train_x,
+        train_y,
+        train_labels,
+        val_x,
+        val_y,
+        val_labels,
+        test_x,
+        test_y,
+        test_labels
+    ) = new(
+        train_x,
+        train_y,
+        train_labels,
+        val_x,
+        val_y,
+        val_labels,
+        test_x,
+        test_y,
+        test_labels
+    )
+end
+
+
+"""
+    load_orbits(data_dir::String, scaling::Real)
+
+Load the orbits data and preprocess the features.
+"""
+function load_orbits(data_dir::String, scaling::Real)
+    train_dir = joinpath(data_dir, "LBs")
+    val_dir = joinpath(data_dir, "Val")
+    test_dir = joinpath(data_dir, "EBs")
+
+    train_data_dirs = [joinpath(train_dir, data_dir) for data_dir in data_dirs]
+    val_data_dirs = [joinpath(val_dir, data_dir) for data_dir in data_dirs]
+    test_data_dirs = [joinpath(test_dir, data_dir) for data_dir in data_dirs]
+
+    train_x, train_y, train_labels = collect_all_activations_labeled(train_data_dirs, 1)
+    val_x, val_y, val_labels = collect_all_activations_labeled(train_data_dirs, 1)
+    test_x, test_y, test_labels = collect_all_activations_labeled(test_data_dirs, 1)
+
+    dt = get_dist(train_x)
+
+    train_x = feature_preprocess(dt, scaling, train_x)
+    test_x = feature_preprocess(dt, scaling, test_x)
+
+    data_struct = DataSplit(
+        train_x,
+        train_y,
+        train_labels,
+        val_x,
+        val_y,
+        val_labels,
+        test_x,
+        test_y,
+        test_labels
+    )
+
+    return data_struct
+    # return X_train, y_train, train_labels, X_test, y_test, test_labels
+end
+
+function get_orbit_names(selection::Vector{String})
+    # Data directories to train/test on
+    data_dirs = Dict(
+        "dot_dusk" => "dot_dusk",
+        "dot_morning" => "dot_morning",
+        "emahigh_dusk" => "emahigh_dusk",
+        "emahigh_morning" => "emahigh_morning",
+        "emalow_dusk" => "emalow_dusk",
+        "emalow_morning" => "emalow_morning",
+        "pr_dusk" => "pr_dusk",
+        "pr_morning" => "pr_morning",
+    )
+
+    class_labels = Dict(
+        "dot_dusk" => "DOTD",
+        "dot_morning" => "DOTM",
+        "emahigh_dusk" => "EMAHD",
+        "emahigh_morning" => "EMAHM",
+        "emalow_dusk" => "EMALD",
+        "emalow_morning" => "EMALM",
+        "pr_dusk" => "PRD",
+        "pr_morning" => "PRM",
+    )
+
+    out_data_dirs = String[]
+    out_class_labels = String[]
+    for item in selection
+        push!(out_data_dirs, data_dirs[item])
+        push!(out_class_labels, class_labels[item])
+    end
+
+    return out_data_dirs, out_class_labels
+end
