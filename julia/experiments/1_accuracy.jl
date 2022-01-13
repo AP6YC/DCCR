@@ -6,7 +6,7 @@ using Random            # Random subsequence
 # using ProgressMeter     # Progress bar
 # using CSV
 # using DataFrames
-# using Dates
+using Dates
 using MLDataUtils
 using Printf            # Formatted number printing
 # using JSON
@@ -14,22 +14,15 @@ using MLBase
 # using Plots
 using StatsPlots
 
+using Latexify
+using DataFrames
+
 # -----------------------------------------------------------------------------
 # FILE SETUP
 # -----------------------------------------------------------------------------
 
-# Set the logging level to Info and standardize the random seed
-LogLevel(Logging.Info)
-Random.seed!(0)
-
-# Get the simulation datetime for the destination directory
-sim_datetime = Dates.format(now(), "yyyy-mm-dd_HH-MM-SS")
-
-# Load source files
-include(projectdir("julia", "lib_c3.jl"))
-
-# Results directory
-results_dir(args...) = projectdir("work", "results", args...)
+# Run the common setup methods (data paths, etc.)
+include(projectdir("julia", "setup.jl"))
 
 # -----------------------------------------------------------------------------
 # OPTIONS
@@ -37,9 +30,8 @@ results_dir(args...) = projectdir("work", "results", args...)
 
 # Saving names
 plot_name = "1_accuracy.png"
-
-# Top data directory
-data_dir = "E:\\dev\\mount\\data\\dist\\M18_Data_Drop_3_PR\\Data\\activations_yolov3"
+# n_F2_name = "1_n_F2.tex"
+n_cat_name = "1_n_cat.tex"
 
 # Select which data entries to use for the experiment
 data_selection = [
@@ -144,5 +136,40 @@ p = groupedbar(
 ylabel!(p, "Accuracy")
 xticks!(collect(1:n_classes), class_labels)
 # title!(p, "test")
+
 # Save the plot
 savefig(p, results_dir(plot_name))
+savefig(p, paper_results_dir(plot_name))
+
+# -----------------------------------------------------------------------------
+# CATEGORY ANALYSIS
+# -----------------------------------------------------------------------------
+
+# Save the number of F2 nodes and total categories per class
+n_F2 = Int[]
+n_categories = Int[]
+# Iterate over every class
+for i = 1:n_classes
+    # Find all of the F2 nodes that correspond to the class
+    i_F2 = findall(x->x==i, ddvfa.labels)
+    # Add the number of F2 nodes to the list
+    push!(n_F2, length(i_F2))
+    # Get the numbers of categories within each F2 node
+    n_cat_list = [F2.n_categories for F2 in ddvfa.F2[i_F2]]
+    # Sum those and add them to the list
+    push!(n_categories, sum(n_cat_list))
+end
+
+@info "F2 nodes:" n_F2
+@info "Total categories:" n_categories
+
+df = DataFrame(F2 = n_F2, Total = n_categories)
+table = latexify(df, env=:table)
+
+open(results_dir(n_cat_name), "w") do io
+    write(io, table)
+end
+
+open(paper_results_dir(n_cat_name), "w") do io
+    write(io, table)
+end
