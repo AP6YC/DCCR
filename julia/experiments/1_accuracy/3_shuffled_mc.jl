@@ -1,10 +1,11 @@
 # Start several processes
 using Distributed
 # addprocs(3, exeflags="--project=.")
-
+# Close the workers after simulation
+# rmprocs(workers())
 @everywhere begin
-    # using Pkg
-    # Pkg.activate(".")
+    using Pkg
+    Pkg.activate(".")
 
     using Revise            # Editing this file
     using DrWatson          # Project directory functions, etc.
@@ -18,7 +19,7 @@ using Distributed
     using MLDataUtils
     using Printf            # Formatted number printing
     # using JSON
-    using MLBase
+    # using MLBase
     # using Plots
     using StatsPlots
 
@@ -26,10 +27,14 @@ using Distributed
     using DataFrames
 
     # Experiment save directory name
-    experiment_top = "3_accuracy"
+    experiment_top = "3_shuffled_mc"
 
     # Run the common setup methods (data paths, etc.)
     include(projectdir("julia", "setup.jl"))
+
+    # Make a path locally just for the sweep results
+    sweep_results_dir(args...) = results_dir("sweep", args...)
+    mkpath(sweep_results_dir())
 
     # Select which data entries to use for the experiment
     data_selection = [
@@ -68,12 +73,52 @@ using Distributed
     @info "Worker $(myid()): loading data"
     data = load_orbits(data_dir, scaling)
 
-    # function local_sim(d, data)
+    # Define the local simulation function
+    function local_sim(d, data, opts)
 
-    # end
+        seed = d["seed"]
+
+        # Create the DDVFA module and setup the config
+        ddvfa = DDVFA(opts)
+        ddvfa.config = DataConfig(0, 1, 128)
+
+        # Shuffle the data with a new random seed
+        Random.seed!(seed)
+        i_train = randperm(length(data.train_y))
+        data.train_x = data.train_x[:, i_train]
+        data.train_y = data.train_y[i_train]
+
+        # Train
+        y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
+        # println("Training labels: ",  size(y_hat_batch_train), " ", typeof(y_hat_batch_train))
+        y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+
+        # Calculate performance on training data, testing data, and with get_bmu
+        train_perf = performance(y_hat_train, data.train_y)
+        test_perf = performance(y_hat, data.test_y)
+
+        fulld = copy(d)
+        fulld["p_tr"] = train_perf
+        fulld["p_te"] = test_perf
+        fulld
+        # # Format each performance number for comparison
+        # @printf "Batch training performance: %.4f\n" perf_train
+        # @printf "Batch testing performance: %.4f\n" perf_test
+
+
+
+        sim_save_name = sweep_results_dir(savename(d, "jld2"))
+        @info "Worker $(myid()): saving to $(sim_save_name)"
+        # wsave(sim_save_name, f)
+        @tagsave sim_save_name fulld
+    end
+
+    # Define a single-parameter function for pmap
+    ls(dict) = local_sim(dict, data, opts)
 
 end
-# println("asdf")
+
+
 
 # Close the workers after simulation
 # rmprocs(workers())

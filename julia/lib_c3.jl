@@ -8,6 +8,8 @@ using Logging
 
 using DelimitedFiles
 
+using MLBase
+
 # -------------------------------------------
 # Aliases
 # -------------------------------------------
@@ -378,81 +380,211 @@ function get_orbit_names(selection::Vector{String})
     return out_data_dirs, out_class_labels
 end
 
+"""
+    get_confusion(n_classes, y, y_hat)
+
+Wrapper method for getting the raw confusion matrix.
+"""
+function get_confusion(n_classes, y, y_hat)
+    return confusmat(n_classes, y, y_hat)
+end
+
+"""
+    get_normalized_confusion(n_classes, y, y_hat)
+
+Get the normalized confusion matrix.
+"""
+function get_normalized_confusion(n_classes, y, y_hat)
+    cm = get_confusion(n_classes, y, y_hat)
+    total = sum(cm, dims=1)
+    norm_cm = cm./total
+    return norm_cm
+end
+
+"""
+    get_accuracies(y, y_hat)
+
+Get a list of the percentage accuracies.
+"""
+function get_accuracies(y, y_hat, n_classes)
+    cm = get_confusion(n_classes, y, y_hat)
+    correct = [cm[i,i] for i = 1:n_classes]
+    total = sum(cm, dims=1)
+    accuracies = correct'./total
+
+    return accuracies
+end
+
+"""
+    get_tt_accuracies(data, y_hat, y_hat)
+
+Get two lists of the training and testing accuracies
+"""
+function get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
+    # TRAIN: Get the percent correct for each class
+    train_accuracies = get_accuracies(data.train_y, y_hat_train, n_classes)
+
+    # TEST: Get the percent correct for each class
+    test_accuracies = get_accuracies(data.test_y, y_hat, n_classes)
+
+    return train_accuracies, test_accuracies
+end
+
+function get_n_categories(ddvfa)
+    # Save the number of F2 nodes and total categories per class
+    n_F2 = Int[]
+    n_categories = Int[]
+
+    # Iterate over every class
+    for i = 1:n_classes
+        # Find all of the F2 nodes that correspond to the class
+        i_F2 = findall(x->x==i, ddvfa.labels)
+        # Add the number of F2 nodes to the list
+        push!(n_F2, length(i_F2))
+        # Get the numbers of categories within each F2 node
+        n_cat_list = [F2.n_categories for F2 in ddvfa.F2[i_F2]]
+        # Sum those and add them to the list
+        push!(n_categories, sum(n_cat_list))
+    end
+
+    return n_F2, n_categories
+end
+
+function create_confusion_heatmap(class_labels, y, y_hat)
+    # Number of classes from the class labels
+    n_classes = length(class_labels)
+
+    # Normalized confusion
+    norm_cm = get_normalized_confusion(n_classes, y, y_hat)
+
+    # Create the heatmap
+    h = heatmap(
+        class_labels,
+        class_labels,
+        norm_cm,
+        fill_z = norm_cm,
+        aspect_ratio=:equal
+    )
+
+    # Create the annotations
+    fontsize = 15
+    nrow, ncol = size(norm_cm)
+    ann = [
+        (i-.5,j-.5, text(round(norm_cm[i,j], digits=2), fontsize, :white, :center))
+        for i in 1:nrow for j in 1:ncol
+    ]
+    annotate!(ann, linecolor=:white)
+
+    return h
+end
+
+"""
+    create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
+
+Return a grouped bar chart with class accuracies.
+"""
+function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
+    # Infer the number of classes from the class labels
+    n_classes = length(class_labels)
+    # Get the training and testing accuracies
+    train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
+    @info "Train Accuracies:" train_accuracies
+    @info "Train Accuracies:" test_accuracies
+
+    # Format the accuracy series for plotting
+    combined_accuracies = [train_accuracies; test_accuracies]'
+
+    # Create the accuracy grouped bar chart
+    p = groupedbar(
+        combined_accuracies,
+        bar_position = :dodge,
+        bar_width=0.7,
+        dpi=dpi,
+        # show=true,
+        # xticks=train_labels
+    )
+
+    ylabel!(p, "Accuracy")
+    xticks!(collect(1:n_classes), class_labels)
+    # title!(p, "test")
+
+    return p
+end
 
 # --------------------------------------------------------------------------- #
 # Linear example
 # --------------------------------------------------------------------------- #
-function accuracy_sim(d::Dict{String, Any}, data_split::DataSplit)
+# function accuracy_sim(d::Dict{String, Any}, data_split::DataSplit)
 
-    # Set the DDVFA options
-    ddvfa_opts = opts_DDVFA()
-    ddvfa_opts.method = d["method"]
-    ddvfa_opts.gamma = d["gamma"]
-    ddvfa_opts.rho_ub = d["rho_ub"]
-    ddvfa_opts.rho_lb = d["rho_lb"]
-    # ddvfa_opts.rho = d["rho"]
-    ddvfa_opts.rho = d["rho_lb"]
-    ddvfa_opts.display = false
+#     # Set the DDVFA options
+#     ddvfa_opts = opts_DDVFA()
+#     ddvfa_opts.method = d["method"]
+#     ddvfa_opts.gamma = d["gamma"]
+#     ddvfa_opts.rho_ub = d["rho_ub"]
+#     ddvfa_opts.rho_lb = d["rho_lb"]
+#     # ddvfa_opts.rho = d["rho"]
+#     ddvfa_opts.rho = d["rho_lb"]
+#     ddvfa_opts.display = false
 
-    # Create the ART modules
-    art_ddvfa = DDVFA(ddvfa_opts)
+#     # Create the ART modules
+#     art_ddvfa = DDVFA(ddvfa_opts)
 
-    # Get the data stats
-    dim, n_samples = size(data_split.train_x)
+#     # Get the data stats
+#     dim, n_samples = size(data_split.train_x)
 
-    # Set the DDVFA config Manually
-    art_ddvfa.config = DataConfig(0.0, 1.0, dim)
-    @info "dim: $dim"
+#     # Set the DDVFA config Manually
+#     art_ddvfa.config = DataConfig(0.0, 1.0, dim)
+#     @info "dim: $dim"
 
-    # Train the DDVFA model and time it
-    train_stats = @timed train!(art_ddvfa, data_split.train_x, y=data_split.train_y)
-    y_hat_train = train_stats.value
+#     # Train the DDVFA model and time it
+#     train_stats = @timed train!(art_ddvfa, data_split.train_x, y=data_split.train_y)
+#     y_hat_train = train_stats.value
 
-    # Training performance
-    local_train_y = convert(Array{Int}, data_split.train_y)
-    train_perf = NaN
-    try
-        train_perf = performance(y_hat_train, local_train_y)
-    catch
-        @info "Performance error!"
-    end
-    @info "Training Performance: $(train_perf)"
+#     # Training performance
+#     local_train_y = convert(Array{Int}, data_split.train_y)
+#     train_perf = NaN
+#     try
+#         train_perf = performance(y_hat_train, local_train_y)
+#     catch
+#         @info "Performance error!"
+#     end
+#     @info "Training Performance: $(train_perf)"
 
-    # Testing performance, timed
-    test_stats = @timed classify(art_ddvfa, data_split.test_x)
-    y_hat_test = test_stats.value
-    local_test_y = convert(Array{Int}, data_split.test_y)
-    test_perf = NaN
-    try
-        test_perf = performance(y_hat_test, local_test_y)
-    catch
-        @info "Performance error!"
-    end
-    @info "Testing Performance: $(test_perf)"
+#     # Testing performance, timed
+#     test_stats = @timed classify(art_ddvfa, data_split.test_x)
+#     y_hat_test = test_stats.value
+#     local_test_y = convert(Array{Int}, data_split.test_y)
+#     test_perf = NaN
+#     try
+#         test_perf = performance(y_hat_test, local_test_y)
+#     catch
+#         @info "Performance error!"
+#     end
+#     @info "Testing Performance: $(test_perf)"
 
-    # Get the number of weights and categories
-    total_vec = [art_ddvfa.F2[i].n_categories for i = 1:art_ddvfa.n_categories]
-    total_cat = sum(total_vec)
-    # @info "Categories: $(art_ddvfa.n_categories)"
-    # @info "Weights: $(total_cat)"
+#     # Get the number of weights and categories
+#     total_vec = [art_ddvfa.F2[i].n_categories for i = 1:art_ddvfa.n_categories]
+#     total_cat = sum(total_vec)
+#     # @info "Categories: $(art_ddvfa.n_categories)"
+#     # @info "Weights: $(total_cat)"
 
-    # Store all of the results of interest
-    fulld = copy(d)
-    # Performances
-    fulld["p_tr"] = train_perf
-    fulld["p_te"] = test_perf
-    # ART statistics
-    fulld["n_cat"] = art_ddvfa.n_categories
-    fulld["n_wt"] = total_cat
-    fulld["m_wt"] = mean(total_vec)
-    fulld["s_wt"] = std(total_vec)
-    # Timing statistics
-    fulld["t_tr"] = train_stats.time
-    fulld["gc_tr"] = train_stats.gctime
-    fulld["b_tr"] = train_stats.bytes
-    fulld["t_te"] = test_stats.time
-    fulld["gc_te"] = test_stats.gctime
-    fulld["b_te"] = test_stats.bytes
-    # Return the results
-    return fulld
-end
+#     # Store all of the results of interest
+#     fulld = copy(d)
+#     # Performances
+#     fulld["p_tr"] = train_perf
+#     fulld["p_te"] = test_perf
+#     # ART statistics
+#     fulld["n_cat"] = art_ddvfa.n_categories
+#     fulld["n_wt"] = total_cat
+#     fulld["m_wt"] = mean(total_vec)
+#     fulld["s_wt"] = std(total_vec)
+#     # Timing statistics
+#     fulld["t_tr"] = train_stats.time
+#     fulld["gc_tr"] = train_stats.gctime
+#     fulld["b_tr"] = train_stats.bytes
+#     fulld["t_te"] = test_stats.time
+#     fulld["gc_te"] = test_stats.gctime
+#     fulld["b_te"] = test_stats.bytes
+#     # Return the results
+#     return fulld
+# end

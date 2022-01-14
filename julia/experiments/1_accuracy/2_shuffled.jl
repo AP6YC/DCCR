@@ -22,7 +22,7 @@ using DataFrames
 # -----------------------------------------------------------------------------
 
 # Experiment save directory name
-experiment_top = "2_accuracy"
+experiment_top = "2_shuffled"
 
 # Run the common setup methods (data paths, etc.)
 include(projectdir("julia", "setup.jl"))
