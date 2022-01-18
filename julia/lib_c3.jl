@@ -12,6 +12,7 @@ using MLBase        # confusmat
 using DrWatson
 using MLDataUtils   # stratifiedobs
 using StatsPlots    # groupedbar
+using DataFrames
 
 # -----------------------------------------------------------------------------
 # ALIASES
@@ -411,6 +412,22 @@ function get_manual_split(data::RealMatrix, targets::IntegerVector)
     return (X_train, y_train), (X_test, y_test)
 end
 
+"""
+    df_column_to_matrix(df::DataFrame, row::Symbol)
+
+Convert a column of lists in a DataFrame into a matrix for analysis.
+"""
+function df_column_to_matrix(df::DataFrame, row::Symbol)
+    lists = df[!, row]
+    n_samples = length(lists)
+    n_classes = length(lists[1])
+    matrix = zeros(n_samples, n_classes)
+    for i = 1:n_samples
+        matrix[i, :] = lists[i]
+    end
+    return matrix
+end
+
 # -----------------------------------------------------------------------------
 # PLOTTING
 # -----------------------------------------------------------------------------
@@ -437,11 +454,12 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
         # color_palette=:okabe_ito,
         # color_palette = cgrad(:thermal, rev = true),
         # color = cgrad(:thermal, rev = true),
-        color = cgrad(:thermal),
+        # color = cgrad(:thermal),
+        color = cgrad(GRADIENTSCHEME),
         # color = :okabe_ito,
         # cgrad([:orange, :blue], [0.1, 0.3, 0.8])
         # color_palette=:thermal
-        dpi=dpi
+        dpi=DPI
     )
 
     # Create the annotations
@@ -478,8 +496,8 @@ function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
         combined_accuracies,
         bar_position = :dodge,
         bar_width=0.7,
-        color_palette=:okabe_ito,
-        dpi=dpi,
+        color_palette=COLORSCHEME,
+        dpi=DPI,
         # show=true,
         # xticks=train_labels
     )
@@ -487,6 +505,52 @@ function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
     ylabel!(p, "Accuracy")
     xticks!(collect(1:n_classes), class_labels)
     # title!(p, "test")
+
+    return p
+end
+
+"""
+"""
+function create_boxplot(data::RealMatrix, class_labels::Vector{String})
+    # df = DataFrame(data, class_labels)
+    # new_matrix = vec(data')
+    n_samples = size(n_w_matrix)[1]
+    new_matrix = vec(data)
+    new_labels = repeat(class_labels, inner=n_samples)
+    df = DataFrame([new_matrix, new_labels], ["n_w", "class"])
+
+    p = @df df violin(
+        :class,
+        :n_w,
+        linewidth=0,
+        color_palette=COLORSCHEME,
+        dpi=DPI
+    )
+
+    @df df boxplot!(
+        :class,
+        :n_w,
+        fillalpha=0.75,
+        linewidth=2,
+        color_palette=COLORSCHEME,
+        dpi=DPI
+    )
+
+    # p = boxplot(
+    #     data,
+    #     labels=permutedims(class_labels),
+    #     fillalpha=0.75,
+    #     linewidth=2,
+    #     dpi=dpi
+    # )
+    # xticks!(collect(1:n_classes), class_labels)
+
+    # # dotplot!(
+    # #     data,
+    # #     # group=class_labels
+    # #     labels=permutedims(class_labels),
+    # #     marker=(:black, stroke(0))
+    # # )
 
     return p
 end

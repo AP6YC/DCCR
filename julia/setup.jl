@@ -7,6 +7,8 @@ Run common setup tasks for Julia experiments, such as setting loading source fil
 using Dates
 using DrWatson
 using Logging
+using Random
+using Plots
 
 # palette(:okabe_ito)
 
@@ -32,3 +34,10 @@ mkpath(paper_results_dir())
 # data_dir = "E:\\dev\\mount\\data\\dist\\M18_Data_Drop_3_PR\\Data\\activations_yolov3"
 # data_dir = joinpath("E:", "dev", "mount", "data", "dist", "M18_Data_Drop_3_PR", "Data", "activations_yolov3")
 data_dir = joinpath("E:\\", "dev", "mount", "data", "dist", "M18_Data_Drop_3_PR", "Data", "activations_yolov3")
+
+# Plotting DPI
+DPI = 350
+
+# Plotting colorscheme
+COLORSCHEME = :okabe_ito
+GRADIENTSCHEME = :thermal
