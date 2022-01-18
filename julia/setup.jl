@@ -4,6 +4,10 @@
 Run common setup tasks for Julia experiments, such as setting loading source files and setting data paths.
 """
 
+using Dates
+using DrWatson
+using Logging
+
 # Set the logging level to Info and standardize the random seed
 LogLevel(Logging.Info)
 Random.seed!(0)

@@ -1,3 +1,17 @@
+"""
+    1_unshuffled.jl
+
+Description:
+    This file runs a single condensed scenario without experience blocks,
+getting the final accuracies per category and saving them to a combined bar chart.
+This script also counts the number of categories, saving to a LaTeX table.
+Both of these results are saved to a local results directory and Dropbox directory
+containing the Overleaf document for the paper.
+
+Author: Sasha Petrenko <sap625@mst.edu>
+Date: 1/17/2022
+"""
+
 using Revise            # Editing this file
 using DrWatson          # Project directory functions, etc.
 using Logging           # Printing diagnostics
@@ -6,13 +20,13 @@ using Random            # Random subsequence
 # using ProgressMeter     # Progress bar
 # using CSV
 # using DataFrames
-using Dates
+# using Dates
 using MLDataUtils
 using Printf            # Formatted number printing
 # using JSON
 # using MLBase
 # using Plots
-using StatsPlots
+# using StatsPlots
 
 using Latexify
 using DataFrames

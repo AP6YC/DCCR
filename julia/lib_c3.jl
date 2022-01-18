@@ -8,7 +8,10 @@ using Logging
 
 using DelimitedFiles
 
-using MLBase
+using MLBase        # confusmat
+using DrWatson
+using MLDataUtils   # stratifiedobs
+using StatsPlots    # groupedbar
 
 # -------------------------------------------
 # Aliases
@@ -381,33 +384,33 @@ function get_orbit_names(selection::Vector{String})
 end
 
 """
-    get_confusion(n_classes, y, y_hat)
+    get_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
 
 Wrapper method for getting the raw confusion matrix.
 """
-function get_confusion(n_classes, y, y_hat)
+function get_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
     return confusmat(n_classes, y, y_hat)
 end
 
 """
-    get_normalized_confusion(n_classes, y, y_hat)
+    get_normalized_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
 
 Get the normalized confusion matrix.
 """
-function get_normalized_confusion(n_classes, y, y_hat)
-    cm = get_confusion(n_classes, y, y_hat)
+function get_normalized_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
+    cm = get_confusion(y, y_hat, n_classes)
     total = sum(cm, dims=1)
     norm_cm = cm./total
     return norm_cm
 end
 
 """
-    get_accuracies(y, y_hat)
+    get_accuracies(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
 
 Get a list of the percentage accuracies.
 """
-function get_accuracies(y, y_hat, n_classes)
-    cm = get_confusion(n_classes, y, y_hat)
+function get_accuracies(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
+    cm = get_confusion(y, y_hat, n_classes)
     correct = [cm[i,i] for i = 1:n_classes]
     total = sum(cm, dims=1)
     accuracies = correct'./total
@@ -416,11 +419,11 @@ function get_accuracies(y, y_hat, n_classes)
 end
 
 """
-    get_tt_accuracies(data, y_hat, y_hat)
+    get_tt_accuracies(data::DataSplit, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Int)
 
 Get two lists of the training and testing accuracies
 """
-function get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
+function get_tt_accuracies(data::DataSplit, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Int)
     # TRAIN: Get the percent correct for each class
     train_accuracies = get_accuracies(data.train_y, y_hat_train, n_classes)
 
@@ -430,7 +433,12 @@ function get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
     return train_accuracies, test_accuracies
 end
 
-function get_n_categories(ddvfa)
+"""
+    get_n_categories(ddvfa::DDVFA)
+
+Returns both the number of F2 categories and total number of weights per class as two lists.
+"""
+function get_n_categories(ddvfa::DDVFA)
     # Save the number of F2 nodes and total categories per class
     n_F2 = Int[]
     n_categories = Int[]
@@ -450,7 +458,22 @@ function get_n_categories(ddvfa)
     return n_F2, n_categories
 end
 
-function create_confusion_heatmap(class_labels, y, y_hat)
+"""
+    get_manual_split(data::RealMatrix, targets::IntegerVector)
+
+Wrapper, returns a manual train/test x/y split from a data matrix and labels using MLDataUtils.
+"""
+function get_manual_split(data::RealMatrix, targets::IntegerVector)
+    (X_train, y_train), (X_test, y_test) = stratifiedobs((data, targets))
+    return (X_train, y_train), (X_test, y_test)
+end
+
+"""
+    create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
+
+Returns a handle to a labeled and annotated heatmap plot of the confusion matrix.
+"""
+function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
     # Number of classes from the class labels
     n_classes = length(class_labels)
 
@@ -467,7 +490,7 @@ function create_confusion_heatmap(class_labels, y, y_hat)
     )
 
     # Create the annotations
-    fontsize = 15
+    fontsize = 10
     nrow, ncol = size(norm_cm)
     ann = [
         (i-.5,j-.5, text(round(norm_cm[i,j], digits=2), fontsize, :white, :center))
@@ -481,7 +504,7 @@ end
 """
     create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
 
-Return a grouped bar chart with class accuracies.
+"Return a grouped bar chart with class accuracies.
 """
 function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
     # Infer the number of classes from the class labels
@@ -509,6 +532,55 @@ function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
     # title!(p, "test")
 
     return p
+end
+
+
+"""
+    shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
+
+Runs a single Monte Carlo simulation of training/testing on shuffled samples.
+"""
+function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
+    # Get the random seed for the experiment
+    seed = d["seed"]
+
+    # Create the DDVFA module and setup the config
+    ddvfa = DDVFA(opts)
+    ddvfa.opts.display = false
+    ddvfa.config = DataConfig(0, 1, 128)
+
+    # Shuffle the data with a new random seed
+    Random.seed!(seed)
+    i_train = randperm(length(data.train_y))
+    data.train_x = data.train_x[:, i_train]
+    data.train_y = data.train_y[i_train]
+
+    # Train
+    y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
+    # println("Training labels: ",  size(y_hat_batch_train), " ", typeof(y_hat_batch_train))
+    y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+
+    # Calculate performance on training data, testing data, and with get_bmu
+    train_perf = performance(y_hat_train, data.train_y)
+    test_perf = performance(y_hat, data.test_y)
+
+    # Save the number of F2 nodes and total categories per class
+    n_F2, n_categories = get_n_categories(ddvfa)
+
+    fulld = deepcopy(d)
+    fulld["p_tr"] = train_perf
+    fulld["p_te"] = test_perf
+    fulld["n_F2"] = n_F2
+    fulld["n_w"] = n_categories
+    # fulld
+    # # Format each performance number for comparison
+    # @printf "Batch training performance: %.4f\n" perf_train
+    # @printf "Batch testing performance: %.4f\n" perf_test
+
+    sim_save_name = sweep_results_dir(savename(d, "jld2"))
+    @info "Worker $(myid()): saving to $(sim_save_name)"
+    # wsave(sim_save_name, f)
+    tagsave(sim_save_name, fulld)
 end
 
 # --------------------------------------------------------------------------- #

@@ -1,8 +1,32 @@
+"""
+    3_shuffled_mc.jl
+
+Description:
+    This script runs a Monte Carlo simulation of the simple shuffled train/test
+scenario in parallel. Because each process does a lot of work, `pmap`` is used,
+requiring every process to be spawned ahead of time and passed the necessary
+function definitions to run each simulation.
+
+**NOTE**: You must manually add the processes (run parallelize.jl) and shut
+them down after. This is done to reduce precompilation in each process during
+development.
+
+Author: Sasha Petrenko <sap625@mst.edu>
+Date: 1/17/2022
+"""
+
 # Start several processes
 using Distributed
 # addprocs(3, exeflags="--project=.")
 # Close the workers after simulation
 # rmprocs(workers())
+
+# Set the simulation parameters
+sim_params = Dict{String, Any}(
+    "m" => "ddvfa",
+    "seed" => collect(1:10)
+)
+
 @everywhere begin
     using Pkg
     Pkg.activate(".")
@@ -16,15 +40,7 @@ using Distributed
     # using CSV
     # using DataFrames
     using Dates
-    using MLDataUtils
-    using Printf            # Formatted number printing
-    # using JSON
-    # using MLBase
-    # using Plots
-    using StatsPlots
-
-    using Latexify
-    using DataFrames
+    # using MLDataUtils
 
     # Experiment save directory name
     experiment_top = "3_shuffled_mc"
@@ -73,52 +89,21 @@ using Distributed
     @info "Worker $(myid()): loading data"
     data = load_orbits(data_dir, scaling)
 
-    # Define the local simulation function
-    function local_sim(d, data, opts)
-
-        seed = d["seed"]
-
-        # Create the DDVFA module and setup the config
-        ddvfa = DDVFA(opts)
-        ddvfa.config = DataConfig(0, 1, 128)
-
-        # Shuffle the data with a new random seed
-        Random.seed!(seed)
-        i_train = randperm(length(data.train_y))
-        data.train_x = data.train_x[:, i_train]
-        data.train_y = data.train_y[i_train]
-
-        # Train
-        y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
-        # println("Training labels: ",  size(y_hat_batch_train), " ", typeof(y_hat_batch_train))
-        y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
-
-        # Calculate performance on training data, testing data, and with get_bmu
-        train_perf = performance(y_hat_train, data.train_y)
-        test_perf = performance(y_hat, data.test_y)
-
-        fulld = copy(d)
-        fulld["p_tr"] = train_perf
-        fulld["p_te"] = test_perf
-        fulld
-        # # Format each performance number for comparison
-        # @printf "Batch training performance: %.4f\n" perf_train
-        # @printf "Batch testing performance: %.4f\n" perf_test
-
-
-
-        sim_save_name = sweep_results_dir(savename(d, "jld2"))
-        @info "Worker $(myid()): saving to $(sim_save_name)"
-        # wsave(sim_save_name, f)
-        @tagsave sim_save_name fulld
-    end
-
     # Define a single-parameter function for pmap
-    ls(dict) = local_sim(dict, data, opts)
+    local_sim(dict) = shuffled_mc(dict, data, opts)
 
 end
 
 
+# Turn the dictionary of lists into a list of dictionaries
+dicts = dict_list(sim_params)
+
+# Remove impermissible sim options
+# filter!(d -> d["rho_ub"] > d["rho_lb"], dicts)
+# @info "Testing permutations:" dicts
+
+# Parallel map the sims
+pmap(ls, dicts)
 
 # Close the workers after simulation
 # rmprocs(workers())
