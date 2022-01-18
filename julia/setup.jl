@@ -8,6 +8,8 @@ using Dates
 using DrWatson
 using Logging
 
+# palette(:okabe_ito)
+
 # Set the logging level to Info and standardize the random seed
 LogLevel(Logging.Info)
 Random.seed!(0)

@@ -119,38 +119,6 @@ perf_test = performance(y_hat, data.test_y)
 # PLOTTING
 # -----------------------------------------------------------------------------
 
-# # TRAIN: Get the percent correct for each class
-# cm = confusmat(n_classes, data.train_y, y_hat_train)
-# correct = [cm[i,i] for i = 1:n_classes]
-# total = sum(cm, dims=1)
-# train_accuracies = correct'./total
-
-# # TEST: Get the percent correct for each class
-# cm = confusmat(n_classes, data.test_y, y_hat)
-# correct = [cm[i,i] for i = 1:n_classes]
-# total = sum(cm, dims=1)
-# test_accuracies = correct'./total
-
-# @info "Train Accuracies:" train_accuracies
-# @info "Train Accuracies:" test_accuracies
-
-# # Format the accuracy series for plotting
-# combined_accuracies = [train_accuracies; test_accuracies]'
-
-# # groupedbar(rand(10,3), bar_position = :dodge, bar_width=0.7)
-# p = groupedbar(
-#     combined_accuracies,
-#     bar_position = :dodge,
-#     bar_width=0.7,
-#     dpi=dpi,
-#     # show=true,
-#     # xticks=train_labels
-# )
-
-# ylabel!(p, "Accuracy")
-# xticks!(collect(1:n_classes), class_labels)
-# # title!(p, "test")
-
 # Create an accuracy grouped bar chart
 p = create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
 
@@ -161,21 +129,6 @@ savefig(p, paper_results_dir(plot_name))
 # -----------------------------------------------------------------------------
 # CATEGORY ANALYSIS
 # -----------------------------------------------------------------------------
-
-# # Save the number of F2 nodes and total categories per class
-# n_F2 = Int[]
-# n_categories = Int[]
-# # Iterate over every class
-# for i = 1:n_classes
-#     # Find all of the F2 nodes that correspond to the class
-#     i_F2 = findall(x->x==i, ddvfa.labels)
-#     # Add the number of F2 nodes to the list
-#     push!(n_F2, length(i_F2))
-#     # Get the numbers of categories within each F2 node
-#     n_cat_list = [F2.n_categories for F2 in ddvfa.F2[i_F2]]
-#     # Sum those and add them to the list
-#     push!(n_categories, sum(n_cat_list))
-# end
 
 # Save the number of F2 nodes and total categories per class
 n_F2, n_categories = get_n_categories(ddvfa)

@@ -13,9 +13,9 @@ using DrWatson
 using MLDataUtils   # stratifiedobs
 using StatsPlots    # groupedbar
 
-# -------------------------------------------
-# Aliases
-# -------------------------------------------
+# -----------------------------------------------------------------------------
+# ALIASES
+# -----------------------------------------------------------------------------
 #   **Taken from StatsBase.jl**
 #
 #  These types signficantly reduces the need of using
@@ -41,66 +41,9 @@ const RealFP = Union{Float32, Float64}
 # System's largest native floating point variable
 const Float = (Sys.WORD_SIZE == 64 ? Float64 : Float32)
 
-# """
-#     DataSplit
-
-# A basic struct for encapsulating the four components of supervised training.
-# """
-# mutable struct DataSplit
-#     train_x::Array
-#     test_x::Array
-#     train_y::Array
-#     test_y::Array
-#     DataSplit(train_x, test_x, train_y, test_y) = new(train_x, test_x, train_y, test_y)
-# end
-
-# """
-#     DataSplit(data_x::Array, data_y::Array, ratio::Float)
-
-# Return a DataSplit struct that is split by the ratio (e.g. 0.8).
-# """
-# function DataSplit(data_x::Array, data_y::Array, ratio::Real)
-#     dim, n_data = size(data_x)
-#     split_ind = Int(floor(n_data * ratio))
-
-#     train_x = data_x[:, 1:split_ind]
-#     test_x = data_x[:, split_ind + 1:end]
-#     train_y = data_y[1:split_ind]
-#     test_y = data_y[split_ind + 1:end]
-
-#     return DataSplit(train_x, test_x, train_y, test_y)
-# end
-
-# """
-#     DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
-
-# Sequential loading and ratio split of the data.
-# """
-# function DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
-#     dim, n_data = size(data_x)
-#     n_splits = length(seq_ind)
-
-#     train_x = Array{Float64}(undef, dim, 0)
-#     train_y = Array{Float64}(undef, 0)
-#     test_x = Array{Float64}(undef, dim, 0)
-#     test_y = Array{Float64}(undef, 0)
-
-#     # Iterate over all splits
-#     for ind in seq_ind
-#         local_x = data_x[:, ind[1]:ind[2]]
-#         local_y = data_y[ind[1]:ind[2]]
-#         # n_data = ind[2] - ind[1] + 1
-#         n_data = size(local_x)[2]
-#         split_ind = Int(floor(n_data * ratio))
-
-#         train_x = [train_x local_x[:, 1:split_ind]]
-#         test_x = [test_x local_x[:, split_ind + 1:end]]
-#         train_y = [train_y; local_y[1:split_ind]]
-#         test_y = [test_y; local_y[split_ind + 1:end]]
-#     end
-#     return DataSplit(train_x, test_x, train_y, test_y)
-# end # DataSplit(data_x::Array, data_y::Array, ratio::Real, seq_ind::Array)
-
+# -----------------------------------------------------------------------------
+# METHODS
+# -----------------------------------------------------------------------------
 
 """
     sigmoid(x::Real)
@@ -468,6 +411,10 @@ function get_manual_split(data::RealMatrix, targets::IntegerVector)
     return (X_train, y_train), (X_test, y_test)
 end
 
+# -----------------------------------------------------------------------------
+# PLOTTING
+# -----------------------------------------------------------------------------
+
 """
     create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
 
@@ -478,7 +425,7 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
     n_classes = length(class_labels)
 
     # Normalized confusion
-    norm_cm = get_normalized_confusion(n_classes, y, y_hat)
+    norm_cm = get_normalized_confusion(y, y_hat, n_classes)
 
     # Create the heatmap
     h = heatmap(
@@ -486,7 +433,15 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
         class_labels,
         norm_cm,
         fill_z = norm_cm,
-        aspect_ratio=:equal
+        aspect_ratio=:equal,
+        # color_palette=:okabe_ito,
+        # color_palette = cgrad(:thermal, rev = true),
+        # color = cgrad(:thermal, rev = true),
+        color = cgrad(:thermal),
+        # color = :okabe_ito,
+        # cgrad([:orange, :blue], [0.1, 0.3, 0.8])
+        # color_palette=:thermal
+        dpi=dpi
     )
 
     # Create the annotations
@@ -509,6 +464,7 @@ end
 function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
     # Infer the number of classes from the class labels
     n_classes = length(class_labels)
+
     # Get the training and testing accuracies
     train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
     @info "Train Accuracies:" train_accuracies
@@ -522,6 +478,7 @@ function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
         combined_accuracies,
         bar_position = :dodge,
         bar_width=0.7,
+        color_palette=:okabe_ito,
         dpi=dpi,
         # show=true,
         # xticks=train_labels
@@ -534,6 +491,9 @@ function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
     return p
 end
 
+# -----------------------------------------------------------------------------
+# EXPERIMENTS
+# -----------------------------------------------------------------------------
 
 """
     shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
@@ -541,6 +501,9 @@ end
 Runs a single Monte Carlo simulation of training/testing on shuffled samples.
 """
 function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
+    # Infer the number of classes
+    n_classes = length(unique(data.train_y))
+
     # Get the random seed for the experiment
     seed = d["seed"]
 
@@ -555,9 +518,8 @@ function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
     data.train_x = data.train_x[:, i_train]
     data.train_y = data.train_y[i_train]
 
-    # Train
+    # Train and test in batch
     y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
-    # println("Training labels: ",  size(y_hat_batch_train), " ", typeof(y_hat_batch_train))
     y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
 
     # Calculate performance on training data, testing data, and with get_bmu
@@ -566,17 +528,28 @@ function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
 
     # Save the number of F2 nodes and total categories per class
     n_F2, n_categories = get_n_categories(ddvfa)
+    n_F2_sum = sum(n_F2)
+    n_categories_sum = sum(n_categories)
 
+    # Get the normalized confusion Matrix
+    norm_cm = get_normalized_confusion(data.test_y, y_hat, n_classes)
+
+    # Get the train/test accuracies
+    train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
+
+    # Deepcopy the simulation dict and add results entries
     fulld = deepcopy(d)
     fulld["p_tr"] = train_perf
     fulld["p_te"] = test_perf
     fulld["n_F2"] = n_F2
     fulld["n_w"] = n_categories
-    # fulld
-    # # Format each performance number for comparison
-    # @printf "Batch training performance: %.4f\n" perf_train
-    # @printf "Batch testing performance: %.4f\n" perf_test
+    fulld["n_F2_sum"] = n_F2_sum
+    fulld["n_w_sum"] = n_categories_sum
+    fulld["norm_cm"] = norm_cm
+    fulld["a_tr"] = train_accuracies
+    fulld["a_te"] = test_accuracies
 
+    # Save the results dictionary
     sim_save_name = sweep_results_dir(savename(d, "jld2"))
     @info "Worker $(myid()): saving to $(sim_save_name)"
     # wsave(sim_save_name, f)
