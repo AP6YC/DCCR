@@ -19,18 +19,31 @@ using StatsPlots
 # pyplot()
 # theme(:dark)
 
+# -----------------------------------------------------------------------------
+# FILE SETUP
+# -----------------------------------------------------------------------------
 
 # Experiment save directory name
 experiment_top = "3_shuffled_mc"
 
-n_w_plot_name = "3_n_w.png"
-n_F2_plot_name = "3_n_F2.png"
-
 # Run the common setup methods (data paths, etc.)
 include(projectdir("julia", "setup.jl"))
 
+# -----------------------------------------------------------------------------
+# OPTIONS
+# -----------------------------------------------------------------------------
+
+# Plot file names
+n_w_plot_name = "3_n_w.png"
+n_F2_plot_name = "3_n_F2.png"
+perf_plot_name = "3_perf.png"
+
 # Point to the local sweep data directory
 sweep_dir = projectdir("work", "results", "3_shuffled_mc", "sweep")
+
+# -----------------------------------------------------------------------------
+# LOAD RESULTS
+# -----------------------------------------------------------------------------
 
 # Collect the results into a single dataframe
 df = collect_results!(sweep_dir)
@@ -62,35 +75,33 @@ data_dirs, class_labels = get_orbit_names(data_selection)
 #     n_w_matrix[i, :] = n_w_lists[i]
 # end
 
-# Get a matrix from the column of number of weights
+# -----------------------------------------------------------------------------
+# PLOTTING
+# -----------------------------------------------------------------------------
+
+# Total number of weights
 n_w_matrix = df_column_to_matrix(df, :n_w)
 p_w = create_boxplot(n_w_matrix, class_labels)
 ylabel!("# Weights")
 display(p_w)
-
 # Save the plot
 savefig(p_w, results_dir(n_w_plot_name))
 savefig(p_w, paper_results_dir(n_w_plot_name))
 
-
+# Number of F2 nodes
 n_F2_matrix = df_column_to_matrix(df, :n_F2)
 ylabel!("# F2 Nodes")
 p_F2 = create_boxplot(n_F2_matrix, class_labels)
 display(p_F2)
-
 # Save the plot
 savefig(p_F2, results_dir(n_F2_plot_name))
 savefig(p_F2, paper_results_dir(n_F2_plot_name))
 
-
-# df_high = filter(row -> row[:test_perf] > 0.94 && row[:train_perf] > 0.94, df)
-
-# plot
-# xlabel!("F2 Category")
-# ylabel!("# Weights")
-# title!(string(cell)*(cell > 1 ? " Windows" : " Window"))
-# # fig_path = joinpath(cell, string(cell))
-# fig_dir = joinpath("work/results", subdir)
-# mkpath(fig_dir)
-# fig_path = joinpath(fig_dir, string(cell))
-# savefig(fig_path)
+# Testing performance
+perf_matrix = df_column_to_matrix(df, :a_te)
+ylabel!("Performance")
+p_perf = create_boxplot(perf_matrix, class_labels)
+display(p_perf)
+# Save the plot
+savefig(p_perf, results_dir(perf_plot_name))
+savefig(p_perf, paper_results_dir(perf_plot_name))

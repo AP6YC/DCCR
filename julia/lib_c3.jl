@@ -244,6 +244,11 @@ function load_orbits(data_dir::String, scaling::Real)
     # return X_train, y_train, train_labels, X_test, y_test, test_labels
 end
 
+"""
+    get_indexed_data(data::DataSplit)
+
+Create a DataSplitIndexed object from a DataSplit.
+"""
 function get_indexed_data(data::DataSplit)
     # Assume the same number of classes in each category
     n_classes = length(unique(data.train_y))
@@ -275,10 +280,7 @@ function get_indexed_data(data::DataSplit)
     val_labels = data.val_labels
     test_labels = data.test_labels
 
-    # println(typeof(train_x))
-    # println(typeof(train_y))
-    # println(typeof(train_labels))
-
+    # Construct the indexed data split
     data_indexed = DataSplitIndexed(
         train_x,
         train_y,
@@ -293,8 +295,13 @@ function get_indexed_data(data::DataSplit)
     return data_indexed
 end
 
+"""
+    get_orbit_names(selection::Vector{String})
+
+Map the experiment orbit names to their data directories and plotting class labels.
+"""
 function get_orbit_names(selection::Vector{String})
-    # Data directories to train/test on
+    # Data directory names
     data_dirs = Dict(
         "dot_dusk" => "dot_dusk",
         "dot_morning" => "dot_morning",
@@ -306,6 +313,7 @@ function get_orbit_names(selection::Vector{String})
         "pr_morning" => "pr_morning",
     )
 
+    # Class labels for plotting
     class_labels = Dict(
         "dot_dusk" => "DOTD",
         "dot_morning" => "DOTM",
@@ -317,6 +325,7 @@ function get_orbit_names(selection::Vector{String})
         "pr_morning" => "PRM",
     )
 
+    # Create the output lists
     out_data_dirs = String[]
     out_class_labels = String[]
     for item in selection
@@ -477,7 +486,7 @@ end
 """
     create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
 
-"Return a grouped bar chart with class accuracies.
+Return a grouped bar chart with class accuracies.
 """
 function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
     # Infer the number of classes from the class labels
@@ -510,47 +519,43 @@ function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
 end
 
 """
+    create_boxplot(data::RealMatrix, class_labels::Vector{String})
+
+Return a colored and formatted boxplot of the data.
 """
 function create_boxplot(data::RealMatrix, class_labels::Vector{String})
-    # df = DataFrame(data, class_labels)
-    # new_matrix = vec(data')
+    # Get the number of sample vectors
     n_samples = size(n_w_matrix)[1]
+    # Vectorize the data along the columns
     new_matrix = vec(data)
+    # Label each sample with an inner-repeated label list
     new_labels = repeat(class_labels, inner=n_samples)
+    # Create a dataframe with each sample and class label
     df = DataFrame([new_matrix, new_labels], ["n_w", "class"])
 
+    # Create a violin plot
     p = @df df violin(
         :class,
         :n_w,
         linewidth=0,
         color_palette=COLORSCHEME,
+        legend=false,
         dpi=DPI
     )
 
+    # Overlay a transparent box plot
     @df df boxplot!(
         :class,
         :n_w,
         fillalpha=0.75,
         linewidth=2,
         color_palette=COLORSCHEME,
+        legend=false,
         dpi=DPI
     )
 
-    # p = boxplot(
-    #     data,
-    #     labels=permutedims(class_labels),
-    #     fillalpha=0.75,
-    #     linewidth=2,
-    #     dpi=dpi
-    # )
-    # xticks!(collect(1:n_classes), class_labels)
-
-    # # dotplot!(
-    # #     data,
-    # #     # group=class_labels
-    # #     labels=permutedims(class_labels),
-    # #     marker=(:black, stroke(0))
-    # # )
+    # Add the universal x-label
+    xlabel!("Class")
 
     return p
 end
@@ -619,81 +624,3 @@ function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
     # wsave(sim_save_name, f)
     tagsave(sim_save_name, fulld)
 end
-
-# --------------------------------------------------------------------------- #
-# Linear example
-# --------------------------------------------------------------------------- #
-# function accuracy_sim(d::Dict{String, Any}, data_split::DataSplit)
-
-#     # Set the DDVFA options
-#     ddvfa_opts = opts_DDVFA()
-#     ddvfa_opts.method = d["method"]
-#     ddvfa_opts.gamma = d["gamma"]
-#     ddvfa_opts.rho_ub = d["rho_ub"]
-#     ddvfa_opts.rho_lb = d["rho_lb"]
-#     # ddvfa_opts.rho = d["rho"]
-#     ddvfa_opts.rho = d["rho_lb"]
-#     ddvfa_opts.display = false
-
-#     # Create the ART modules
-#     art_ddvfa = DDVFA(ddvfa_opts)
-
-#     # Get the data stats
-#     dim, n_samples = size(data_split.train_x)
-
-#     # Set the DDVFA config Manually
-#     art_ddvfa.config = DataConfig(0.0, 1.0, dim)
-#     @info "dim: $dim"
-
-#     # Train the DDVFA model and time it
-#     train_stats = @timed train!(art_ddvfa, data_split.train_x, y=data_split.train_y)
-#     y_hat_train = train_stats.value
-
-#     # Training performance
-#     local_train_y = convert(Array{Int}, data_split.train_y)
-#     train_perf = NaN
-#     try
-#         train_perf = performance(y_hat_train, local_train_y)
-#     catch
-#         @info "Performance error!"
-#     end
-#     @info "Training Performance: $(train_perf)"
-
-#     # Testing performance, timed
-#     test_stats = @timed classify(art_ddvfa, data_split.test_x)
-#     y_hat_test = test_stats.value
-#     local_test_y = convert(Array{Int}, data_split.test_y)
-#     test_perf = NaN
-#     try
-#         test_perf = performance(y_hat_test, local_test_y)
-#     catch
-#         @info "Performance error!"
-#     end
-#     @info "Testing Performance: $(test_perf)"
-
-#     # Get the number of weights and categories
-#     total_vec = [art_ddvfa.F2[i].n_categories for i = 1:art_ddvfa.n_categories]
-#     total_cat = sum(total_vec)
-#     # @info "Categories: $(art_ddvfa.n_categories)"
-#     # @info "Weights: $(total_cat)"
-
-#     # Store all of the results of interest
-#     fulld = copy(d)
-#     # Performances
-#     fulld["p_tr"] = train_perf
-#     fulld["p_te"] = test_perf
-#     # ART statistics
-#     fulld["n_cat"] = art_ddvfa.n_categories
-#     fulld["n_wt"] = total_cat
-#     fulld["m_wt"] = mean(total_vec)
-#     fulld["s_wt"] = std(total_vec)
-#     # Timing statistics
-#     fulld["t_tr"] = train_stats.time
-#     fulld["gc_tr"] = train_stats.gctime
-#     fulld["b_tr"] = train_stats.bytes
-#     fulld["t_te"] = test_stats.time
-#     fulld["gc_te"] = test_stats.gctime
-#     fulld["b_te"] = test_stats.bytes
-#     # Return the results
-#     return fulld
-# end
