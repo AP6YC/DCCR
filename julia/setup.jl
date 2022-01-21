@@ -40,4 +40,7 @@ DPI = 350
 
 # Plotting colorscheme
 COLORSCHEME = :okabe_ito
-GRADIENTSCHEME = :thermal
+GRADIENTSCHEME = pubu_9[5:end]
+# GRADIENTSCHEME = :thermal
+# GRADIENTSCHEME = ylgn_9
+# cgrad([:orange, :blue], [0.1, 0.3, 0.8])

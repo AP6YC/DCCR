@@ -118,6 +118,7 @@ perf_test = performance(y_hat, data.test_y)
 
 # Create an accuracy grouped bar chart
 p = create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
+display(p)
 
 # Save the plot
 savefig(p, results_dir(plot_name))

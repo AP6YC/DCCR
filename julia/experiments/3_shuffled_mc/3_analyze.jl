@@ -90,8 +90,8 @@ savefig(p_w, paper_results_dir(n_w_plot_name))
 
 # Number of F2 nodes
 n_F2_matrix = df_column_to_matrix(df, :n_F2)
-ylabel!("# F2 Nodes")
 p_F2 = create_boxplot(n_F2_matrix, class_labels)
+ylabel!("# F2 Nodes")
 display(p_F2)
 # Save the plot
 savefig(p_F2, results_dir(n_F2_plot_name))
@@ -99,8 +99,8 @@ savefig(p_F2, paper_results_dir(n_F2_plot_name))
 
 # Testing performance
 perf_matrix = df_column_to_matrix(df, :a_te)
-ylabel!("Performance")
 p_perf = create_boxplot(perf_matrix, class_labels)
+ylabel!("Class Testing Accuracy")
 display(p_perf)
 # Save the plot
 savefig(p_perf, results_dir(perf_plot_name))

@@ -14,6 +14,9 @@ using MLDataUtils   # stratifiedobs
 using StatsPlots    # groupedbar
 using DataFrames
 
+# Add the custom colors definitions
+include("colors.jl")
+
 # -----------------------------------------------------------------------------
 # ALIASES
 # -----------------------------------------------------------------------------
@@ -460,14 +463,7 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
         norm_cm,
         fill_z = norm_cm,
         aspect_ratio=:equal,
-        # color_palette=:okabe_ito,
-        # color_palette = cgrad(:thermal, rev = true),
-        # color = cgrad(:thermal, rev = true),
-        # color = cgrad(:thermal),
         color = cgrad(GRADIENTSCHEME),
-        # color = :okabe_ito,
-        # cgrad([:orange, :blue], [0.1, 0.3, 0.8])
-        # color_palette=:thermal
         dpi=DPI
     )
 
@@ -479,6 +475,7 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
         for i in 1:nrow for j in 1:ncol
     ]
     annotate!(ann, linecolor=:white)
+    # annotate!(ann, linecolor=:black)
 
     return h
 end

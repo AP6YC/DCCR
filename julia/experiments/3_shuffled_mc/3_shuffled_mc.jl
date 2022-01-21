@@ -24,7 +24,7 @@ using Distributed
 # Set the simulation parameters
 sim_params = Dict{String, Any}(
     "m" => "ddvfa",
-    "seed" => collect(1:100)
+    "seed" => collect(1:1000)
 )
 
 @everywhere begin
@@ -94,6 +94,8 @@ sim_params = Dict{String, Any}(
 
 end
 
+# Log the simulation scale
+@info "START: $(dict_list_count(sim_params)) simulations across $(nprocs())."
 
 # Turn the dictionary of lists into a list of dictionaries
 dicts = dict_list(sim_params)
