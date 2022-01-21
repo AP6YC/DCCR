@@ -8,18 +8,21 @@ using Random            # Random subsequence
 # using DataFrames
 using Dates
 using MLDataUtils
-using Printf            # Formatted number printing
+# using Printf            # Formatted number printing
 # using JSON
-using MLBase
+# using MLBase
 # using Plots
-using StatsPlots
+# using StatsPlots
 
 # -----------------------------------------------------------------------------
 # FILE SETUP
 # -----------------------------------------------------------------------------
 
+# Experiment save directory name
+experiment_top = "4_unsupervised"
+
 # Run the common setup methods (data paths, etc.)
-include(projectdir("julia", "setup.jl"))
+include(projectdir("src", "setup.jl"))
 
 # -----------------------------------------------------------------------------
 # OPTIONS
@@ -55,15 +58,13 @@ opts = opts_DDVFA(
 # Sigmoid input scaling
 scaling = 2.0
 
-# Plotting DPI
-dpi = 350
-
 # -----------------------------------------------------------------------------
 # EXPERIMENT SETUP
 # -----------------------------------------------------------------------------
 
 # Number of classes
-n_classes = length(data_dirs)
+# n_classes = length(data_dirs)
+
 
 # Load the data names and class labels from the selection
 data_dirs, class_labels = get_orbit_names(data_selection)

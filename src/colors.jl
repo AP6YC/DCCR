@@ -26,7 +26,7 @@ pubu_9_raw = [
     2	56	88
 ]/255.0
 
-n_colors = size(ylgn_9)[1]
+n_colors = size(ylgn_9_raw)[1]
 
 ylgn_9 = ColorScheme([RGB{Float64}(ylgn_9_raw[i, :]...) for i = 1:n_colors])
 pubu_9 = ColorScheme([RGB{Float64}(pubu_9_raw[i, :]...) for i = 1:n_colors])

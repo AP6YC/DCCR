@@ -20,7 +20,7 @@ Random.seed!(0)
 sim_datetime = Dates.format(now(), "yyyy-mm-dd_HH-MM-SS")
 
 # Load source files
-include(projectdir("julia", "lib_c3.jl"))
+include(projectdir("src", "lib_c3.jl"))
 
 # Results directories (local and paper)
 results_dir(args...) = projectdir("work", "results", experiment_top, args...)
