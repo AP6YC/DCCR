@@ -12,34 +12,19 @@ Author: Sasha Petrenko <sap625@mst.edu>
 Date: 1/17/2022
 """
 
-using Revise            # Editing this file
-using DrWatson          # Project directory functions, etc.
-using Logging           # Printing diagnostics
-using AdaptiveResonance # ART modules
-using Random            # Random subsequence
-# using ProgressMeter     # Progress bar
-# using CSV
-# using DataFrames
-# using Dates
-using MLDataUtils
-using Printf            # Formatted number printing
-# using JSON
-# using MLBase
-# using Plots
-# using StatsPlots
-
-using Latexify
-using DataFrames
-
 # -----------------------------------------------------------------------------
 # FILE SETUP
 # -----------------------------------------------------------------------------
+
+# Load Revise for speed and DrWatson for folder pointing
+using Revise            # Editing this file
+using DrWatson          # Project directory functions, etc.
 
 # Experiment save directory name
 experiment_top = "1_accuracy"
 
 # Run the common setup methods (data paths, etc.)
-include(projectdir("julia", "setup.jl"))
+include(projectdir("src", "setup.jl"))
 
 # -----------------------------------------------------------------------------
 # OPTIONS

@@ -4,13 +4,23 @@
 Run common setup tasks for Julia experiments, such as setting loading source files and setting data paths.
 """
 
-using Dates
 using DrWatson
-using Logging
-using Random
+using Dates
+using Logging           # Printing diagnostics
+using Random            # Random subsequence
 using Plots
 
-# palette(:okabe_ito)
+using AdaptiveResonance # ART modules
+# using ProgressMeter     # Progress bar
+using Printf            # Formatted number printing
+
+using Latexify          #
+using DataFrames
+
+# using PlotThemes
+# Plotting style
+# pyplot()
+# theme(:dark)
 
 # Set the logging level to Info and standardize the random seed
 LogLevel(Logging.Info)
@@ -31,16 +41,23 @@ mkpath(results_dir())
 mkpath(paper_results_dir())
 
 # Top data directory
-# data_dir = "E:\\dev\\mount\\data\\dist\\M18_Data_Drop_3_PR\\Data\\activations_yolov3"
-# data_dir = joinpath("E:", "dev", "mount", "data", "dist", "M18_Data_Drop_3_PR", "Data", "activations_yolov3")
-data_dir = joinpath("E:\\", "dev", "mount", "data", "dist", "M18_Data_Drop_3_PR", "Data", "activations_yolov3")
+# data_dir = joinpath("E:\\", "dev", "mount", "data", "dist", "M18_Data_Drop_3_PR", "Data", "activations_yolov3")
+data_dir = projectdir("work", "data", "activations_yolov3")
 
 # Plotting DPI
 DPI = 350
 
 # Plotting colorscheme
 COLORSCHEME = :okabe_ito
+
+# Heatmap color gradient
 GRADIENTSCHEME = pubu_9[5:end]
 # GRADIENTSCHEME = :thermal
 # GRADIENTSCHEME = ylgn_9
 # cgrad([:orange, :blue], [0.1, 0.3, 0.8])
+
+# Plotting fontfamily for all text
+FONTFAMILY = "Computer Modern"
+
+# Aspect ratio correction for heatmap
+SQUARE_SIZE = 500.0 .* (1.0, 0.925)

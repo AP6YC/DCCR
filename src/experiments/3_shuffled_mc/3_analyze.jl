@@ -9,25 +9,18 @@ Author: Sasha Petrenko <sap625@mst.edu>
 Date: 1/17/2022
 """
 
-using Revise
-using DataFrames
-# using Plots
-# using PlotThemes
-using DrWatson
-using StatsPlots
-# Plotting style
-# pyplot()
-# theme(:dark)
-
 # -----------------------------------------------------------------------------
 # FILE SETUP
 # -----------------------------------------------------------------------------
+
+using Revise
+using DrWatson
 
 # Experiment save directory name
 experiment_top = "3_shuffled_mc"
 
 # Run the common setup methods (data paths, etc.)
-include(projectdir("julia", "setup.jl"))
+include(projectdir("src", "setup.jl"))
 
 # -----------------------------------------------------------------------------
 # OPTIONS

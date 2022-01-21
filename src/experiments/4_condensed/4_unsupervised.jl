@@ -1,25 +1,22 @@
-using Revise            # Editing this file
-using DrWatson          # Project directory functions, etc.
-using Logging           # Printing diagnostics
-using AdaptiveResonance # ART modules
-using Random            # Random subsequence
-# using ProgressMeter     # Progress bar
-# using CSV
-# using DataFrames
-using Dates
-using MLDataUtils
-# using Printf            # Formatted number printing
-# using JSON
-# using MLBase
-# using Plots
-# using StatsPlots
+"""
+    4_condensed.jl
+
+Description:
+    This script runs a single condensed scenario iteration.
+
+Author: Sasha Petrenko <sap625@mst.edu>
+Date: 1/18/2022
+"""
 
 # -----------------------------------------------------------------------------
 # FILE SETUP
 # -----------------------------------------------------------------------------
 
+using Revise            # Editing this file
+using DrWatson          # Project directory functions, etc.
+
 # Experiment save directory name
-experiment_top = "4_unsupervised"
+experiment_top = "4_condensed"
 
 # Run the common setup methods (data paths, etc.)
 include(projectdir("src", "setup.jl"))
@@ -29,8 +26,8 @@ include(projectdir("src", "setup.jl"))
 # -----------------------------------------------------------------------------
 
 # Saving names
-plot_name_1 = "4_unsupervised_1.png"
-plot_name_2 = "4_unsupervised_2.png"
+plot_name = "4_condensed.png"
+# plot_name_2 = "4_condensed_2.png"
 
 # Select which data entries to use for the experiment
 data_selection = [
@@ -62,12 +59,11 @@ scaling = 2.0
 # EXPERIMENT SETUP
 # -----------------------------------------------------------------------------
 
-# Number of classes
-# n_classes = length(data_dirs)
-
-
 # Load the data names and class labels from the selection
 data_dirs, class_labels = get_orbit_names(data_selection)
+
+# Number of classes
+n_classes = length(data_dirs)
 
 # Load the data
 data = load_orbits(data_dir, scaling)
@@ -75,22 +71,55 @@ data = load_orbits(data_dir, scaling)
 # Sort/reload the data as indexed components
 data_indexed = get_indexed_data(data)
 
-
-# # X_train, y_train, train_labels, X_test, y_test, test_labels = load_orbits(data_dir, scaling)
-# data = load_orbits(data_dir, scaling)
-
-# # i_train = randperm(length(y_train))
-# # X_train = X_train[:, i_train]
-# # y_train = y_train[i_train]
-
-# # (X_train, y_train), (X_test, y_test) = stratifiedobs((data, targets))
-
+# Create the DDVFA module and set the data config
 ddvfa = DDVFA(opts)
 ddvfa.config = DataConfig(0, 1, 128)
 
-# # -----------------------------------------------------------------------------
-# # TRAIN/TEST
-# # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# TRAIN/TEST
+# -----------------------------------------------------------------------------
+
+# Get the data dimensions
+dim, n_train = size(data.train_x)
+_, n_test = size(data.test_x)
+
+# Create the estimate containers
+# y_hat_train = zeros(Int, n_train)
+# y_hat_test = zeros(Int, n_classes, n_test)
+# y_hat_test = fill([], n_classes)
+# perfs = fill([], n_classes)
+perfs = [[] for i = 1:n_classes]
+
+# Initial testing block
+for j = 1:n_classes
+    # local_y_hat = AdaptiveResonance.classify(ddvfa, data_indexed.test_x[j], get_bmu=true)
+    # push!(perfs[j], performance(local_y_hat, data_indexed.test_y[j]))
+    push!(perfs[j], 0.0)
+end
+
+# Iterate over each class
+for i = 1:n_classes
+    _, n_samples_local = size(data_indexed.train_x[i])
+    train!(ddvfa, data_indexed.train_x[i], y=data_indexed.train_y[i])
+
+    # Test over each class
+    for j = 1:n_classes
+        local_y_hat = AdaptiveResonance.classify(ddvfa, data_indexed.test_x[j], get_bmu=true)
+        push!(perfs[j], performance(local_y_hat, data_indexed.test_y[j]))
+    end
+    # y_hat_test[i, :] = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+
+    # y_hat_train[]
+end
+
+p = create_condensed_plot(perfs, class_labels)
+display(p)
+
+# Save the plot
+savefig(p, results_dir(plot_name))
+savefig(p, paper_results_dir(plot_name))
+
+# for
 
 # # We can train in batch with a simple supervised mode by passing the labels as a keyword argument.
 # y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)

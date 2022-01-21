@@ -1,8 +1,15 @@
+name = "DCCR"
+uuid = "dda83153-39f0-42dd-9274-4013d6a5be40"
+authors = ["Sasha Petrenko <sap625@umsystem.edu>"]
+version = "0.1.0"
+
 [deps]
 AdaptiveResonance = "3d72adc0-63d3-4141-bf9b-84450dd0395b"
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
 ConfParser = "88353bc9-fd38-507d-a820-d3b43837d6b9"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
 Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"

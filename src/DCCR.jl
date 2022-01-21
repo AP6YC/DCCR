@@ -1,5 +1,5 @@
 module DCCR
 
-    # include("setup.jl")
-    println("asdf")
+    include("setup.jl")
+    # println("asdf")
 end

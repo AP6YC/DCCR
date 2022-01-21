@@ -1,7 +1,7 @@
 using AdaptiveResonance
 
 using StatsBase
-using Statistics
+# using Statistics
 
 using Logging
 # using HDF5              # Loading .h5 activation files
@@ -9,7 +9,7 @@ using Logging
 using DelimitedFiles
 
 using MLBase        # confusmat
-using DrWatson
+# using DrWatson
 using MLDataUtils   # stratifiedobs
 using StatsPlots    # groupedbar
 using DataFrames
@@ -455,6 +455,7 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
 
     # Normalized confusion
     norm_cm = get_normalized_confusion(y, y_hat, n_classes)
+    @info norm_cm
 
     # Create the heatmap
     h = heatmap(
@@ -463,7 +464,13 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
         norm_cm,
         fill_z = norm_cm,
         aspect_ratio=:equal,
+        # aspect_ratio=1,
         color = cgrad(GRADIENTSCHEME),
+        fontfamily=FONTFAMILY,
+        annotationfontfamily=FONTFAMILY,
+        size=SQUARE_SIZE,
+        # annotationfontfamily = "Computer Modern",
+        # annotationrotation = 90.0,
         dpi=DPI
     )
 
@@ -471,10 +478,28 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
     fontsize = 10
     nrow, ncol = size(norm_cm)
     ann = [
-        (i-.5,j-.5, text(round(norm_cm[i,j], digits=2), fontsize, :white, :center))
+        (
+            i-.5,
+            j-.5,
+            text(
+                round(norm_cm[i,j], digits=2),
+                # norm_cm[i, j],
+                fontsize,
+                # fontfamily="Computer Modern",
+                # fontfamily=FONTFAMILY,
+                :white,
+                :center
+            )
+        )
         for i in 1:nrow for j in 1:ncol
     ]
-    annotate!(ann, linecolor=:white)
+    annotate!(
+        ann,
+        linecolor=:white,
+        fontfamily=FONTFAMILY
+        # annotationfontfamily = "Computer Modern",
+        # annotationrotation = 90.0
+    )
     # annotate!(ann, linecolor=:black)
 
     return h
@@ -555,6 +580,30 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String})
     xlabel!("Class")
 
     return p
+end
+
+"""
+    create_condensed_plot(y_hat, class_labels)
+
+Create and return a simplified condensed scenario plot.
+"""
+function create_condensed_plot(perfs, class_labels)
+    # Add initial testing block to labels
+    local_labels = cat("", class_labels, dims=1)
+    println(local_labels)
+    # local_labels = reshape(local_labels, 1, length(local_labels))
+
+    p = plot(
+        perfs,
+        linestyle = [:dot :solid :dash :dot :dashdot :dashdotdot],
+        color_palette=COLORSCHEME,
+        labels=reshape(class_labels, 1, length(class_labels)),
+        dpi=DPI
+    )
+
+    xlabel!("Training Class")
+    ylabel!("Testing Accuracy")
+    xticks!(collect(1:length(local_labels)), local_labels)
 end
 
 # -----------------------------------------------------------------------------

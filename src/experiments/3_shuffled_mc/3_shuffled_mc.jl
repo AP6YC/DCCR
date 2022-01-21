@@ -28,25 +28,19 @@ sim_params = Dict{String, Any}(
 )
 
 @everywhere begin
+    # Activate the project in case
     using Pkg
     Pkg.activate(".")
 
+    # Modules
     using Revise            # Editing this file
     using DrWatson          # Project directory functions, etc.
-    using Logging           # Printing diagnostics
-    using AdaptiveResonance # ART modules
-    using Random            # Random subsequence
-    # using ProgressMeter     # Progress bar
-    # using CSV
-    # using DataFrames
-    using Dates
-    # using MLDataUtils
 
     # Experiment save directory name
     experiment_top = "3_shuffled_mc"
 
     # Run the common setup methods (data paths, etc.)
-    include(projectdir("julia", "setup.jl"))
+    include(projectdir("src", "setup.jl"))
 
     # Make a path locally just for the sweep results
     sweep_results_dir(args...) = results_dir("sweep", args...)
