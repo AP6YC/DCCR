@@ -455,22 +455,18 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
 
     # Normalized confusion
     norm_cm = get_normalized_confusion(y, y_hat, n_classes)
-    @info norm_cm
 
     # Create the heatmap
     h = heatmap(
         class_labels,
         class_labels,
-        norm_cm,
+        norm_cm',
         fill_z = norm_cm,
         aspect_ratio=:equal,
-        # aspect_ratio=1,
         color = cgrad(GRADIENTSCHEME),
         fontfamily=FONTFAMILY,
         annotationfontfamily=FONTFAMILY,
         size=SQUARE_SIZE,
-        # annotationfontfamily = "Computer Modern",
-        # annotationrotation = 90.0,
         dpi=DPI
     )
 
@@ -483,25 +479,28 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
             j-.5,
             text(
                 round(norm_cm[i,j], digits=2),
-                # norm_cm[i, j],
                 fontsize,
-                # fontfamily="Computer Modern",
-                # fontfamily=FONTFAMILY,
+                FONTFAMILY,
                 :white,
-                :center
+                :center,
             )
         )
         for i in 1:nrow for j in 1:ncol
     ]
+
+    # Add the cell annotations
     annotate!(
         ann,
         linecolor=:white,
-        fontfamily=FONTFAMILY
-        # annotationfontfamily = "Computer Modern",
-        # annotationrotation = 90.0
+        # linecolor=:black,
+        fontfamily=FONTFAMILY,
     )
-    # annotate!(ann, linecolor=:black)
 
+    # Label truth and predicted axes
+    xlabel!("Predicted")
+    ylabel!("Truth")
+
+    # Return the plot handle for display or saving
     return h
 end
 
@@ -596,9 +595,12 @@ function create_condensed_plot(perfs, class_labels)
     p = plot(
         perfs,
         linestyle = [:dot :solid :dash :dot :dashdot :dashdotdot],
+        # linestyle = :auto,
+        linewidth = 3,
         color_palette=COLORSCHEME,
         labels=reshape(class_labels, 1, length(class_labels)),
-        dpi=DPI
+        legend=:topleft,
+        dpi=DPI,
     )
 
     xlabel!("Training Class")

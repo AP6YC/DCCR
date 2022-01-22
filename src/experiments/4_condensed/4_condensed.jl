@@ -84,16 +84,10 @@ dim, n_train = size(data.train_x)
 _, n_test = size(data.test_x)
 
 # Create the estimate containers
-# y_hat_train = zeros(Int, n_train)
-# y_hat_test = zeros(Int, n_classes, n_test)
-# y_hat_test = fill([], n_classes)
-# perfs = fill([], n_classes)
 perfs = [[] for i = 1:n_classes]
 
 # Initial testing block
 for j = 1:n_classes
-    # local_y_hat = AdaptiveResonance.classify(ddvfa, data_indexed.test_x[j], get_bmu=true)
-    # push!(perfs[j], performance(local_y_hat, data_indexed.test_y[j]))
     push!(perfs[j], 0.0)
 end
 
@@ -107,11 +101,13 @@ for i = 1:n_classes
         local_y_hat = AdaptiveResonance.classify(ddvfa, data_indexed.test_x[j], get_bmu=true)
         push!(perfs[j], performance(local_y_hat, data_indexed.test_y[j]))
     end
-    # y_hat_test[i, :] = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
-
-    # y_hat_train[]
 end
 
+# -----------------------------------------------------------------------------
+# PLOTTING
+# -----------------------------------------------------------------------------
+
+# Simplified condensed scenario plot
 p = create_condensed_plot(perfs, class_labels)
 display(p)
 
@@ -119,7 +115,6 @@ display(p)
 savefig(p, results_dir(plot_name))
 savefig(p, paper_results_dir(plot_name))
 
-# for
 
 # # We can train in batch with a simple supervised mode by passing the labels as a keyword argument.
 # y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)

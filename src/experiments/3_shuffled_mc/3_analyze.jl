@@ -59,15 +59,6 @@ data_dirs, class_labels = get_orbit_names(data_selection)
 # df_high = filter(row -> row[:test_perf] > 0.97, df)
 # df_high[:, Not([:method, :arch, :path])]
 
-# Analyse the number of weights per category
-# n_w_lists = df[!, :n_w]
-# n_samples = length(n_w_lists)
-# n_classes = length(n_w_lists[1])
-# n_w_matrix = zeros(n_samples, n_classes)
-# for i = 1:n_samples
-#     n_w_matrix[i, :] = n_w_lists[i]
-# end
-
 # -----------------------------------------------------------------------------
 # PLOTTING
 # -----------------------------------------------------------------------------
