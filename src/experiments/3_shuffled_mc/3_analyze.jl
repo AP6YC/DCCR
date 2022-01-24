@@ -83,7 +83,7 @@ savefig(p_F2, paper_results_dir(n_F2_plot_name))
 
 # Testing performance
 perf_matrix = df_column_to_matrix(df, :a_te)
-p_perf = create_boxplot(perf_matrix, class_labels)
+p_perf = create_boxplot(perf_matrix, class_labels, percentages=true)
 ylabel!("Class Testing Accuracy")
 display(p_perf)
 # Save the plot

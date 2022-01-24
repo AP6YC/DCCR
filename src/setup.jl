@@ -61,3 +61,6 @@ FONTFAMILY = "Computer Modern"
 
 # Aspect ratio correction for heatmap
 SQUARE_SIZE = 500.0 .* (1.0, 0.925)
+
+# colorbar_formatter
+percentage_formatter = j -> @sprintf("%0.0f%%", 100*j)

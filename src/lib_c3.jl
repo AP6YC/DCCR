@@ -13,6 +13,7 @@ using MLBase        # confusmat
 using MLDataUtils   # stratifiedobs
 using StatsPlots    # groupedbar
 using DataFrames
+using Printf
 
 # Add the custom colors definitions
 include("colors.jl")
@@ -444,68 +445,68 @@ end
 # PLOTTING
 # -----------------------------------------------------------------------------
 
-"""
-    create_confusion_heatmap_old(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
+# """
+#     create_confusion_heatmap_old(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
 
-Returns a handle to a labeled and annotated heatmap plot of the confusion matrix.
-"""
-function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
-    # Number of classes from the class labels
-    n_classes = length(class_labels)
+# Returns a handle to a labeled and annotated heatmap plot of the confusion matrix.
+# """
+# function create_confusion_heatmap_old(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
+#     # Number of classes from the class labels
+#     n_classes = length(class_labels)
 
-    # Normalized confusion
-    norm_cm = get_normalized_confusion(y, y_hat, n_classes)
+#     # Normalized confusion
+#     norm_cm = get_normalized_confusion(y, y_hat, n_classes)
 
-    # Transpose reflect
-    plot_cm = norm_cm'
+#     # Transpose reflect
+#     plot_cm = norm_cm'
 
-    # Create the heatmap
-    h = heatmap(
-        class_labels,
-        class_labels,
-        plot_cm,
-        fill_z = norm_cm,
-        aspect_ratio=:equal,
-        color = cgrad(GRADIENTSCHEME),
-        fontfamily=FONTFAMILY,
-        annotationfontfamily=FONTFAMILY,
-        size=SQUARE_SIZE,
-        dpi=DPI
-    )
+#     # Create the heatmap
+#     h = heatmap(
+#         class_labels,
+#         class_labels,
+#         plot_cm,
+#         fill_z = norm_cm,
+#         aspect_ratio=:equal,
+#         color = cgrad(GRADIENTSCHEME),
+#         fontfamily=FONTFAMILY,
+#         annotationfontfamily=FONTFAMILY,
+#         size=SQUARE_SIZE,
+#         dpi=DPI
+#     )
 
-    # Create the annotations
-    fontsize = 10
-    nrow, ncol = size(norm_cm)
-    ann = [
-        (
-            i-.5,
-            j-.5,
-            text(
-                round(plot_cm[i,j], digits=2),
-                fontsize,
-                FONTFAMILY,
-                :white,
-                :center,
-            )
-        )
-        for i in 1:nrow for j in 1:ncol
-    ]
+#     # Create the annotations
+#     fontsize = 10
+#     nrow, ncol = size(norm_cm)
+#     ann = [
+#         (
+#             i-.5,
+#             j-.5,
+#             text(
+#                 round(plot_cm[i,j], digits=2),
+#                 fontsize,
+#                 FONTFAMILY,
+#                 :white,
+#                 :center,
+#             )
+#         )
+#         for i in 1:nrow for j in 1:ncol
+#     ]
 
-    # Add the cell annotations
-    annotate!(
-        ann,
-        linecolor=:white,
-        # linecolor=:black,
-        fontfamily=FONTFAMILY,
-    )
+#     # Add the cell annotations
+#     annotate!(
+#         ann,
+#         linecolor=:white,
+#         # linecolor=:black,
+#         fontfamily=FONTFAMILY,
+#     )
 
-    # Label truth and predicted axes
-    xlabel!("Predicted")
-    ylabel!("Truth")
+#     # Label truth and predicted axes
+#     xlabel!("Predicted")
+#     ylabel!("Truth")
 
-    # Return the plot handle for display or saving
-    return h
-end
+#     # Return the plot handle for display or saving
+#     return h
+# end
 
 """
     create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
@@ -515,12 +516,13 @@ Returns a handle to a labeled and annotated heatmap plot of the confusion matrix
 function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
     # Number of classes from the class labels
     n_classes = length(class_labels)
-
     # Normalized confusion
     norm_cm = get_normalized_confusion(y, y_hat, n_classes)
-
     # Transpose reflect
     plot_cm = reverse(norm_cm', dims=1)
+    # Convert to percentages
+    plot_cm *= 100.0
+    # Transpose the y labels
     x_labels = class_labels
     y_labels = reverse(class_labels)
 
@@ -546,7 +548,6 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
             i-.5,
             j-.5,
             text(
-                # round(plot_cm[i,j], digits=2),
                 round(plot_cm[j,i], digits=2),
                 fontsize,
                 FONTFAMILY,
@@ -578,7 +579,7 @@ end
 
 Return a grouped bar chart with class accuracies.
 """
-function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
+function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels ; percentages=false)
     # Infer the number of classes from the class labels
     n_classes = length(class_labels)
 
@@ -590,18 +591,27 @@ function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
     # Format the accuracy series for plotting
     combined_accuracies = [train_accuracies; test_accuracies]'
 
+    # Convert to percentages
+    y_formatter = percentages ? percentage_formatter : :auto
+
     # Create the accuracy grouped bar chart
     p = groupedbar(
         combined_accuracies,
         bar_position = :dodge,
         bar_width=0.7,
         color_palette=COLORSCHEME,
+        fontfamily=FONTFAMILY,
+        legend_position=:outerright,
+        labels=["Training" "Testing"],
         dpi=DPI,
+        yformatter = y_formatter,
+        # yformatter = j -> @sprintf("%0.0f%%", 100*j),
         # show=true,
         # xticks=train_labels
     )
 
-    ylabel!(p, "Accuracy")
+    ylabel!(p, "Class Accuracy")
+    # yticklabels(j -> @sprintf("%0.0f%%", 100*j))
     xticks!(collect(1:n_classes), class_labels)
     # title!(p, "test")
 
@@ -613,11 +623,13 @@ end
 
 Return a colored and formatted boxplot of the data.
 """
-function create_boxplot(data::RealMatrix, class_labels::Vector{String})
+function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false)
     # Get the number of sample vectors
     n_samples = size(n_w_matrix)[1]
     # Vectorize the data along the columns
     new_matrix = vec(data)
+    # Convert to percentages
+    y_formatter = percentages ? percentage_formatter : :auto
     # Label each sample with an inner-repeated label list
     new_labels = repeat(class_labels, inner=n_samples)
     # Create a dataframe with each sample and class label
@@ -629,8 +641,10 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String})
         :n_w,
         linewidth=0,
         color_palette=COLORSCHEME,
+        fontfamily=FONTFAMILY,
         legend=false,
-        dpi=DPI
+        dpi=DPI,
+        yformatter=y_formatter,
     )
 
     # Overlay a transparent box plot
@@ -640,6 +654,7 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String})
         fillalpha=0.75,
         linewidth=2,
         color_palette=COLORSCHEME,
+        # fontfamily=FONTFAMILY,
         legend=false,
         dpi=DPI
     )
@@ -655,26 +670,38 @@ end
 
 Create and return a simplified condensed scenario plot.
 """
-function create_condensed_plot(perfs, class_labels)
+function create_condensed_plot(perfs, class_labels, percentages=true)
     # Add initial testing block to labels
     local_labels = cat("", class_labels, dims=1)
     println(local_labels)
     # local_labels = reshape(local_labels, 1, length(local_labels))
 
+    # Convert to percentages
+    # plot_perfs = perfs * 100.0;
+    y_formatter = percentages ? percentage_formatter : :auto
+
     p = plot(
+        # plot_perfs,
         perfs,
-        linestyle = [:dot :solid :dash :dot :dashdot :dashdotdot],
+        linestyle = [:dot :dash :dashdot :solid :dot :dashdotdot],
         # linestyle = :auto,
         linewidth = 3,
+        # thickness_scaling = 1,
         color_palette=COLORSCHEME,
         labels=reshape(class_labels, 1, length(class_labels)),
-        legend=:topleft,
+        # legend=:topleft,
+        fontfamily=FONTFAMILY,
+        legend=:outerright,
+        yformatter=y_formatter,
+        # legendlinewidth=10,
         dpi=DPI,
     )
 
     xlabel!("Training Class")
     ylabel!("Testing Accuracy")
     xticks!(collect(1:length(local_labels)), local_labels)
+
+    return p
 end
 
 # -----------------------------------------------------------------------------
