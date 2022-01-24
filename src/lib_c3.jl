@@ -445,7 +445,7 @@ end
 # -----------------------------------------------------------------------------
 
 """
-    create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
+    create_confusion_heatmap_old(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
 
 Returns a handle to a labeled and annotated heatmap plot of the confusion matrix.
 """
@@ -456,11 +456,14 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
     # Normalized confusion
     norm_cm = get_normalized_confusion(y, y_hat, n_classes)
 
+    # Transpose reflect
+    plot_cm = norm_cm'
+
     # Create the heatmap
     h = heatmap(
         class_labels,
         class_labels,
-        norm_cm',
+        plot_cm,
         fill_z = norm_cm,
         aspect_ratio=:equal,
         color = cgrad(GRADIENTSCHEME),
@@ -478,7 +481,73 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
             i-.5,
             j-.5,
             text(
-                round(norm_cm[i,j], digits=2),
+                round(plot_cm[i,j], digits=2),
+                fontsize,
+                FONTFAMILY,
+                :white,
+                :center,
+            )
+        )
+        for i in 1:nrow for j in 1:ncol
+    ]
+
+    # Add the cell annotations
+    annotate!(
+        ann,
+        linecolor=:white,
+        # linecolor=:black,
+        fontfamily=FONTFAMILY,
+    )
+
+    # Label truth and predicted axes
+    xlabel!("Predicted")
+    ylabel!("Truth")
+
+    # Return the plot handle for display or saving
+    return h
+end
+
+"""
+    create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
+
+Returns a handle to a labeled and annotated heatmap plot of the confusion matrix.
+"""
+function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
+    # Number of classes from the class labels
+    n_classes = length(class_labels)
+
+    # Normalized confusion
+    norm_cm = get_normalized_confusion(y, y_hat, n_classes)
+
+    # Transpose reflect
+    plot_cm = reverse(norm_cm', dims=1)
+    x_labels = class_labels
+    y_labels = reverse(class_labels)
+
+    # Create the heatmap
+    h = heatmap(
+        x_labels,
+        y_labels,
+        plot_cm,
+        fill_z = norm_cm,
+        aspect_ratio=:equal,
+        color = cgrad(GRADIENTSCHEME),
+        fontfamily=FONTFAMILY,
+        annotationfontfamily=FONTFAMILY,
+        size=SQUARE_SIZE,
+        dpi=DPI
+    )
+
+    # Create the annotations
+    fontsize = 10
+    nrow, ncol = size(norm_cm)
+    ann = [
+        (
+            i-.5,
+            j-.5,
+            text(
+                # round(plot_cm[i,j], digits=2),
+                round(plot_cm[j,i], digits=2),
                 fontsize,
                 FONTFAMILY,
                 :white,
