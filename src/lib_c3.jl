@@ -300,6 +300,53 @@ function get_indexed_data(data::DataSplit)
 end
 
 """
+    get_deindexed_data(data::DataSplitIndexed, order::IntegerVector)
+
+Turn a DataSplitIndexed into a DataSplit with the given train/test order.
+"""
+function get_deindexed_data(data::DataSplitIndexed, order::IntegerVector)
+    dim = 128
+    train_x = Array{Float64}(undef, dim, 0)
+    train_y = Array{Int}(undef, 0)
+    train_labels = Vector{String}()
+
+    val_x = Array{Float64}(undef, 128, 0)
+    val_y = Array{Int}(undef, 0)
+    val_labels = Vector{String}()
+
+    test_x = Array{Float64}(undef, 128, 0)
+    test_y = Array{Int}(undef, 0)
+    test_labels = Vector{String}()
+
+    for i in order
+        train_x = hcat(train_x, data.train_x[i])
+        train_y = vcat(train_y, data.train_y[i])
+        val_x = hcat(val_x, data.val_x[i])
+        val_y = vcat(val_y, data.val_y[i])
+        test_x = hcat(test_x, data.test_x[i])
+        test_y = vcat(test_y, data.test_y[i])
+    end
+
+    train_labels = data.train_labels[order]
+    val_labels = data.val_labels[order]
+    test_labels = data.test_labels[order]
+
+    data_struct = DataSplit(
+        train_x,
+        train_y,
+        train_labels,
+        val_x,
+        val_y,
+        val_labels,
+        test_x,
+        test_y,
+        test_labels
+    )
+
+    return data_struct
+end
+
+"""
     get_orbit_names(selection::Vector{String})
 
 Map the experiment orbit names to their data directories and plotting class labels.
@@ -730,6 +777,61 @@ function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
     i_train = randperm(length(data.train_y))
     data.train_x = data.train_x[:, i_train]
     data.train_y = data.train_y[i_train]
+
+    # Train and test in batch
+    y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
+    y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+
+    # Calculate performance on training data, testing data, and with get_bmu
+    train_perf = performance(y_hat_train, data.train_y)
+    test_perf = performance(y_hat, data.test_y)
+
+    # Save the number of F2 nodes and total categories per class
+    n_F2, n_categories = get_n_categories(ddvfa)
+    n_F2_sum = sum(n_F2)
+    n_categories_sum = sum(n_categories)
+
+    # Get the normalized confusion Matrix
+    norm_cm = get_normalized_confusion(data.test_y, y_hat, n_classes)
+
+    # Get the train/test accuracies
+    train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
+
+    # Deepcopy the simulation dict and add results entries
+    fulld = deepcopy(d)
+    fulld["p_tr"] = train_perf
+    fulld["p_te"] = test_perf
+    fulld["n_F2"] = n_F2
+    fulld["n_w"] = n_categories
+    fulld["n_F2_sum"] = n_F2_sum
+    fulld["n_w_sum"] = n_categories_sum
+    fulld["norm_cm"] = norm_cm
+    fulld["a_tr"] = train_accuracies
+    fulld["a_te"] = test_accuracies
+
+    # Save the results dictionary
+    sim_save_name = sweep_results_dir(savename(d, "jld2"))
+    @info "Worker $(myid()): saving to $(sim_save_name)"
+    # wsave(sim_save_name, f)
+    tagsave(sim_save_name, fulld)
+end
+
+"""
+    permuted(d::Dict, data::DataSplit, opts::opts_DDVFA)
+
+Runs a single Monte Carlo simulation of training/testing on shuffled samples.
+"""
+function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
+    # Get the train/test order for the experiment
+    order = d["order"]
+
+    # Create the DDVFA module and setup the config
+    ddvfa = DDVFA(opts)
+    ddvfa.opts.display = false
+    ddvfa.config = DataConfig(0, 1, 128)
+
+    # Get a deindexed dataset with the indexed order
+    data = get_deindexed_data(data_indexed, order)
 
     # Train and test in batch
     y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)

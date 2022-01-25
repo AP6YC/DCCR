@@ -93,7 +93,7 @@ end
 
 # Iterate over each class
 for i = 1:n_classes
-    _, n_samples_local = size(data_indexed.train_x[i])
+    # _, n_samples_local = size(data_indexed.train_x[i])
     train!(ddvfa, data_indexed.train_x[i], y=data_indexed.train_y[i])
 
     # Test over each class
