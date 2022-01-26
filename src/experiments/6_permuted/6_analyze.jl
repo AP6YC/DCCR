@@ -29,6 +29,7 @@ include(projectdir("src", "setup.jl"))
 n_w_plot_name = "6_n_w.png"
 n_F2_plot_name = "6_n_F2.png"
 perf_plot_name = "6_perf.png"
+heatmap_plot_name = "6_heatmap.png"
 
 # Point to the local sweep data directory
 sweep_dir = projectdir("work", "results", "6_permuted", "sweep")
@@ -88,3 +89,14 @@ display(p_perf)
 # Save the plot
 savefig(p_perf, results_dir(perf_plot_name))
 savefig(p_perf, paper_results_dir(perf_plot_name))
+
+# Normalized confusion heatmap
+# norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
+norm_cm_df = df[:, :norm_cm]
+norm_cm = mean(cms)
+h = create_custom_confusion_heatmap(class_labels, norm_cm)
+display(h)
+
+# Save the heatmap to both the local and paper results directories
+savefig(h, results_dir(heatmap_plot_name))
+savefig(h, paper_results_dir(heatmap_plot_name))

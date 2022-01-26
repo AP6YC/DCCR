@@ -1,3 +1,3 @@
 # Start several processes
 using Distributed
-addprocs(26, exeflags="--project=.")
+addprocs(24, exeflags="--project=.")

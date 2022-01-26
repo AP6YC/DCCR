@@ -446,7 +446,8 @@ Get the normalized confusion matrix.
 """
 function get_normalized_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
     cm = get_confusion(y, y_hat, n_classes)
-    total = sum(cm, dims=1)
+    # total = sum(cm, dims=1)
+    total = sum(cm, dims=2)'
     norm_cm = cm./total
     return norm_cm
 end
@@ -459,8 +460,8 @@ Get a list of the percentage accuracies.
 function get_accuracies(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
     cm = get_confusion(y, y_hat, n_classes)
     correct = [cm[i,i] for i = 1:n_classes]
-    total = sum(cm, dims=1)
-    # total = sum(cm, dims=2)
+    # total = sum(cm, dims=1)
+    total = sum(cm, dims=2)'
     accuracies = correct'./total
 
     return accuracies
@@ -610,7 +611,8 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
     # Normalized confusion
     norm_cm = get_normalized_confusion(y, y_hat, n_classes)
     # Transpose reflect
-    plot_cm = reverse(norm_cm', dims=1)
+    # plot_cm = reverse(norm_cm', dims=1)
+    plot_cm = reverse(norm_cm, dims=1)
     # Convert to percentages
     plot_cm *= 100.0
     # Transpose the y labels
@@ -625,6 +627,7 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
         fill_z = norm_cm,
         aspect_ratio=:equal,
         color = cgrad(GRADIENTSCHEME),
+        clims = (0, 100),
         fontfamily=FONTFAMILY,
         annotationfontfamily=FONTFAMILY,
         size=SQUARE_SIZE,
@@ -640,6 +643,74 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
             j-.5,
             text(
                 round(plot_cm[j,i], digits=2),
+                fontsize,
+                FONTFAMILY,
+                :white,
+                :center,
+            )
+        )
+        for i in 1:nrow for j in 1:ncol
+    ]
+
+    # Add the cell annotations
+    annotate!(
+        ann,
+        linecolor=:white,
+        # linecolor=:black,
+        fontfamily=FONTFAMILY,
+    )
+
+    # Label truth and predicted axes
+    xlabel!("Predicted")
+    ylabel!("Truth")
+
+    # Return the plot handle for display or saving
+    return h
+end
+
+"""
+    create_custom_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
+
+Returns a handle to a labeled and annotated heatmap plot of the confusion matrix.
+"""
+function create_custom_confusion_heatmap(class_labels::Vector{String}, norm_cm)
+    # Number of classes from the class labels
+    # n_classes = length(class_labels)
+    # Normalized confusion
+    # norm_cm = get_normalized_confusion(y, y_hat, n_classes)
+    # Transpose reflect
+    plot_cm = reverse(norm_cm', dims=1)
+    # Convert to percentages
+    plot_cm *= 100.0
+    # Transpose the y labels
+    x_labels = class_labels
+    y_labels = reverse(class_labels)
+
+    # Create the heatmap
+    h = heatmap(
+        x_labels,
+        y_labels,
+        plot_cm,
+        fill_z = norm_cm,
+        aspect_ratio=:equal,
+        color = cgrad(GRADIENTSCHEME),
+        clims = (0, 100),
+        fontfamily=FONTFAMILY,
+        annotationfontfamily=FONTFAMILY,
+        size=SQUARE_SIZE,
+        dpi=DPI
+    )
+
+    # Create the annotations
+    fontsize = 10
+    nrow, ncol = size(norm_cm)
+    ann = [
+        (
+            i-.5,
+            j-.5,
+            text(
+                # round(plot_cm[j,i], digits=2),
+                string(round(plot_cm[j,i], digits=2)) * "%",
                 fontsize,
                 FONTFAMILY,
                 :white,
@@ -766,7 +837,6 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percent
     # Convert to percentages
     y_formatter = percentages ? percentage_formatter : :auto
     # Label each sample with an inner-repeated label list
-    @info new_labels
     new_labels = repeat(class_labels, inner=n_samples)
     # Create a dataframe with each sample and class label
     df = DataFrame([new_matrix, new_labels], ["n_w", "class"])
@@ -794,6 +864,11 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percent
         legend=false,
         dpi=DPI
     )
+
+    if percentages
+        # ylims!(p, (-Inf, 1))
+        ylims!(p, (0.6, 1))
+    end
 
     # Add the universal x-label
     xlabel!("Class")
@@ -901,28 +976,166 @@ function create_complex_condensed_plot(perfs, vals, class_labels, percentages=tr
         legend=:outerright,
         dpi=DPI,
     )
-    # p = plot(
-    #     # plot_perfs,
-    #     perfs,
-    #     linestyle = [:dot :dash :dashdot :solid :dot :dashdotdot],
-    #     # linestyle = :auto,
-    #     linewidth = 3,
-    #     # thickness_scaling = 1,
-    #     color_palette=COLORSCHEME,
-    #     labels=reshape(class_labels, 1, length(class_labels)),
-    #     # legend=:topleft,
-    #     fontfamily=FONTFAMILY,
-    #     legend=:outerright,
-    #     yformatter=y_formatter,
-    #     # legendlinewidth=10,
-    #     dpi=DPI,
-    # )
 
     # xlabel!("Training Class")
     ylabel!("Testing Accuracy")
     # xticks!(collect(1:length(local_labels)), local_labels)
 
     return p, plot_data
+end
+
+"""
+    create_complex_condensed_plot_alt(y_hat, vals, class_labels)
+
+Create and return an alternate complex condensed scenario plot.
+"""
+function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentages=true)
+    # Add initial testing block to labels
+    local_labels = cat("", class_labels, dims=1)
+    println(local_labels)
+    # local_labels = reshape(local_labels, 1, length(local_labels))
+
+    # Convert to percentages
+    # plot_perfs = perfs * 100.0;
+    y_formatter = percentages ? percentage_formatter : :auto
+
+    # linestyles = [:dot :dash :dashdot :solid :dot :dashdotdot]
+    linewidths = 2
+
+    n_classes = length(class_labels)
+    plot_data = Array{Float64}(undef, n_classes, 0)
+
+    n_eb = 10
+
+    cutoffs = []
+
+    # First EB
+    local_eb = [perfs[j][j] for j = 1:n_classes]
+    local_eb = repeat(local_eb, outer=[1, n_eb])
+    plot_data = hcat(plot_data, local_eb)
+    push!(cutoffs, n_eb)
+
+    # Old plot data
+    for i = 1:n_classes
+        # Append the validation values
+        plot_data = hcat(plot_data, vals[i])
+        push!(cutoffs, cutoffs[end] + size(vals[i], 2))
+        # Create an EB
+        local_eb = [perfs[j][i+1] for j = 1:n_classes]
+        local_eb = repeat(local_eb, outer=[1, n_eb])
+        plot_data = hcat(plot_data, local_eb)
+        push!(cutoffs, cutoffs[end] + n_eb)
+    end
+
+    # Just current training data
+    training_vals = []
+    x_training_vals = []
+    tick_locations = []
+    start_point = cutoffs[1]
+    for i = 1:n_classes
+        # Fencepost evaluation values
+        local_vals = vals[i][i, :]
+        push!(local_vals, vals[i][i, end])
+        n_local_vals = length(local_vals)
+        # Add the tick locations as midway along training
+        push!(tick_locations, start_point + floor(Int, n_local_vals/2))
+        # Add the local training vals
+        push!(training_vals, local_vals)
+        # Add the start and stop points of the training vals
+        push!(x_training_vals, collect(start_point:start_point + n_local_vals - 1))
+        # Reset the start point
+        start_point += n_local_vals + n_eb - 1
+    end
+
+    @info tick_locations
+    # @info length(x_training_vals)
+    # @info length(training_vals)
+
+    # Get evaluation lines locations
+    fcut = vcat(0, cutoffs)
+    eval_points = [mean([fcut[i-1], fcut[i]]) for i = 2:2:length(fcut)]
+
+    # Local palette
+    local_palette = palette(COLORSCHEME)
+
+    # Original plotlines
+    # p = plot(
+    #     plot_data',
+    #     linestyle=linestyles,
+    #     linewidth=linewidths,
+    #     labels=reshape(class_labels, 1, length(class_labels)),
+    #     # color_palette=palette(COLORSCHEME, 6),
+    #     # color_palette=COLORSCHEME,
+    #     color_palette=local_palette,
+    # )
+
+    # New training plotlines
+    p = plot(
+        x_training_vals,
+        training_vals,
+        linestyle=:solid,
+        linewidth=linewidths,
+        labels=reshape(class_labels, 1, length(class_labels)),
+        # color_palette=palette(COLORSCHEME, 6),
+        # color_palette=COLORSCHEME,
+        color_palette=local_palette,
+    )
+
+    # Vertical lines
+    vline!(
+        p,
+        # cutoffs,
+        fcut,
+        linewidth=linewidths,
+        # linestyle=:dash,
+        linestyle=:solid,
+        fillalpha=0.1,
+        color=:gray25,
+        label="",
+    )
+
+    # The biggest headache in the world
+    local_colors = [local_palette[1]; local_palette[collect(2:n_classes+1)]]
+    # Eval lines
+    plot!(
+        p,
+        eval_points,
+        markershape=:circle,
+        markersize=3,
+        hcat(perfs...),
+        color_palette=local_colors,
+        linewidth=linewidths,
+        linestyle=:dot,
+        # labels=reshape(class_labels, 1, length(class_labels)),
+        labels=""
+    )
+
+    # Vertical spans
+    vspan!(
+        p,
+        # vcat(0, cutoffs),
+        fcut,
+        color=:gray25,
+        fillalpha=0.1,
+        label="",
+        # zorder=0,
+    )
+
+    # Format the plot
+    plot!(
+        size=(1200, 400),
+        yformatter=y_formatter,
+        fontfamily=FONTFAMILY,
+        legend=:outerright,
+        dpi=DPI,
+        xticks=(tick_locations, class_labels)
+    )
+
+    # xlabel!("Training Class")
+    ylabel!("Testing Accuracy")
+    # xticks!(collect(1:length(local_labels)), local_labels)
+
+    return p, training_vals, x_training_vals
 end
 
 # -----------------------------------------------------------------------------
