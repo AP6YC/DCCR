@@ -224,12 +224,13 @@ function load_orbits(data_dir::String, scaling::Real)
     test_data_dirs = [joinpath(test_dir, data_dir) for data_dir in data_dirs]
 
     train_x, train_y, train_labels = collect_all_activations_labeled(train_data_dirs, 1)
-    val_x, val_y, val_labels = collect_all_activations_labeled(train_data_dirs, 1)
+    val_x, val_y, val_labels = collect_all_activations_labeled(val_data_dirs, 1)
     test_x, test_y, test_labels = collect_all_activations_labeled(test_data_dirs, 1)
 
     dt = get_dist(train_x)
 
     train_x = feature_preprocess(dt, scaling, train_x)
+    val_x = feature_preprocess(dt, scaling, val_x)
     test_x = feature_preprocess(dt, scaling, test_x)
 
     data_struct = DataSplit(
@@ -247,6 +248,48 @@ function load_orbits(data_dir::String, scaling::Real)
     return data_struct
     # return X_train, y_train, train_labels, X_test, y_test, test_labels
 end
+
+# """
+#     load_val_orbits(data_dir::String, scaling::Real)
+
+# Load the orbits data and preprocess the features.
+
+# This uses training data for validation because of a problem with the val
+# distribution at the time of this writing.
+# """
+# function load_val_orbits(data_dir::String, scaling::Real)
+#     train_dir = joinpath(data_dir, "LBs")
+#     # val_dir = joinpath(data_dir, "Val")
+#     test_dir = joinpath(data_dir, "EBs")
+
+#     train_data_dirs = [joinpath(train_dir, data_dir) for data_dir in data_dirs]
+#     # val_data_dirs = [joinpath(val_dir, data_dir) for data_dir in data_dirs]
+#     test_data_dirs = [joinpath(test_dir, data_dir) for data_dir in data_dirs]
+
+#     train_x, train_y, train_labels = collect_all_activations_labeled(train_data_dirs, 1)
+#     # val_x, val_y, val_labels = collect_all_activations_labeled(val_data_dirs, 1)
+#     test_x, test_y, test_labels = collect_all_activations_labeled(test_data_dirs, 1)
+
+#     dt = get_dist(train_x)
+
+#     train_x = feature_preprocess(dt, scaling, train_x)
+#     test_x = feature_preprocess(dt, scaling, test_x)
+
+#     data_struct = DataSplit(
+#         train_x,
+#         train_y,
+#         train_labels,
+#         val_x,
+#         val_y,
+#         val_labels,
+#         test_x,
+#         test_y,
+#         test_labels
+#     )
+
+#     return data_struct
+#     # return X_train, y_train, train_labels, X_test, y_test, test_labels
+# end
 
 """
     get_indexed_data(data::DataSplit)
@@ -417,6 +460,7 @@ function get_accuracies(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
     cm = get_confusion(y, y_hat, n_classes)
     correct = [cm[i,i] for i = 1:n_classes]
     total = sum(cm, dims=1)
+    # total = sum(cm, dims=2)
     accuracies = correct'./total
 
     return accuracies
@@ -666,6 +710,50 @@ function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels ; per
 end
 
 """
+    create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels)
+
+Return a grouped bar chart with comparison bars.
+"""
+function create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels ; percentages=false)
+    # Infer the number of classes from the class labels
+    n_classes = length(class_labels)
+
+    # Get the training and testing accuracies
+    # train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
+    test_accuracies = get_accuracies(data.test_y, y_hat, n_classes)
+    test_accuracies_val = get_accuracies(data.test_y, y_hat_val, n_classes)
+
+    # Format the accuracy series for plotting
+    combined_accuracies = [test_accuracies; test_accuracies_val]'
+
+    # Convert to percentages
+    y_formatter = percentages ? percentage_formatter : :auto
+
+    # Create the accuracy grouped bar chart
+    p = groupedbar(
+        combined_accuracies,
+        bar_position = :dodge,
+        bar_width=0.7,
+        color_palette=COLORSCHEME,
+        fontfamily=FONTFAMILY,
+        legend_position=:outerright,
+        labels=["Pretrained" "Bootstrapped"],
+        dpi=DPI,
+        yformatter = y_formatter,
+        # yformatter = j -> @sprintf("%0.0f%%", 100*j),
+        # show=true,
+        # xticks=train_labels
+    )
+
+    ylabel!(p, "Class Accuracy")
+    # yticklabels(j -> @sprintf("%0.0f%%", 100*j))
+    xticks!(collect(1:n_classes), class_labels)
+    # title!(p, "test")
+
+    return p
+end
+
+"""
     create_boxplot(data::RealMatrix, class_labels::Vector{String})
 
 Return a colored and formatted boxplot of the data.
@@ -678,6 +766,7 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percent
     # Convert to percentages
     y_formatter = percentages ? percentage_formatter : :auto
     # Label each sample with an inner-repeated label list
+    @info new_labels
     new_labels = repeat(class_labels, inner=n_samples)
     # Create a dataframe with each sample and class label
     df = DataFrame([new_matrix, new_labels], ["n_w", "class"])
@@ -749,6 +838,91 @@ function create_condensed_plot(perfs, class_labels, percentages=true)
     xticks!(collect(1:length(local_labels)), local_labels)
 
     return p
+end
+
+"""
+    create_complex_condensed_plot(y_hat, vals, class_labels)
+
+Create and return a complex condensed scenario plot.
+"""
+function create_complex_condensed_plot(perfs, vals, class_labels, percentages=true)
+    # Add initial testing block to labels
+    local_labels = cat("", class_labels, dims=1)
+    println(local_labels)
+    # local_labels = reshape(local_labels, 1, length(local_labels))
+
+    # Convert to percentages
+    # plot_perfs = perfs * 100.0;
+    y_formatter = percentages ? percentage_formatter : :auto
+
+    linestyles = [:dot :dash :dashdot :solid :dot :dashdotdot]
+    linewidths = 2
+
+    n_classes = length(class_labels)
+    plot_data = Array{Float64}(undef, n_classes, 0)
+
+    n_eb = 10
+
+    cutoffs = []
+
+    # First EB
+    local_eb = [perfs[j][1] for j = 1:n_classes]
+    local_eb = repeat(local_eb, outer=[1, n_eb])
+    plot_data = hcat(plot_data, local_eb)
+    push!(cutoffs, n_eb)
+
+    for i = 1:n_classes
+        # Append the validation values
+        plot_data = hcat(plot_data, vals[i])
+        push!(cutoffs, cutoffs[end] + size(vals[i], 2))
+        # Create an EB
+        local_eb = [perfs[j][i+1] for j = 1:n_classes]
+        local_eb = repeat(local_eb, outer=[1, n_eb])
+        plot_data = hcat(plot_data, local_eb)
+        push!(cutoffs, cutoffs[end] + n_eb)
+    end
+
+    p = plot(
+        plot_data',
+        linestyle=linestyles,
+        linewidth=linewidths,
+        labels=reshape(class_labels, 1, length(class_labels)),
+        color_palette=COLORSCHEME,
+    )
+    vline!(
+        cutoffs,
+        linewidth=linewidths,
+        linestyle=:dash,
+    )
+    plot!(
+        size=(1200, 400),
+        yformatter=y_formatter,
+        fontfamily=FONTFAMILY,
+        legend=:outerright,
+        dpi=DPI,
+    )
+    # p = plot(
+    #     # plot_perfs,
+    #     perfs,
+    #     linestyle = [:dot :dash :dashdot :solid :dot :dashdotdot],
+    #     # linestyle = :auto,
+    #     linewidth = 3,
+    #     # thickness_scaling = 1,
+    #     color_palette=COLORSCHEME,
+    #     labels=reshape(class_labels, 1, length(class_labels)),
+    #     # legend=:topleft,
+    #     fontfamily=FONTFAMILY,
+    #     legend=:outerright,
+    #     yformatter=y_formatter,
+    #     # legendlinewidth=10,
+    #     dpi=DPI,
+    # )
+
+    # xlabel!("Training Class")
+    ylabel!("Testing Accuracy")
+    # xticks!(collect(1:length(local_labels)), local_labels)
+
+    return p, plot_data
 end
 
 # -----------------------------------------------------------------------------
@@ -865,7 +1039,10 @@ function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
     fulld["a_te"] = test_accuracies
 
     # Save the results dictionary
-    sim_save_name = sweep_results_dir(savename(d, "jld2"))
+    saved = deepcopy(d)
+    saved["perm"] = join(order)
+    # sim_save_name = sweep_results_dir(savename(d, "jld2"))
+    sim_save_name = sweep_results_dir(savename(saved, "jld2"))
     @info "Worker $(myid()): saving to $(sim_save_name)"
     # wsave(sim_save_name, f)
     tagsave(sim_save_name, fulld)
