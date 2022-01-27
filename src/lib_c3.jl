@@ -413,8 +413,10 @@ function get_orbit_names(selection::Vector{String})
         "dot_morning" => "DOTM",
         "emahigh_dusk" => "EMAHD",
         "emahigh_morning" => "EMAHM",
-        "emalow_dusk" => "EMALD",
-        "emalow_morning" => "EMALM",
+        # "emalow_dusk" => "EMALD",
+        # "emalow_morning" => "EMALM",
+        "emalow_dusk" => "EMAD",
+        "emalow_morning" => "EMAM",
         "pr_dusk" => "PRD",
         "pr_morning" => "PRM",
     )
@@ -772,7 +774,7 @@ function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels ; per
         # xticks=train_labels
     )
 
-    ylabel!(p, "Class Accuracy")
+    ylabel!(p, "Context Accuracy")
     # yticklabels(j -> @sprintf("%0.0f%%", 100*j))
     xticks!(collect(1:n_classes), class_labels)
     # title!(p, "test")
@@ -816,7 +818,7 @@ function create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels ; per
         # xticks=train_labels
     )
 
-    ylabel!(p, "Class Accuracy")
+    ylabel!(p, "Context Accuracy")
     # yticklabels(j -> @sprintf("%0.0f%%", 100*j))
     xticks!(collect(1:n_classes), class_labels)
     # title!(p, "test")
@@ -831,7 +833,8 @@ Return a colored and formatted boxplot of the data.
 """
 function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false)
     # Get the number of sample vectors
-    n_samples = size(n_w_matrix)[1]
+    # n_samples = size(n_w_matrix)[1]
+    n_samples = size(data)[1]
     # Vectorize the data along the columns
     new_matrix = vec(data)
     # Convert to percentages
@@ -848,9 +851,6 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percent
         linewidth=0,
         color_palette=COLORSCHEME,
         fontfamily=FONTFAMILY,
-        legend=false,
-        dpi=DPI,
-        yformatter=y_formatter,
     )
 
     # Overlay a transparent box plot
@@ -861,8 +861,6 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percent
         linewidth=2,
         color_palette=COLORSCHEME,
         # fontfamily=FONTFAMILY,
-        legend=false,
-        dpi=DPI
     )
 
     if percentages
@@ -870,10 +868,78 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percent
         ylims!(p, (0.6, 1))
     end
 
+    # Format the plot
+    plot!(
+        dpi=DPI,
+        legend=false,
+        yformatter=y_formatter,
+        # color_palette=COLORSCHEME,
+    )
+
     # Add the universal x-label
-    xlabel!("Class")
+    xlabel!("Context")
 
     return p
+end
+
+"""
+    create_inverted_boxplot(data::RealMatrix, class_labels::Vector{String})
+
+Return a colored and formatted boxplot of the data.
+"""
+function create_inverted_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false)
+    # Get the number of sample vectors
+    n_samples = size(data)[1]
+    # Vectorize the data along the columns
+    new_matrix = vec(data)
+    # Convert to percentages
+    y_formatter = percentages ? percentage_formatter : :auto
+    # Label each sample with an inner-repeated label list
+    new_labels = repeat(class_labels, inner=n_samples)
+    # Create a dataframe with each sample and class label
+    df = DataFrame([new_matrix, new_labels], ["n_w", "class"])
+
+    local_palette = palette(COLORSCHEME)
+
+    # Overlay a transparent box plot
+    p = @df df boxplot(
+        :class,
+        :n_w,
+        fillalpha=0.75,
+        linewidth=2,
+        color=local_palette[2],
+        order=2,
+        fontfamily=FONTFAMILY,
+    )
+
+    # Create a violin plot
+    @df df violin!(
+        :class,
+        :n_w,
+        linewidth=0,
+        fillalpha=0.75,
+        color=local_palette[1],
+        # fontfamily=FONTFAMILY,
+        order=1,
+    )
+
+    if percentages
+        # ylims!(p, (-Inf, 1))
+        ylims!(p, (0.6, 1))
+    end
+
+    # Format the plot
+    plot!(
+        dpi=DPI,
+        legend=false,
+        yformatter=y_formatter,
+    )
+
+    # Add the universal x-label
+    xlabel!("Context")
+
+    return p
+    # return p, df
 end
 
 """
@@ -936,7 +1002,7 @@ function create_complex_condensed_plot(perfs, vals, class_labels, percentages=tr
     n_classes = length(class_labels)
     plot_data = Array{Float64}(undef, n_classes, 0)
 
-    n_eb = 10
+    n_eb = N_EB
 
     cutoffs = []
 
@@ -970,7 +1036,7 @@ function create_complex_condensed_plot(perfs, vals, class_labels, percentages=tr
         linestyle=:dash,
     )
     plot!(
-        size=(1200, 400),
+        size=DOUBLE_WIDE,
         yformatter=y_formatter,
         fontfamily=FONTFAMILY,
         legend=:outerright,
@@ -1005,7 +1071,7 @@ function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentage
     n_classes = length(class_labels)
     plot_data = Array{Float64}(undef, n_classes, 0)
 
-    n_eb = 10
+    n_eb = N_EB
 
     cutoffs = []
 
@@ -1123,12 +1189,13 @@ function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentage
 
     # Format the plot
     plot!(
-        size=(1200, 400),
+        size=DOUBLE_WIDE,
         yformatter=y_formatter,
         fontfamily=FONTFAMILY,
         legend=:outerright,
         dpi=DPI,
-        xticks=(tick_locations, class_labels)
+        xticks=(tick_locations, class_labels),
+        left_margin = 10Plots.mm,
     )
 
     # xlabel!("Training Class")

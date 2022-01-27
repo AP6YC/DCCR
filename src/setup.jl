@@ -60,7 +60,14 @@ GRADIENTSCHEME = pubu_9[5:end]
 FONTFAMILY = "Computer Modern"
 
 # Aspect ratio correction for heatmap
-SQUARE_SIZE = 500.0 .* (1.0, 0.925)
+# SQUARE_SIZE = 500.0 .* (1.0, 0.925)
+SQUARE_SIZE = 500.0 .* (1.0, 0.94)
+
+# Condensed plot parameters
+# DOUBLE_WIDE = 0.75.* (1200, 400)
+DOUBLE_WIDE = 1.0 .* (1200, 400)
+# N_EB = 10
+N_EB = 8
 
 # colorbar_formatter
 percentage_formatter = j -> @sprintf("%0.0f%%", 100*j)

@@ -94,7 +94,7 @@ savefig(p_perf, paper_results_dir(perf_plot_name))
 # Normalized confusion heatmap
 # norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
 norm_cm_df = df[:, :norm_cm]
-norm_cm = mean(cms)
+norm_cm = mean(norm_cm_df)
 h = create_custom_confusion_heatmap(class_labels, norm_cm)
 display(h)
 
