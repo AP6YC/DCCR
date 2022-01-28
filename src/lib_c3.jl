@@ -662,6 +662,10 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
         fontfamily=FONTFAMILY,
     )
 
+    plot!(
+        bottom_margin = -8Plots.mm,
+    )
+
     # Label truth and predicted axes
     xlabel!("Predicted")
     ylabel!("Truth")
@@ -730,6 +734,10 @@ function create_custom_confusion_heatmap(class_labels::Vector{String}, norm_cm)
         fontfamily=FONTFAMILY,
     )
 
+    plot!(
+        bottom_margin = -8Plots.mm,
+    )
+
     # Label truth and predicted axes
     xlabel!("Predicted")
     ylabel!("Truth")
@@ -787,14 +795,26 @@ end
 
 Return a grouped bar chart with comparison bars.
 """
-function create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels ; percentages=false)
+function create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels ; percentages=false, extended=false)
     # Infer the number of classes from the class labels
     n_classes = length(class_labels)
+    # If we need a category to dump in, extend the
+    # extended && n_classes+= 1
+    if extended
+        n_classes += 1
+    end
 
     # Get the training and testing accuracies
     # train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
     test_accuracies = get_accuracies(data.test_y, y_hat, n_classes)
     test_accuracies_val = get_accuracies(data.test_y, y_hat_val, n_classes)
+
+    # If we had a dumping category, pop the last results to get back
+    @info test_accuracies
+    # if extended
+        # test_accuracies = test_accuracies[1, 1:end-1]
+        # test_accuracies_val = test_accuracies_val[1, 1:end-1]
+    # end
 
     # Format the accuracy series for plotting
     combined_accuracies = [test_accuracies; test_accuracies_val]'
@@ -810,7 +830,7 @@ function create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels ; per
         color_palette=COLORSCHEME,
         fontfamily=FONTFAMILY,
         legend_position=:outerright,
-        labels=["Pretrained" "Bootstrapped"],
+        labels=["Before" "After"],
         dpi=DPI,
         yformatter = y_formatter,
         # yformatter = j -> @sprintf("%0.0f%%", 100*j),
@@ -820,6 +840,11 @@ function create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels ; per
 
     ylabel!(p, "Context Accuracy")
     # yticklabels(j -> @sprintf("%0.0f%%", 100*j))
+    if extended
+        xticks!(collect(1:n_classes-1), class_labels)
+    else
+        xticks!(collect(1:n_classes), class_labels)
+    end
     xticks!(collect(1:n_classes), class_labels)
     # title!(p, "test")
 
@@ -865,7 +890,8 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percent
 
     if percentages
         # ylims!(p, (-Inf, 1))
-        ylims!(p, (0.6, 1))
+        # ylims!(p, (0.6, 1))
+        ylims!(p, PERCENTAGES_BOUNDS)
     end
 
     # Format the plot
@@ -901,8 +927,14 @@ function create_inverted_boxplot(data::RealMatrix, class_labels::Vector{String} 
 
     local_palette = palette(COLORSCHEME)
 
+    # p = @df df dotplot(
+    #     :class,
+    #     :n_w,
+    # )
+
     # Overlay a transparent box plot
     p = @df df boxplot(
+    # @df df boxplot!(
         :class,
         :n_w,
         fillalpha=0.75,
@@ -925,7 +957,8 @@ function create_inverted_boxplot(data::RealMatrix, class_labels::Vector{String} 
 
     if percentages
         # ylims!(p, (-Inf, 1))
-        ylims!(p, (0.6, 1))
+        # ylims!(p, (0.6, 1))
+        ylims!(p, PERCENTAGES_BOUNDS)
     end
 
     # Format the plot
@@ -974,7 +1007,7 @@ function create_condensed_plot(perfs, class_labels, percentages=true)
         dpi=DPI,
     )
 
-    xlabel!("Training Class")
+    xlabel!("Training Context")
     ylabel!("Testing Accuracy")
     xticks!(collect(1:length(local_labels)), local_labels)
 
@@ -1056,40 +1089,26 @@ end
 Create and return an alternate complex condensed scenario plot.
 """
 function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentages=true)
-    # Add initial testing block to labels
-    local_labels = cat("", class_labels, dims=1)
-    println(local_labels)
-    # local_labels = reshape(local_labels, 1, length(local_labels))
-
-    # Convert to percentages
-    # plot_perfs = perfs * 100.0;
+    # Reshape the labels string vector for plotting
+    local_labels = reshape(class_labels, 1, length(class_labels))
+    # Determine if plotting percentages or [0, 1]
     y_formatter = percentages ? percentage_formatter : :auto
-
-    # linestyles = [:dot :dash :dashdot :solid :dot :dashdotdot]
-    linewidths = 2
-
+    # Set all the linewidths
+    linewidths = CONDENSED_LINEWIDTH
+    # Infer the number of classes
     n_classes = length(class_labels)
-    plot_data = Array{Float64}(undef, n_classes, 0)
-
+    # Number of experience block sample points
     n_eb = N_EB
-
+    # Initialize cutoff x-locations (EB-LB boundaries)
     cutoffs = []
-
     # First EB
-    local_eb = [perfs[j][j] for j = 1:n_classes]
-    local_eb = repeat(local_eb, outer=[1, n_eb])
-    plot_data = hcat(plot_data, local_eb)
     push!(cutoffs, n_eb)
 
     # Old plot data
     for i = 1:n_classes
-        # Append the validation values
-        plot_data = hcat(plot_data, vals[i])
+        # Append the training length to the cutoff
         push!(cutoffs, cutoffs[end] + size(vals[i], 2))
-        # Create an EB
-        local_eb = [perfs[j][i+1] for j = 1:n_classes]
-        local_eb = repeat(local_eb, outer=[1, n_eb])
-        plot_data = hcat(plot_data, local_eb)
+        # Append the number of experience block "samples"
         push!(cutoffs, cutoffs[end] + n_eb)
     end
 
@@ -1113,27 +1132,12 @@ function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentage
         start_point += n_local_vals + n_eb - 1
     end
 
-    @info tick_locations
-    # @info length(x_training_vals)
-    # @info length(training_vals)
-
     # Get evaluation lines locations
     fcut = vcat(0, cutoffs)
     eval_points = [mean([fcut[i-1], fcut[i]]) for i = 2:2:length(fcut)]
 
-    # Local palette
+    # Local colors
     local_palette = palette(COLORSCHEME)
-
-    # Original plotlines
-    # p = plot(
-    #     plot_data',
-    #     linestyle=linestyles,
-    #     linewidth=linewidths,
-    #     labels=reshape(class_labels, 1, length(class_labels)),
-    #     # color_palette=palette(COLORSCHEME, 6),
-    #     # color_palette=COLORSCHEME,
-    #     color_palette=local_palette,
-    # )
 
     # New training plotlines
     p = plot(
@@ -1141,19 +1145,15 @@ function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentage
         training_vals,
         linestyle=:solid,
         linewidth=linewidths,
-        labels=reshape(class_labels, 1, length(class_labels)),
-        # color_palette=palette(COLORSCHEME, 6),
-        # color_palette=COLORSCHEME,
+        labels=local_labels,
         color_palette=local_palette,
     )
 
     # Vertical lines
     vline!(
         p,
-        # cutoffs,
         fcut,
         linewidth=linewidths,
-        # linestyle=:dash,
         linestyle=:solid,
         fillalpha=0.1,
         color=:gray25,
@@ -1172,19 +1172,17 @@ function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentage
         color_palette=local_colors,
         linewidth=linewidths,
         linestyle=:dot,
-        # labels=reshape(class_labels, 1, length(class_labels)),
+        # linestyle=:dash,
         labels=""
     )
 
-    # Vertical spans
+    # Vertical spans (gray boxes)
     vspan!(
         p,
-        # vcat(0, cutoffs),
-        fcut,
-        color=:gray25,
-        fillalpha=0.1,
-        label="",
-        # zorder=0,
+        fcut,           # Full cutoff locations, including 0
+        color=:gray25,  # 25% gray from Colors.jl
+        fillalpha=0.1,  # Opacity
+        label="",       # Keeps the spans out of the legend
     )
 
     # Format the plot
@@ -1193,6 +1191,8 @@ function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentage
         yformatter=y_formatter,
         fontfamily=FONTFAMILY,
         legend=:outerright,
+        legendfontsize=25,
+        thickness_scaling=1,
         dpi=DPI,
         xticks=(tick_locations, class_labels),
         left_margin = 10Plots.mm,
@@ -1285,15 +1285,15 @@ function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
     ddvfa.config = DataConfig(0, 1, 128)
 
     # Get a deindexed dataset with the indexed order
-    data = get_deindexed_data(data_indexed, order)
+    local_data = get_deindexed_data(data_indexed, order)
 
     # Train and test in batch
-    y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
-    y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+    y_hat_train = train!(ddvfa, local_data.train_x, y=local_data.train_y)
+    y_hat = AdaptiveResonance.classify(ddvfa, local_data.test_x, get_bmu=true)
 
     # Calculate performance on training data, testing data, and with get_bmu
-    train_perf = performance(y_hat_train, data.train_y)
-    test_perf = performance(y_hat, data.test_y)
+    train_perf = performance(y_hat_train, local_data.train_y)
+    test_perf = performance(y_hat, local_data.test_y)
 
     # Save the number of F2 nodes and total categories per class
     n_F2, n_categories = get_n_categories(ddvfa)
@@ -1301,10 +1301,10 @@ function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
     n_categories_sum = sum(n_categories)
 
     # Get the normalized confusion Matrix
-    norm_cm = get_normalized_confusion(data.test_y, y_hat, n_classes)
+    norm_cm = get_normalized_confusion(local_data.test_y, y_hat, n_classes)
 
     # Get the train/test accuracies
-    train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
+    train_accuracies, test_accuracies = get_tt_accuracies(local_data, y_hat_train, y_hat, n_classes)
 
     # Deepcopy the simulation dict and add results entries
     fulld = deepcopy(d)
@@ -1326,4 +1326,67 @@ function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
     @info "Worker $(myid()): saving to $(sim_save_name)"
     # wsave(sim_save_name, f)
     tagsave(sim_save_name, fulld)
+
+    # return fulld
 end
+
+
+# """
+#     permuted(d::Dict, data::DataSplit, opts::opts_DDVFA)
+
+# Runs a single Monte Carlo simulation of training/testing on shuffled samples.
+# """
+# function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
+#     # Get the train/test order for the experiment
+#     order = d["order"]
+
+#     # Create the DDVFA module and setup the config
+#     ddvfa = DDVFA(opts)
+#     ddvfa.opts.display = false
+#     ddvfa.config = DataConfig(0, 1, 128)
+
+#     # Get a deindexed dataset with the indexed order
+#     data = get_deindexed_data(data_indexed, order)
+
+#     # Train and test in batch
+#     y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
+#     y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+
+#     # Calculate performance on training data, testing data, and with get_bmu
+#     train_perf = performance(y_hat_train, data.train_y)
+#     test_perf = performance(y_hat, data.test_y)
+
+#     # Save the number of F2 nodes and total categories per class
+#     n_F2, n_categories = get_n_categories(ddvfa)
+#     n_F2_sum = sum(n_F2)
+#     n_categories_sum = sum(n_categories)
+
+#     # Get the normalized confusion Matrix
+#     norm_cm = get_normalized_confusion(data.test_y, y_hat, n_classes)
+
+#     # Get the train/test accuracies
+#     train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
+
+#     # Deepcopy the simulation dict and add results entries
+#     fulld = deepcopy(d)
+#     fulld["p_tr"] = train_perf
+#     fulld["p_te"] = test_perf
+#     fulld["n_F2"] = n_F2
+#     fulld["n_w"] = n_categories
+#     fulld["n_F2_sum"] = n_F2_sum
+#     fulld["n_w_sum"] = n_categories_sum
+#     fulld["norm_cm"] = norm_cm
+#     fulld["a_tr"] = train_accuracies
+#     fulld["a_te"] = test_accuracies
+
+#     # Save the results dictionary
+#     saved = deepcopy(d)
+#     saved["perm"] = join(order)
+#     # sim_save_name = sweep_results_dir(savename(d, "jld2"))
+#     sim_save_name = sweep_results_dir(savename(saved, "jld2"))
+#     @info "Worker $(myid()): saving to $(sim_save_name)"
+#     # wsave(sim_save_name, f)
+#     tagsave(sim_save_name, fulld)
+
+#     # return fulld
+# end

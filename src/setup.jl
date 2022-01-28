@@ -61,13 +61,18 @@ FONTFAMILY = "Computer Modern"
 
 # Aspect ratio correction for heatmap
 # SQUARE_SIZE = 500.0 .* (1.0, 0.925)
-SQUARE_SIZE = 500.0 .* (1.0, 0.94)
+# SQUARE_SIZE = 500.0 .* (1.0, 0.94)
+# SQUARE_SIZE = 500.0 .* (1.0, 0.86)  # -9Plots.mm
+SQUARE_SIZE = 500.0 .* (1.0, 0.87)  # -8Plots.mm
 
 # Condensed plot parameters
 # DOUBLE_WIDE = 0.75.* (1200, 400)
 DOUBLE_WIDE = 1.0 .* (1200, 400)
 # N_EB = 10
 N_EB = 8
+CONDENSED_LINEWIDTH = 2.5
 
 # colorbar_formatter
 percentage_formatter = j -> @sprintf("%0.0f%%", 100*j)
+
+PERCENTAGES_BOUNDS = (0.45, 1)

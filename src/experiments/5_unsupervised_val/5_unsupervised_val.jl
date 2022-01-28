@@ -97,6 +97,7 @@ perf_test = performance(y_hat, data.test_y)
 # Train in batch, unsupervised
 # y_hat_train_val = train!(ddvfa, data.val_x, y=data.val_y)
 y_hat_train_val = train!(ddvfa, data.val_x)
+replace!(x -> !(x in collect(1:n_classes)) ? 7 : x, ddvfa.labels)
 y_hat_val = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
 
 # Calculate performance on training data, testing data, and with get_bmu
@@ -112,7 +113,7 @@ perf_test_val = performance(y_hat, data.test_y)
 # -----------------------------------------------------------------------------
 
 # Create an accuracy grouped bar chart
-p = create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels, percentages=true)
+p = create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels, percentages=true, extended=true)
 display(p)
 
 # Save the plot

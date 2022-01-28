@@ -41,6 +41,7 @@ sweep_dir = projectdir("work", "results", "3_shuffled_mc", "sweep")
 
 # Collect the results into a single dataframe
 df = collect_results!(sweep_dir)
+# df = collect_results(sweep_dir)
 
 # Select which data entries to use for the experiment
 data_selection = [
@@ -85,7 +86,7 @@ savefig(p_F2, paper_results_dir(n_F2_plot_name))
 # Testing performance
 perf_matrix = df_column_to_matrix(df, :a_te)
 p_perf = create_boxplot(perf_matrix, class_labels, percentages=true)
-ylabel!("Class Testing Accuracy")
+ylabel!("Context Testing Accuracy")
 display(p_perf)
 # Save the plot
 savefig(p_perf, results_dir(perf_plot_name))
