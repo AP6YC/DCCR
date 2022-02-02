@@ -42,7 +42,7 @@ mkpath(paper_results_dir())
 
 # Top data directory
 # data_dir = joinpath("E:\\", "dev", "mount", "data", "dist", "M18_Data_Drop_3_PR", "Data", "activations_yolov3")
-data_dir = projectdir("work", "data", "activations_yolov3")
+data_dir = projectdir("work", "data", "activations_yolov3_cell=1")
 
 # Plotting DPI
 DPI = 350

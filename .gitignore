@@ -6,6 +6,8 @@ work/**
 !work/*
 # Except for the gitkeeps in these subfolders
 !work/*/.gitkeep
+# Except for the data folder
+!work/data/**
 
 # IDE ignores
 .vscode/
