@@ -2,6 +2,13 @@
     exp_setup.jl
 
 Run common setup tasks for Julia experiments, such as setting loading source files and setting data paths.
+
+Authors:
+- Sasha Petrenko <sap625@mst.edu>
+
+Timeline:
+- 1/15/2022: Created.
+- 2/17/2022: Documented.
 """
 
 using DrWatson
@@ -41,38 +48,37 @@ mkpath(results_dir())
 mkpath(paper_results_dir())
 
 # Top data directory
-# data_dir = joinpath("E:\\", "dev", "mount", "data", "dist", "M18_Data_Drop_3_PR", "Data", "activations_yolov3")
-data_dir = projectdir("work", "data", "activations_yolov3_cell=1")
+const data_dir = projectdir("work", "data", "activations_yolov3_cell=1")
 
 # Plotting DPI
-DPI = 350
+const DPI = 350
 
 # Plotting colorscheme
-COLORSCHEME = :okabe_ito
+const COLORSCHEME = :okabe_ito
 
 # Heatmap color gradient
-GRADIENTSCHEME = pubu_9[5:end]
+const GRADIENTSCHEME = pubu_9[5:end]
 # GRADIENTSCHEME = :thermal
 # GRADIENTSCHEME = ylgn_9
 # cgrad([:orange, :blue], [0.1, 0.3, 0.8])
 
 # Plotting fontfamily for all text
-FONTFAMILY = "Computer Modern"
+const FONTFAMILY = "Computer Modern"
 
 # Aspect ratio correction for heatmap
 # SQUARE_SIZE = 500.0 .* (1.0, 0.925)
 # SQUARE_SIZE = 500.0 .* (1.0, 0.94)
 # SQUARE_SIZE = 500.0 .* (1.0, 0.86)  # -9Plots.mm
-SQUARE_SIZE = 500.0 .* (1.0, 0.87)  # -8Plots.mm
+const SQUARE_SIZE = 500.0 .* (1.0, 0.87)  # -8Plots.mm
 
 # Condensed plot parameters
 # DOUBLE_WIDE = 0.75.* (1200, 400)
-DOUBLE_WIDE = 1.0 .* (1200, 400)
+const DOUBLE_WIDE = 1.0 .* (1200, 400)
 # N_EB = 10
-N_EB = 8
-CONDENSED_LINEWIDTH = 2.5
+const N_EB = 8
+const CONDENSED_LINEWIDTH = 2.5
 
 # colorbar_formatter
-percentage_formatter = j -> @sprintf("%0.0f%%", 100*j)
+const percentage_formatter = j -> @sprintf("%0.0f%%", 100*j)
 
-PERCENTAGES_BOUNDS = (0.45, 1)
+const PERCENTAGES_BOUNDS = (0.45, 1)

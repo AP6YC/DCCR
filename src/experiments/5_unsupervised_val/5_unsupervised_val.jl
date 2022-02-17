@@ -2,10 +2,16 @@
     5_unsupervised_val.jl
 
 Description:
+    This script runs an unsupervised learning scenario. After supervised pretraining,
+the module learns upon additional data unsupervised and is tested for performance
+before and after.
 
+Authors:
+- Sasha Petrenko <sap625@mst.edu>
 
-Author: Sasha Petrenko <sap625@mst.edu>
-Date: 1/25/2022
+Timeline:
+- 1/25/2022: Created.
+- 2/17/2022: Documented.
 """
 
 # -----------------------------------------------------------------------------
@@ -97,6 +103,7 @@ perf_test = performance(y_hat, data.test_y)
 # Train in batch, unsupervised
 # y_hat_train_val = train!(ddvfa, data.val_x, y=data.val_y)
 y_hat_train_val = train!(ddvfa, data.val_x)
+# If the category is not in 1:6, replace the label as 7 for the new/incorrect bin
 replace!(x -> !(x in collect(1:n_classes)) ? 7 : x, ddvfa.labels)
 y_hat_val = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
 

@@ -4,8 +4,12 @@
 Description:
     This script runs a complex single condensed scenario iteration.
 
-Author: Sasha Petrenko <sap625@mst.edu>
-Date: 1/18/2022
+Authors:
+- Sasha Petrenko <sap625@mst.edu>
+
+Timeline:
+- 1/18/2022: Created.
+- 2/17/2022: Documented.
 """
 
 # -----------------------------------------------------------------------------

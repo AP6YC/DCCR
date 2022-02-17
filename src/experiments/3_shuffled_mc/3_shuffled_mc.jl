@@ -11,8 +11,12 @@ function definitions to run each simulation.
 them down after. This is done to reduce precompilation in each process during
 development.
 
-Author: Sasha Petrenko <sap625@mst.edu>
-Date: 1/17/2022
+Authors:
+- Sasha Petrenko <sap625@mst.edu>
+
+Timeline:
+- 1/17/2022: Created.
+- 2/17/2022: Documented.
 """
 
 # Start several processes

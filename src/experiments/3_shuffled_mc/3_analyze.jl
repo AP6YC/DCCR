@@ -5,8 +5,12 @@ Description:
     This script takes the results of the Monte Carlo of shuffled simulations
 and generates plots of their statistics.
 
-Author: Sasha Petrenko <sap625@mst.edu>
-Date: 1/17/2022
+Authors:
+- Sasha Petrenko <sap625@mst.edu>
+
+Timeline:
+- 1/17/2022: Created.
+- 2/17/2022: Documented.
 """
 
 # -----------------------------------------------------------------------------

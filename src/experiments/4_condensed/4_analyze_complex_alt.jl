@@ -5,8 +5,12 @@ Description:
     This script analyzes a complex single condensed scenario iteration.
 This script is updated to use the updated full condensed scenario plot.
 
-Author: Sasha Petrenko <sap625@mst.edu>
-Date: 1/26/2022
+Authors:
+- Sasha Petrenko <sap625@mst.edu>
+
+Timeline:
+- 1/26/2022: Created.
+- 2/17/2022: Documented.
 """
 
 # -----------------------------------------------------------------------------

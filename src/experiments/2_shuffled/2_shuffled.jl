@@ -6,28 +6,13 @@ Description:
 the individual samples. The same training, testing, plots, and category tables
 are generated and saved.
 
-Author: Sasha Petrenko <sap625@mst.edu>
-Date: 1/17/2022
+Authors:
+- Sasha Petrenko <sap625@mst.edu>
+
+Timeline:
+- 1/17/2022: Created.
+- 2/17/2022: Documented.
 """
-
-# using Revise            # Editing this file
-# using DrWatson          # Project directory functions, etc.
-# using Logging           # Printing diagnostics
-# using AdaptiveResonance # ART modules
-# using Random            # Random subsequence
-# # using ProgressMeter     # Progress bar
-# # using CSV
-# # using DataFrames
-# using Dates
-# # using MLDataUtils
-# using Printf            # Formatted number printing
-# # using JSON
-# using MLBase
-# # using Plots
-# using StatsPlots
-
-# using Latexify
-# using DataFrames
 
 # -----------------------------------------------------------------------------
 # FILE SETUP
