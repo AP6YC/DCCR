@@ -14,7 +14,6 @@ Deep Clustering Context Recognition (DCCR); materials for the upcoming paper "Wh
   - [History](#history)
   - [Credits](#credits)
     - [Authors](#authors)
-    - [Software](#software)
 
 ## Usage
 
@@ -30,10 +29,6 @@ DCCR
 │   ├── lib                 //      Common experimental code
 │   ├── meta-icvi           //      Meta-ICVI development scripts and libs
 │   └── utils               //      Utility scripts (data inspection, etc.)
-├── python                  // Source: python scripts and modules
-├── cluster                 // Cluster: submission scripts for the MST HPC cluster
-│   ├── scripts             //      Utility scripts
-│   └── sub                 //      Submission scripts
 ├── opts                    // Options: files for each experiment, learner, etc.
 ├── test                    // Test: Pytest unit, integration, and environment tests
 ├── work                    // Work: Temporary file location (weights, datasets)
@@ -42,7 +37,6 @@ DCCR
 ├── .gitattributes          // Git: definitions for LFS patterns
 ├── .gitignore              // Git: .gitignore for the whole project
 ├── README.md               // Doc: this document
-└── requirements.txt        // Doc: pip requirements file for standard venv
 ```
 
 ## Contributing
@@ -52,15 +46,11 @@ Please raise an [issue][issues-url].
 ## History
 
 - 6/25/2021 - Initialize the project.
-- 8/23/2021 - Refactor L2MTaskDetector as a Julia dependency.
+- 4/6/2022 - Create anonymous submission release.
 
 ## Credits
 
 ### Authors
 
 - Sasha Petrenko <sap625@mst.edu>
-- Andrew Brna <>
-
-### Software
-
-- https://github.com/AP6YC/L2MTaskDetector.jl
+- Andrew Brna <andrew.brna@teledyne.com>
