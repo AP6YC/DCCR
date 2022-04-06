@@ -4,9 +4,6 @@
 Description:
     This script runs a single condensed scenario iteration.
 
-Authors:
-- Sasha Petrenko <sap625@mst.edu>
-
 Timeline:
 - 1/18/2022: Created.
 - 2/17/2022: Documented.

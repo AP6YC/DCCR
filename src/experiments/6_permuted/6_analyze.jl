@@ -4,9 +4,6 @@
 Description:
     Analyze/plot the permuted condensed scenario runs from 6_permuted.jl.
 
-Authors:
-- Sasha Petrenko <sap625@mst.edu>
-
 Timeline:
 - 1/25/2022: Created.
 - 2/17/2022: Documented.

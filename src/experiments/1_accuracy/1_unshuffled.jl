@@ -8,9 +8,6 @@ This script also counts the number of categories, saving to a LaTeX table.
 Both of these results are saved to a local results directory and Dropbox directory
 containing the Overleaf document for the paper.
 
-Authors:
-- Sasha Petrenko <sap625@mst.edu>
-
 Timeline:
 - 1/17/2022: Created.
 - 2/17/2022: Documented.

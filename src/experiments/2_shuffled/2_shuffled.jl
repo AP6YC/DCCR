@@ -6,9 +6,6 @@ Description:
 the individual samples. The same training, testing, plots, and category tables
 are generated and saved.
 
-Authors:
-- Sasha Petrenko <sap625@mst.edu>
-
 Timeline:
 - 1/17/2022: Created.
 - 2/17/2022: Documented.
