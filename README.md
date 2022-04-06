@@ -27,7 +27,6 @@ DCCR
 │   ├── lib                 //      Common experimental code
 │   ├── meta-icvi           //      Meta-ICVI development scripts and libs
 │   └── utils               //      Utility scripts (data inspection, etc.)
-├── python                  // Source: python scripts and modules
 ├── opts                    // Options: files for each experiment, learner, etc.
 ├── work                    // Work: Temporary file location (weights, datasets)
 │   ├── data                //      Datasets
@@ -35,7 +34,6 @@ DCCR
 ├── .gitattributes          // Git: definitions for LFS patterns
 ├── .gitignore              // Git: .gitignore for the whole project
 ├── README.md               // Doc: this document
-└── requirements.txt        // Doc: pip requirements file for standard venv
 ```
 
 ## Contributing
