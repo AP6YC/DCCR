@@ -22,7 +22,7 @@ using Distributed
 # Set the simulation parameters
 sim_params = Dict{String, Any}(
     "m" => "ddvfa",
-    "seed" => collect(1:10)
+    "seed" => collect(1:1000)
 )
 
 @everywhere begin
@@ -100,6 +100,7 @@ dicts = dict_list(sim_params)
 # Parallel map the sims
 pmap(local_sim, dicts)
 
+println("--- Simulation complete ---")
 # Close the workers after simulation
 # rmprocs(workers())
 

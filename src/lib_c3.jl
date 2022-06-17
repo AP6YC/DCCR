@@ -1407,7 +1407,7 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     y_hat_train_val = train!(ddvfa, local_val_x)
     # If the category is not in 1:6, replace the label as 7 for the new/incorrect bin
     replace!(x -> !(x in collect(1:n_classes)) ? 7 : x, ddvfa.labels)
-    replace!(x -> !(x in collect(1:n_classes)) ? 0 : x, y_hat_train_val)
+    replace!(x -> !(x in collect(1:n_classes)) ? 7 : x, y_hat_train_val)
     y_hat_val = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
 
     # Calculate performance on training data, testing data, and with get_bmu
@@ -1430,9 +1430,9 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     # TEST: Get the percent correct for each class
     test_accuracies = get_accuracies(data.test_y, y_hat, n_classes)
     # TRAIN: Get the percent correct for each class
-    train_accuracies_val = get_accuracies(local_val_y, y_hat_train_val, n_classes)
+    train_accuracies_val = get_accuracies(local_val_y, y_hat_train_val, n_classes+1)
     # TEST: Get the percent correct for each class
-    test_accuracies_val = get_accuracies(data.test_y, y_hat_val, n_classes)
+    test_accuracies_val = get_accuracies(data.test_y, y_hat_val, n_classes+1)
 
     # Deepcopy the simulation dict and add results entries
     fulld = deepcopy(d)
