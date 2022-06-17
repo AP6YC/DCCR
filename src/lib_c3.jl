@@ -167,27 +167,27 @@ mutable struct DataSplit
     test_y::RealVector
     test_labels::Vector{String}
 
-    DataSplit(
-        train_x,
-        train_y,
-        train_labels,
-        val_x,
-        val_y,
-        val_labels,
-        test_x,
-        test_y,
-        test_labels
-    ) = new(
-        train_x,
-        train_y,
-        train_labels,
-        val_x,
-        val_y,
-        val_labels,
-        test_x,
-        test_y,
-        test_labels
-    )
+    # DataSplit(
+    #     train_x,
+    #     train_y,
+    #     train_labels,
+    #     val_x,
+    #     val_y,
+    #     val_labels,
+    #     test_x,
+    #     test_y,
+    #     test_labels
+    # ) = new(
+    #     train_x,
+    #     train_y,
+    #     train_labels,
+    #     val_x,
+    #     val_y,
+    #     val_labels,
+    #     test_x,
+    #     test_y,
+    #     test_labels
+    # )
 end
 
 """
@@ -207,6 +207,34 @@ mutable struct DataSplitIndexed
     test_x::Vector{RealMatrix}
     test_y::Vector{IntegerVector}
     test_labels::Vector{String}
+end
+
+"""
+    DataSplitCombined
+
+A struct for combining training and validation data, containing only train and test splits.
+"""
+mutable struct DataSplitCombined
+    train_x::RealMatrix
+    train_y::IntegerVector
+    train_labels::Vector{String}
+
+    test_x::RealMatrix
+    test_y::IntegerVector
+    test_labels::Vector{String}
+end
+
+function DataSplitCombined(data::DataSplit)
+    # println(size(data.train_x))
+    # println(size(data.val_x))
+    DataSplitCombined(
+        hcat(data.train_x, data.val_x),
+        vcat(data.train_y, data.val_y),
+        vcat(data.train_labels, data.val_labels),
+        data.test_x,
+        data.test_y,
+        data.test_labels
+    )
 end
 
 """
@@ -470,11 +498,11 @@ function get_accuracies(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
 end
 
 """
-    get_tt_accuracies(data::DataSplit, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Int)
+    get_tt_accuracies(data::Union{DataSplit, DataSplitCombined}, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Int)
 
 Get two lists of the training and testing accuracies
 """
-function get_tt_accuracies(data::DataSplit, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Int)
+function get_tt_accuracies(data::Union{DataSplit, DataSplitCombined}, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Int)
     # TRAIN: Get the percent correct for each class
     train_accuracies = get_accuracies(data.train_y, y_hat_train, n_classes)
 
@@ -1328,6 +1356,105 @@ function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
     tagsave(sim_save_name, fulld)
 
     # return fulld
+end
+
+"""
+    unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
+
+Runs a single Monte Carlo simulation of supervised training and unsupervised training/testing.
+"""
+function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
+    # Infer the number of classes
+    n_classes = length(unique(data.train_y))
+
+    # Get the random seed for the experiment
+    seed = d["seed"]
+
+    # Create the DDVFA module and setup the config
+    ddvfa = DDVFA(opts)
+    ddvfa.opts.display = false
+    ddvfa.config = DataConfig(0, 1, 128)
+
+    # Shuffle the data with a new random seed
+    Random.seed!(seed)
+    i_train = randperm(length(data.train_y))
+    data.train_x = data.train_x[:, i_train]
+    data.train_y = data.train_y[i_train]
+
+    n_samples = length(data.train_y)
+    i_split = Int(floor(0.8*n_samples))
+
+    local_train_x = data.train_x[:, 1:i_split]
+    local_train_y = data.train_y[1:i_split]
+
+    local_val_x = data.train_x[:, i_split+1:end]
+    local_val_y = data.train_y[i_split+1:end]
+
+    # --- SUPERVISED ---
+
+    # Train and test in batch
+    y_hat_train = train!(ddvfa, local_train_x, y=local_train_y)
+    y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+
+    # Calculate performance on training data, testing data, and with get_bmu
+    train_perf = performance(y_hat_train, local_train_y)
+    test_perf = performance(y_hat, data.test_y)
+
+    # --- UNSUPERVISED ---
+
+    # Train in batch, unsupervised
+    # y_hat_train_val = train!(ddvfa, data.val_x, y=data.val_y)
+    y_hat_train_val = train!(ddvfa, local_val_x)
+    # If the category is not in 1:6, replace the label as 7 for the new/incorrect bin
+    replace!(x -> !(x in collect(1:n_classes)) ? 7 : x, ddvfa.labels)
+    replace!(x -> !(x in collect(1:n_classes)) ? 0 : x, y_hat_train_val)
+    y_hat_val = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+
+    # Calculate performance on training data, testing data, and with get_bmu
+    train_perf_val = performance(y_hat_train_val, local_val_y)
+    test_perf_val = performance(y_hat, data.test_y)
+
+    # Save the number of F2 nodes and total categories per class
+    n_F2, n_categories = get_n_categories(ddvfa)
+    n_F2_sum = sum(n_F2)
+    n_categories_sum = sum(n_categories)
+
+    # Get the normalized confusion Matrix
+    norm_cm = get_normalized_confusion(data.test_y, y_hat, n_classes)
+
+    # Get the train/test accuracies
+    # train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
+    # train_accuracies_val, test_accuracies_val = get_tt_accuracies(data, y_hat_train_val, y_hat_val, n_classes)
+    # TRAIN: Get the percent correct for each class
+    train_accuracies = get_accuracies(local_train_y, y_hat_train, n_classes)
+    # TEST: Get the percent correct for each class
+    test_accuracies = get_accuracies(data.test_y, y_hat, n_classes)
+    # TRAIN: Get the percent correct for each class
+    train_accuracies_val = get_accuracies(local_val_y, y_hat_train_val, n_classes)
+    # TEST: Get the percent correct for each class
+    test_accuracies_val = get_accuracies(data.test_y, y_hat_val, n_classes)
+
+    # Deepcopy the simulation dict and add results entries
+    fulld = deepcopy(d)
+    fulld["p_tr"] = train_perf
+    fulld["p_te"] = test_perf
+    fulld["p_trv"] = train_perf_val
+    fulld["p_tev"] = test_perf_val
+    fulld["n_F2"] = n_F2
+    fulld["n_w"] = n_categories
+    fulld["n_F2_sum"] = n_F2_sum
+    fulld["n_w_sum"] = n_categories_sum
+    fulld["norm_cm"] = norm_cm
+    fulld["a_tr"] = train_accuracies
+    fulld["a_te"] = test_accuracies
+    fulld["a_trv"] = train_accuracies_val
+    fulld["a_tev"] = test_accuracies_val
+
+    # Save the results dictionary
+    sim_save_name = sweep_results_dir(savename(d, "jld2"))
+    @info "Worker $(myid()): saving to $(sim_save_name)"
+    # wsave(sim_save_name, f)
+    tagsave(sim_save_name, fulld)
 end
 
 
