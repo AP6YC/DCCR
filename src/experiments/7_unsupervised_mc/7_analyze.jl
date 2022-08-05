@@ -88,7 +88,7 @@ savefig(p_F2, paper_results_dir(n_F2_plot_name))
 
 # Testing performance
 perf_matrix = df_column_to_matrix(df, :a_te)
-p_perf = create_boxplot(perf_matrix, class_labels, percentages=true)
+p_perf = create_boxplot(perf_matrix, class_labels, percentages=true, bounds_override=(0.8, 1))
 ylabel!("Context Testing Accuracy")
 display(p_perf)
 # Save the plot

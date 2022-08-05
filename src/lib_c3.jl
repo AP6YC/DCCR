@@ -884,7 +884,7 @@ end
 
 Return a colored and formatted boxplot of the data.
 """
-function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false)
+function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false, bounds_override=[])
     # Get the number of sample vectors
     # n_samples = size(n_w_matrix)[1]
     n_samples = size(data)[1]
@@ -917,9 +917,15 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percent
     )
 
     if percentages
+        # Set the bounds
+        if !isempty(bounds_override)
+            local_bounds = bounds_override
+        else
+            local_bounds = PERCENTAGES_BOUNDS
+        end
         # ylims!(p, (-Inf, 1))
         # ylims!(p, (0.6, 1))
-        ylims!(p, PERCENTAGES_BOUNDS)
+        ylims!(p, local_bounds)
     end
 
     # Format the plot
