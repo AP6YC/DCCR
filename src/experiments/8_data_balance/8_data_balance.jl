@@ -54,7 +54,7 @@ data_sizes = Dict(
     "PRM" => Dict(
         "train" => 281,
         "test" => 283,
-        # "test" => 2,
+        # "test" => 2, # for testing entropy
     ),
     # "" => Dict(
     #     "train" =>,
@@ -68,7 +68,6 @@ test_vec = [data_sizes[key]["test"] for (key, _) in data_sizes]
 n_classes = length(train_vec)
 n_train = sum(train_vec)
 n_test = sum(test_vec)
-# H = -sum()
 
 # OLD
 
@@ -80,4 +79,12 @@ B_test = H_test / log(n_classes)
 
 @info "Balances:" B_train B_test
 
-H =
+# Shannon diversity index
+H_SDI_train = (n_train * log(n_train) - sum(train_vec .* log.(train_vec))) / n_train
+H_SDI_test = (n_test * log(n_test) - sum(test_vec .* log.(test_vec))) / n_test
+
+# Shannon equitability index
+H_SEI_train = H_SDI_train / log(n_classes)
+H_SEI_test = H_SDI_test / log(n_classes)
+
+@info "Shannon Diversity Indices and Equitability Indices:" H_SDI_train H_SDI_test H_SEI_train H_SEI_test
