@@ -1425,8 +1425,9 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     n_F2_sum = sum(n_F2)
     n_categories_sum = sum(n_categories)
 
-    # Get the normalized confusion Matrix
+    # Get the normalized confusion matrices
     norm_cm = get_normalized_confusion(data.test_y, y_hat, n_classes)
+    norm_cm_val = get_normalized_confusion(data.val_y, y_hat_val, n_classes)
 
     # Get the train/test accuracies
     # train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
@@ -1451,6 +1452,7 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     fulld["n_F2_sum"] = n_F2_sum
     fulld["n_w_sum"] = n_categories_sum
     fulld["norm_cm"] = norm_cm
+    fulld["norm_cm_val"] = norm_cm_val
     fulld["a_tr"] = train_accuracies
     fulld["a_te"] = test_accuracies
     fulld["a_trv"] = train_accuracies_val
