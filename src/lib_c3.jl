@@ -15,6 +15,8 @@ using StatsPlots    # groupedbar
 using DataFrames
 using Printf
 
+import Tar
+
 # Add the custom colors definitions
 include("colors.jl")
 
@@ -1465,6 +1467,18 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     tagsave(sim_save_name, fulld)
 end
 
+
+function pack_data(data_folder)
+    from_dir = projectdir("data", "unpacked", data_folder)
+    to_file = projectdir("data", "packed", data_folder * ".tar")
+    Tar.create(from_dir, to_file)
+end
+
+function unpack_data()
+    from_file = projectdir("data", "packed", data_folder * ".tar")
+    to_dir = projectdir("data", "unpacked", data_folder)
+    Tar.extract(from_file, to_dir)
+end
 
 # """
 #     permuted(d::Dict, data::DataSplit, opts::opts_DDVFA)

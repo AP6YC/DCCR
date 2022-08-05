@@ -6,8 +6,19 @@ work/**
 !work/*
 # Except for the gitkeeps in these subfolders
 !work/*/.gitkeep
-# Except for the data folder
-!work/data/**
+# # Except for the unpacked data folder
+# !work/data/**
+
+# ------------------------------------------------ #
+# EXPERIMENT DATA EXCEPTIONS
+# ------------------------------------------------ #
+
+# Ignore the unpacking directory
+data/unpacked/**
+!data/unpacked/.gitkeep
+
+# Except the shuffled Monte Carlo results
+# !work/results/3_shuffled_mc/sweep/*
 
 # IDE ignores
 .vscode/
