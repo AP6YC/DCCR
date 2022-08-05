@@ -1467,18 +1467,27 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     tagsave(sim_save_name, fulld)
 end
 
+"""
+    pack_data(experiment_name::String)
 
-function pack_data(data_folder)
-    from_dir = projectdir("data", "unpacked", data_folder)
-    to_file = projectdir("data", "packed", data_folder * ".tar")
+Packs the data under the provided experiment name folder into an LFS-tracked tarball.
+"""
+function pack_data(experiment_name::String)
+    from_dir = projectdir("data", "unpacked", experiment_name)
+    to_file = projectdir("data", "packed", experiment_name * ".tar")
     Tar.create(from_dir, to_file)
-end
+end # pack_data(experiment_name::String)
 
-function unpack_data()
-    from_file = projectdir("data", "packed", data_folder * ".tar")
-    to_dir = projectdir("data", "unpacked", data_folder)
+"""
+    unpack_data(experiment_name::String)
+
+Unpacks data at the provided experiment name tarball into a working directory.
+"""
+function unpack_data(experiment_name::String)
+    from_file = projectdir("data", "packed", experiment_name * ".tar")
+    to_dir = projectdir("data", "unpacked", experiment_name)
     Tar.extract(from_file, to_dir)
-end
+end # unpack_data(experiment_name::String)
 
 # """
 #     permuted(d::Dict, data::DataSplit, opts::opts_DDVFA)
