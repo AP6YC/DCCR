@@ -42,7 +42,8 @@ sim_params = Dict{String, Any}(
 
     # Make a path locally just for the sweep results
     # sweep_results_dir(args...) = results_dir("sweep", args...)
-    sweep_results_dir(args...) = projectdir("work", "data", experiment_top, "sweep", args...)
+    # sweep_results_dir(args...) = projectdir("work", "data", experiment_top, "sweep", args...)
+    sweep_results_dir(args...) = unpacked_dir(experiment_top, "sweep", args...)
     mkpath(sweep_results_dir())
 
     # Select which data entries to use for the experiment

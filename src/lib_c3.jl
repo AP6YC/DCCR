@@ -1467,14 +1467,20 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     tagsave(sim_save_name, fulld)
 end
 
+# Packed data directory
+packed_dir(args...) = datadir("packed", args...)
+
+# Unpacked data directory
+unpacked_dir(args...) = datadir("unpacked", args...)
+
 """
     pack_data(experiment_name::String)
 
 Packs the data under the provided experiment name folder into an LFS-tracked tarball.
 """
 function pack_data(experiment_name::String)
-    from_dir = projectdir("data", "unpacked", experiment_name)
-    to_file = projectdir("data", "packed", experiment_name * ".tar")
+    from_dir = unpacked_dir(experiment_name)
+    to_file = packed_dir(experiment_name * ".tar")
     Tar.create(from_dir, to_file)
 end # pack_data(experiment_name::String)
 
@@ -1484,10 +1490,21 @@ end # pack_data(experiment_name::String)
 Unpacks data at the provided experiment name tarball into a working directory.
 """
 function unpack_data(experiment_name::String)
-    from_file = projectdir("data", "packed", experiment_name * ".tar")
-    to_dir = projectdir("data", "unpacked", experiment_name)
+    from_file = packed_dir(experiment_name * ".tar")
+    to_dir = unpacked_dir(experiment_name)
     Tar.extract(from_file, to_dir)
 end # unpack_data(experiment_name::String)
+
+"""
+    safe_unpack(experiment_name::String)
+
+If the provided experiment unpacked directory does not exist, this unpacks it.
+"""
+function safe_unpack(experiment_name::String)
+    if !isdir(unpacked_dir(experiment_name))
+        unpack_data(experiment_name)
+    end
+end # safe_unpack(experiment_name::String)
 
 # """
 #     permuted(d::Dict, data::DataSplit, opts::opts_DDVFA)

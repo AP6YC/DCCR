@@ -37,7 +37,9 @@ perf_plot_name = "3_perf.png"
 heatmap_plot_name = "3_heatmap.png"
 
 # Point to the local sweep data directory
-sweep_dir = projectdir("work", "results", "3_shuffled_mc", "sweep")
+# sweep_dir = projectdir("work", "results", "3_shuffled_mc", "sweep")
+safe_unpack(experiment_top)
+sweep_dir = unpacked_dir(experiment_top, "sweep")
 
 # -----------------------------------------------------------------------------
 # LOAD RESULTS

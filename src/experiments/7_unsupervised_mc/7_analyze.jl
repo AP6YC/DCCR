@@ -37,7 +37,9 @@ heatmap_plot_name = "7_heatmap.png"
 diff_perf_plot_name = "7_diff_perf.png"
 
 # Point to the local sweep data directory
-sweep_dir = projectdir("work", "results", experiment_top, "sweep")
+# sweep_dir = projectdir("work", "results", experiment_top, "sweep")
+safe_unpack(experiment_top)
+sweep_dir = unpacked_dir(experiment_top, "sweep")
 
 # -----------------------------------------------------------------------------
 # LOAD RESULTS
