@@ -1389,12 +1389,13 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     data.train_x = data.train_x[:, i_train]
     data.train_y = data.train_y[i_train]
 
+    # Get the number of samples in the training dataset to split it up
     n_samples = length(data.train_y)
     i_split = Int(floor(0.8*n_samples))
 
+    # Split the original training dataset into train (supervised) and val (unsupervised)
     local_train_x = data.train_x[:, 1:i_split]
     local_train_y = data.train_y[1:i_split]
-
     local_val_x = data.train_x[:, i_split+1:end]
     local_val_y = data.train_y[i_split+1:end]
 
@@ -1418,9 +1419,9 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     replace!(x -> !(x in collect(1:n_classes)) ? 7 : x, y_hat_train_val)
     y_hat_val = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
 
-    # Calculate performance on training data, testing data, and with get_bmu
+    # Calculate performance on second training data, testing data, and with get_bmu
     train_perf_val = performance(y_hat_train_val, local_val_y)
-    test_perf_val = performance(y_hat, data.test_y)
+    test_perf_val = performance(y_hat_val, data.test_y)
 
     # Save the number of F2 nodes and total categories per class
     n_F2, n_categories = get_n_categories(ddvfa)
@@ -1429,7 +1430,7 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
 
     # Get the normalized confusion matrices
     norm_cm = get_normalized_confusion(data.test_y, y_hat, n_classes)
-    norm_cm_val = get_normalized_confusion(data.val_y, y_hat_val, n_classes)
+    norm_cm_val = get_normalized_confusion(data.test_y, y_hat_val, n_classes + 1)
 
     # Get the train/test accuracies
     # train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
