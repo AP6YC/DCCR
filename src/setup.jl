@@ -49,7 +49,8 @@ mkpath(results_dir())
 mkpath(paper_results_dir())
 
 # Top data directory
-const data_dir = projectdir("work", "data", "activations_yolov3_cell=1")
+# const data_dir = projectdir("work", "data", "activations_yolov3_cell=1")
+const data_dir = unpacked_dir("activations_yolov3_cell=1")
 
 # Plotting DPI
 const DPI = 350

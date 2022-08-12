@@ -14,5 +14,5 @@ Timeline:
 
 # Start several processes
 using Distributed
-addprocs(26, exeflags="--project=.")
+addprocs(28, exeflags="--project=.")
 # addprocs(10, exeflags="--project=.")

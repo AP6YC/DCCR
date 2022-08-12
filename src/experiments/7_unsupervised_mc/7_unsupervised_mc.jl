@@ -102,6 +102,9 @@ dicts = dict_list(sim_params)
 # Parallel map the sims
 pmap(local_sim, dicts)
 
+# Save the data into a binary
+pack_data(experiment_top)
+
 println("--- Simulation complete ---")
 # Close the workers after simulation
 # rmprocs(workers())
