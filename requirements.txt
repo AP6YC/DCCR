@@ -1,0 +1,5 @@
+l2metrics
+l2logger
+jupyterlab
+pandas
+numpy
