@@ -3,3 +3,4 @@ l2logger
 jupyterlab
 pandas
 numpy
+ctypes
