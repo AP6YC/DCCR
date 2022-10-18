@@ -27,7 +27,7 @@ Pkg.build("PyCall")
 using PyCall
 using Conda
 
-# Use pip through conda
+# Use pip through conda because l2logger and l2metrics are not on conda/conda-forge
 Conda.pip_interop(true)
 
 # Install the l2loggers
