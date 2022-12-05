@@ -21,8 +21,6 @@ if !isempty(ARGS)
     addprocs(parse(Int, ARGS[1]), exeflags="--project=.")
 end
 
-safe_unpack("activations_yolo3_cell=1")
-
 # Set the simulation parameters
 sim_params = Dict{String, Any}(
     "m" => "ddvfa",
