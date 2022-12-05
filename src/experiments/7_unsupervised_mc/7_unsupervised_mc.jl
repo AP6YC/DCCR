@@ -18,13 +18,12 @@ using Distributed
 
 # If we parallelize from the command line
 if !isempty(ARGS)
-    # addprocs(ARGS[1], exeflags="--project=.")
-    addprocs(ARGS[1])
-
-    @everywhere begin
-        using Pkg
-        Pkg.activate(".")
-    end
+    addprocs(parse(Int, ARGS[1]), exeflags="--project=.")
+    # addprocs(ARGS[1])
+    # @everywhere begin
+    #     using Pkg
+    #     Pkg.activate(".")
+    # end
 end
 
 # Set the simulation parameters
