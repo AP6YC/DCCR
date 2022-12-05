@@ -19,12 +19,9 @@ using Distributed
 # If we parallelize from the command line
 if !isempty(ARGS)
     addprocs(parse(Int, ARGS[1]), exeflags="--project=.")
-    # addprocs(ARGS[1])
-    # @everywhere begin
-    #     using Pkg
-    #     Pkg.activate(".")
-    # end
 end
+
+safe_unpack("activations_yolo3_cell=1")
 
 # Set the simulation parameters
 sim_params = Dict{String, Any}(
