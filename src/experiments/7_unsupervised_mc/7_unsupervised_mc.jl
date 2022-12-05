@@ -15,9 +15,11 @@ Timeline:
 
 # Start several processes
 using Distributed
-# addprocs(3, exeflags="--project=.")
-# Close the workers after simulation
-# rmprocs(workers())
+
+# If we parallelize from the command line
+if !isempty(ARGS)
+    addprocs(ARGS[1], exeflags="--project=.")
+end
 
 # Set the simulation parameters
 sim_params = Dict{String, Any}(
@@ -106,9 +108,14 @@ pmap(local_sim, dicts)
 pack_data(experiment_top)
 
 println("--- Simulation complete ---")
+
 # Close the workers after simulation
 # rmprocs(workers())
 
+# Close the workers after simulation
+if !isempty(ARGS)
+    rmprocs(workers())
+end
 
 # # -----------------------------------------------------------------------------
 # # FILE SETUP
