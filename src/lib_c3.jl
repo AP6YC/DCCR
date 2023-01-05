@@ -1,52 +1,44 @@
-using AdaptiveResonance
+"""
+    lib_c3.jl
 
-using StatsBase
-# using Statistics
+# Description
+This file contains the majority of common data structures, loading functions, and experiments for the DCCR project.
 
-using Logging
-# using HDF5              # Loading .h5 activation files
+# Authors
+- Sasha Petrenko <sap625@mst.edu>
+"""
 
-using DelimitedFiles
+# using AdaptiveResonance
+# using StatsBase
+# # using Statistics
+# using Logging
+# using DelimitedFiles
+# using MLBase        # confusmat
+# # using DrWatson
+# using MLDataUtils   # stratifiedobs
+# using StatsPlots    # groupedbar
+# using DataFrames
+# using Printf
+# using NumericalTypeAliases
+# # using HDF5              # Loading .h5 activation files
 
-using MLBase        # confusmat
-# using DrWatson
-using MLDataUtils   # stratifiedobs
-using StatsPlots    # groupedbar
-using DataFrames
-using Printf
+using
+    AdaptiveResonance,
+    StatsBase,
+    Logging,
+    DelimitedFiles,
+    MLBase,             # confusmat
+    MLDataUtils,        # stratifiedobs
+    StatsPlots,         # groupedbar
+    DataFrames,
+    Printf,
+    NumericalTypeAliases
+
 
 import Tar
 
 # Add the custom colors definitions
 include("colors.jl")
-
-# -----------------------------------------------------------------------------
-# ALIASES
-# -----------------------------------------------------------------------------
-#   **Taken from StatsBase.jl**
-#
-#  These types signficantly reduces the need of using
-#  type parameters in functions (which are often just
-#  for the purpose of restricting the arrays to real)
-#
-# These could be removed when the Base supports
-# covariant type notation, i.e. AbstractVector{<:Real}
-
-# Real-numbered aliases
-const RealArray{T<:Real, N} = AbstractArray{T, N}
-const RealVector{T<:Real} = AbstractArray{T, 1}
-const RealMatrix{T<:Real} = AbstractArray{T, 2}
-
-# Integered aliases
-const IntegerArray{T<:Integer, N} = AbstractArray{T, N}
-const IntegerVector{T<:Integer} = AbstractArray{T, 1}
-const IntegerMatrix{T<:Integer} = AbstractArray{T, 2}
-
-# Specifically floating-point aliases
-const RealFP = Union{Float32, Float64}
-
-# System's largest native floating point variable
-const Float = (Sys.WORD_SIZE == 64 ? Float64 : Float32)
 
 # -----------------------------------------------------------------------------
 # METHODS
@@ -156,40 +148,17 @@ end
 A basic struct for encapsulating the components of supervised training.
 """
 mutable struct DataSplit
-
-    train_x::RealMatrix
-    train_y::IntegerVector
+    train_x::Matrix{Float}
+    train_y::Vector{Int}
     train_labels::Vector{String}
 
-    val_x::RealMatrix
-    val_y::IntegerVector
+    val_x::Matrix{Float}
+    val_y::Vector{Int}
     val_labels::Vector{String}
 
-    test_x::RealMatrix
-    test_y::RealVector
+    test_x::Matrix{Float}
+    test_y::Vector{Int}
     test_labels::Vector{String}
-
-    # DataSplit(
-    #     train_x,
-    #     train_y,
-    #     train_labels,
-    #     val_x,
-    #     val_y,
-    #     val_labels,
-    #     test_x,
-    #     test_y,
-    #     test_labels
-    # ) = new(
-    #     train_x,
-    #     train_y,
-    #     train_labels,
-    #     val_x,
-    #     val_y,
-    #     val_labels,
-    #     test_x,
-    #     test_y,
-    #     test_labels
-    # )
 end
 
 """
@@ -198,16 +167,16 @@ end
 A basic struct for encapsulating the components of supervised training.
 """
 mutable struct DataSplitIndexed
-    train_x::Vector{RealMatrix}
-    train_y::Vector{IntegerVector}
+    train_x::Vector{Matrix{Float}}
+    train_y::Vector{Vector{Int}}
     train_labels::Vector{String}
 
-    val_x::Vector{RealMatrix}
-    val_y::Vector{IntegerVector}
+    val_x::Vector{Matrix{Float}}
+    val_y::Vector{Vector{Int}}
     val_labels::Vector{String}
 
-    test_x::Vector{RealMatrix}
-    test_y::Vector{IntegerVector}
+    test_x::Vector{Matrix{Float}}
+    test_y::Vector{Vector{Int}}
     test_labels::Vector{String}
 end
 
@@ -217,12 +186,12 @@ end
 A struct for combining training and validation data, containing only train and test splits.
 """
 mutable struct DataSplitCombined
-    train_x::RealMatrix
-    train_y::IntegerVector
+    train_x::Matrix{Float}
+    train_y::Vector{Int}
     train_labels::Vector{String}
 
-    test_x::RealMatrix
-    test_y::IntegerVector
+    test_x::Matrix{Float}
+    test_y::Vector{Int}
     test_labels::Vector{String}
 end
 
@@ -330,15 +299,24 @@ function get_indexed_data(data::DataSplit)
     # Assume the same number of classes in each category
     n_classes = length(unique(data.train_y))
 
-    # data_indexed =
-    train_x = Vector{RealMatrix}()
-    train_y = Vector{IntegerVector}()
+    # train_x = Vector{RealMatrix}()
+    # train_y = Vector{IntegerVector}()
+    # train_labels = Vector{String}()
+    # val_x = Vector{RealMatrix}()
+    # val_y = Vector{IntegerVector}()
+    # val_labels = Vector{String}()
+    # test_x = Vector{RealMatrix}()
+    # test_y = Vector{IntegerVector}()
+    # test_labels = Vector{String}()
+
+    train_x = Vector{Matrix{Float}}()
+    train_y = Vector{Vector{Int}}()
     train_labels = Vector{String}()
-    val_x = Vector{RealMatrix}()
-    val_y = Vector{IntegerVector}()
+    val_x = Vector{Matrix{Float}}()
+    val_y = Vector{Vector{Int}}()
     val_labels = Vector{String}()
-    test_x = Vector{RealMatrix}()
-    test_y = Vector{IntegerVector}()
+    test_x = Vector{Matrix{Float}}()
+    test_y = Vector{Vector{Int}}()
     test_labels = Vector{String}()
 
     for i = 1:n_classes
@@ -1479,33 +1457,33 @@ unpacked_dir(args...) = datadir("unpacked", args...)
 
 Packs the data under the provided experiment name folder into an LFS-tracked tarball.
 """
-function pack_data(experiment_name::String)
+function pack_data(experiment_name::AbstractString)
     from_dir = unpacked_dir(experiment_name)
     to_file = packed_dir(experiment_name * ".tar")
     Tar.create(from_dir, to_file)
-end # pack_data(experiment_name::String)
+end
 
 """
     unpack_data(experiment_name::String)
 
 Unpacks data at the provided experiment name tarball into a working directory.
 """
-function unpack_data(experiment_name::String)
+function unpack_data(experiment_name::AbstractString)
     from_file = packed_dir(experiment_name * ".tar")
     to_dir = unpacked_dir(experiment_name)
     Tar.extract(from_file, to_dir)
-end # unpack_data(experiment_name::String)
+end
 
 """
     safe_unpack(experiment_name::String)
 
 If the provided experiment unpacked directory does not exist, this unpacks it.
 """
-function safe_unpack(experiment_name::String)
+function safe_unpack(experiment_name::AbstractString)
     if !isdir(unpacked_dir(experiment_name))
         unpack_data(experiment_name)
     end
-end # safe_unpack(experiment_name::String)
+end
 
 # """
 #     permuted(d::Dict, data::DataSplit, opts::opts_DDVFA)

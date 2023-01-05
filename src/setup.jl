@@ -11,18 +11,27 @@ Timeline:
 - 2/17/2022: Documented.
 """
 
-using DrWatson
-using Dates
-using Logging           # Printing diagnostics
-using Random            # Random subsequence
-using Plots
+# using DrWatson
+# using Dates
+# using Logging           # Printing diagnostics
+# using Random            # Random subsequence
+# using Plots
+# using AdaptiveResonance # ART modules
+# # using ProgressMeter     # Progress bar
+# using Printf            # Formatted number printing
+# using Latexify
+# using DataFrames
 
-using AdaptiveResonance # ART modules
-# using ProgressMeter     # Progress bar
-using Printf            # Formatted number printing
-
-using Latexify          #
-using DataFrames
+using
+    DrWatson,
+    Dates,
+    Logging,           # Printing diagnostics
+    Random,            # Random subsequence
+    Plots,
+    AdaptiveResonance, # ART modules
+    Printf,            # Formatted number printing
+    Latexify,
+    DataFrames
 
 # using PlotThemes
 # Plotting style

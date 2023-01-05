@@ -1,13 +1,13 @@
 """
-    setup.jl
+    setup_l2_packages.jl
 
-Description:
-    This script sets up the PyCall environment for the l2metrics experiment.
+# Description
+This script sets up the PyCall environment for the l2metrics experiment.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
 
-Timeline:
+# Timeline
 - 9/28/2022: Created and documented.
 """
 
