@@ -139,6 +139,7 @@ DDVFA-based L2 agent.
 """
 struct DDVFAAgent <: Agent
     agent::DDVFA
+    params::Dict
     scenario::ExperienceQueueContainer
 end
 
@@ -180,9 +181,10 @@ Overload of the show function for DDVFAAgent.
 function Base.show(io::IO, agent::DDVFAAgent)
 # function Base.show(io::IO, ::MIME"text/plain", agent::DDVFAAgent)
     # compact = get(io, :compact, false)
-    print(io, "DDVFA agent with options:\n")
-    print(io, agent.agent.opts)
-    print(io, "Scenario: \n")
+    print(io, "--- DDVFA agent with options:\n")
+    # print(io, agent.agent.opts)
+    print(io, agent.params)
+    print(io, "\n--- Scenario: \n")
     print(io, agent.scenario)
 end
 
@@ -237,9 +239,16 @@ function DDVFAAgent(scenario_dict::AbstractDict ; kwargs...)
     # Create the experience dequeue
     exp_container = ExperienceQueueContainer(scenario_dict)
 
+    # Create the params object for Logging
+    params = Dict{String, Any}()
+    for (key, value) in kwargs
+        params[string(key)] = value
+    end
+
     # Construct and return the DDVFAAgent
     return DDVFAAgent(
         ddvfa,
+        params,
         exp_container,
     )
 end
@@ -247,30 +256,6 @@ end
 # -----------------------------------------------------------------------------
 # FUNCTIONS
 # -----------------------------------------------------------------------------
-
-"""
-
-# Arguments
-- `exp::Experience`:
-- `results::Dict`:
-- `status::AbstractString`:
-"""
-function log_data(data_logger, exp::Experience, results::Dict, params::Dict ; status::AbstractString="completed")
-    seq = exp.seq_nums
-    worker = "9_l2metrics"
-    record = Dict(
-        "block_num" => seq.block_num,
-        "block_type" => exp.block_type,
-        # "task_params" => exp.params,
-        # "task_params" => params,
-        "task_name" => exp.task_name,
-        "exp_num" => seq.exp_num,
-        "exp_status" => status,
-        "worker_id" => worker,
-    )
-    merge!(record, results)
-    data_logger.log_record(record)
-end
 
 """
 Saves the dictionary to a JSON file.
@@ -307,6 +292,30 @@ function is_complete(agent::Agent)
 end
 
 """
+
+# Arguments
+- `exp::Experience`:
+- `results::Dict`:
+- `status::AbstractString`:
+"""
+function log_data(data_logger, exp::Experience, results::Dict, params::Dict ; status::AbstractString="complete")
+    seq = exp.seq_nums
+    worker = "9_l2metrics"
+    record = Dict(
+        "block_num" => seq.block_num,
+        "block_type" => exp.block_type,
+        # "task_params" => exp.params,
+        "task_params" => params,
+        "task_name" => exp.task_name,
+        "exp_num" => seq.exp_num,
+        "exp_status" => status,
+        "worker_id" => worker,
+    )
+    merge!(record, results)
+    data_logger.log_record(record)
+end
+
+"""
 Runs an agent's scenario.
 
 # Arguments
@@ -329,7 +338,7 @@ function run_scenario(agent::Agent, data_logger)
         results = Dict(
             "performance" => 0.0,
         )
-        log_data(data_logger, exp, results)
+        log_data(data_logger, exp, results, agent.params)
     end
 
     return
