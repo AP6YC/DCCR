@@ -30,15 +30,12 @@ include(projectdir("src", "setup_l2.jl"))
 config_file = configs_dir("config.json")
 scenario_file = configs_dir("scenario.json")
 
-
-
 # -----------------------------------------------------------------------------
 # CONFIG FILE
 # -----------------------------------------------------------------------------
 
-# DIR = "work/results/9_l2metrics"
-DIR = results_dir()
-NAME = "9_l2metrics"
+DIR = results_dir("logs")
+NAME = "9_l2metrics_logger"
 COLS = Dict(
     # "metrics_columns" => "reward",
     "metrics_columns" => ["performance",],
@@ -66,33 +63,10 @@ json_save(config_file, config_dict)
 # SCENARIO FILE
 # -----------------------------------------------------------------------------
 
-# Select which data entries to use for the experiment
-data_selection = [
-    "dot_dusk",
-    "dot_morning",
-    # "emahigh_dusk",
-    # "emahigh_morning",
-    "emalow_dusk",
-    "emalow_morning",
-    "pr_dusk",
-    "pr_morning",
-]
+# Load the default data configuration
+data, data_indexed, class_labels, n_classes = load_default_orbit_data(data_dir)
 
-# Sigmoid input scaling
-scaling = 2.0
-
-# Load the data names and class labels from the selection
-data_dirs, class_labels = get_orbit_names(data_selection)
-
-# Number of classes
-n_classes = length(data_dirs)
-
-# Load the data
-data = load_orbits(data_dir, scaling)
-
-# Sort/reload the data as indexed components
-data_indexed = get_indexed_data(data)
-
+# Build the scenario vector
 SCENARIO = []
 for ix = 1:n_classes
     # Create a train step and push
@@ -106,16 +80,33 @@ for ix = 1:n_classes
     push!(SCENARIO, train_step)
 
     # Create all test steps and push
+    regimes = []
     for jx = 1:n_classes
-        test_step = Dict(
-            "type" => "test",
-            "regimes" => [Dict(
-                "task" => class_labels[jx],
-                "count" => length(data_indexed.test_y[jx]),
-            )],
+        local_regime = Dict(
+            "task" => class_labels[jx],
+            "count" => length(data_indexed.test_y[jx]),
         )
-        push!(SCENARIO, test_step)
+        push!(regimes, local_regime)
     end
+
+    test_step = Dict(
+        "type" => "test",
+        "regimes" => regimes,
+    )
+
+    push!(SCENARIO, test_step)
+
+    # # Create all test steps and push
+    # for jx = 1:n_classes
+    #     test_step = Dict(
+    #         "type" => "test",
+    #         "regimes" => [Dict(
+    #             "task" => class_labels[jx],
+    #             "count" => length(data_indexed.test_y[jx]),
+    #         )],
+    #     )
+    #     push!(SCENARIO, test_step)
+    # end
 end
 
 # Make scenario list into a dict entry

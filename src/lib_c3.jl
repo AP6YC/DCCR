@@ -8,20 +8,6 @@ This file contains the majority of common data structures, loading functions, an
 - Sasha Petrenko <sap625@mst.edu>
 """
 
-# using AdaptiveResonance
-# using StatsBase
-# # using Statistics
-# using Logging
-# using DelimitedFiles
-# using MLBase        # confusmat
-# # using DrWatson
-# using MLDataUtils   # stratifiedobs
-# using StatsPlots    # groupedbar
-# using DataFrames
-# using Printf
-# using NumericalTypeAliases
-# # using HDF5              # Loading .h5 activation files
-
 using
     AdaptiveResonance,
     StatsBase,
@@ -34,6 +20,9 @@ using
     Printf,
     NumericalTypeAliases
 
+# # using Statistics
+# # using DrWatson
+# # using HDF5              # Loading .h5 activation files
 
 import Tar
 
@@ -213,7 +202,7 @@ end
 
 Load the orbits data and preprocess the features.
 """
-function load_orbits(data_dir::String, scaling::Real)
+function load_orbits(data_dir::AbstractString, data_dirs::Vector{String}, scaling::Real)
     train_dir = joinpath(data_dir, "LBs")
     val_dir = joinpath(data_dir, "Val")
     test_dir = joinpath(data_dir, "EBs")
@@ -1484,6 +1473,47 @@ function safe_unpack(experiment_name::AbstractString)
         unpack_data(experiment_name)
     end
 end
+
+function load_default_orbit_data(data_dir::AbstractString ; scaling::Float=2.0)
+    # Select which data entries to use for the experiment
+    data_selection = [
+        "dot_dusk",
+        "dot_morning",
+        # "emahigh_dusk",
+        # "emahigh_morning",
+        "emalow_dusk",
+        "emalow_morning",
+        "pr_dusk",
+        "pr_morning",
+    ]
+
+    # Sigmoid input scaling
+    # scaling = 2.0
+
+    # Load the data names and class labels from the selection
+    data_dirs, class_labels = get_orbit_names(data_selection)
+
+    # Number of classes
+    n_classes = length(data_dirs)
+
+    # Load the data
+    data = load_orbits(data_dir, data_dirs, scaling)
+
+    # Sort/reload the data as indexed components
+    data_indexed = get_indexed_data(data)
+
+    return data, data_indexed, class_labels, n_classes
+end
+# function load_orbit_data(data_dir::AbstractString, data_selection::Vector{String} ;scaling::Float=2.0)
+#     # Load the data names and class labels from the selection
+#     # data_dirs, class_labels = get_orbit_names(data_selection)
+
+#     # Load the data
+#     data = load_orbits(data_dir, scaling)
+
+#     # Return the
+#     return data
+# end
 
 # """
 #     permuted(d::Dict, data::DataSplit, opts::opts_DDVFA)
