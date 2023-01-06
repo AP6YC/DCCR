@@ -199,8 +199,13 @@ end
 
 """
 A constructor for LabeledDataset that merges two other LabeledDatasets.
+
+# Arguments
+- `d1::LabeledDataset`: the first LabeledDataset to consolidate.
+- `d2::LabeledDataset`: the second LabeledDataset to consolidate.
 """
 function LabeledDataset(d1::LabeledDataset, d2::LabeledDataset)
+    # Consolidate everything and construct in one step
     return LabeledDataset(
         hcat(d1.x, d2.x),
         vcat(d1.y, d2.y),
