@@ -73,8 +73,8 @@ data_dirs, class_labels = get_orbit_names(data_selection)
 # Number of classes
 n_classes = length(data_dirs)
 
-# X_train, y_train, train_labels, X_test, y_test, test_labels = load_orbits(data_dir, scaling)
-data = load_orbits(data_dir, scaling)
+# Load the orbit data
+data = load_orbits(data_dir, data_dirs, scaling)
 
 i_train = randperm(length(data.train_y))
 data.train_x = data.train_x[:, i_train]

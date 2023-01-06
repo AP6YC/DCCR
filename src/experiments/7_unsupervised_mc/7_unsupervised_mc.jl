@@ -83,7 +83,7 @@ sim_params = Dict{String, Any}(
 
     # Load the orbits
     @info "Worker $(myid()): loading data"
-    data = load_orbits(data_dir, scaling)
+    data = load_orbits(data_dir, data_dirs, scaling)
 
     combined_data = DataSplitCombined(data)
     # Define a single-parameter function for pmap

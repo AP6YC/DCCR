@@ -14,6 +14,7 @@ A collection of l2-specific experiment function and struct definitions.
 
 using
     DataStructures,     # Dequeue
+    PyCall,             # PyObject
     JSON                # JSON file load/save
 
 # -----------------------------------------------------------------------------
@@ -322,23 +323,29 @@ Runs an agent's scenario.
 - `agent::Agent`: a struct that contains an `agent` and `scenario`.
 - `data_logger`: a l2logger object.
 """
-function run_scenario(agent::Agent, data_logger)
-    # for experience in agent.scenario
+function run_scenario(agent::Agent, data_logger::PyObject)
     # Initialize the "last sequence"
     last_seq = SequenceNums(-1, -1)
+
     # Iterate while the agent's scenario is incomplete
     while !is_complete(agent)
         # Get the next experience
         exp = popfirst!(agent.scenario.queue)
         # Get the current sequence number
         cur_seq = exp.seq_nums
+        # Logging
         if last_seq.block_num != cur_seq.block_num
             @info "New block: $(cur_seq.block_num)"
         end
+        # Artificially create some results
         results = Dict(
             "performance" => 0.0,
         )
+        # Log the data
         log_data(data_logger, exp, results, agent.params)
+
+        # Loop reflection
+        last_seq = cur_seq
     end
 
     return

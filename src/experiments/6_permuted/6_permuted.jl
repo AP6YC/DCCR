@@ -91,7 +91,7 @@ sim_params = Dict{String, Any}(
 
     # Load the orbits
     @info "Worker $(myid()): loading data"
-    data = load_orbits(data_dir, scaling)
+    data = load_orbits(data_dir, data_dirs, scaling)
 
     # Sort/reload the data as indexed components
     data_indexed = get_indexed_data(data)

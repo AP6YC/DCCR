@@ -198,29 +198,37 @@ function DataSplitCombined(data::DataSplit)
 end
 
 """
-    load_orbits(data_dir::String, scaling::Real)
-
 Load the orbits data and preprocess the features.
+
+# Arguments
+- `data_dir::AbstractString`: the top-level data directory.
+- `data_dirs::Vector{String}`: the subfolders to load.
 """
 function load_orbits(data_dir::AbstractString, data_dirs::Vector{String}, scaling::Real)
+    # Point to the train, validation, and test block folders
     train_dir = joinpath(data_dir, "LBs")
     val_dir = joinpath(data_dir, "Val")
     test_dir = joinpath(data_dir, "EBs")
 
+    # Point to all of the subfolders in each data block
     train_data_dirs = [joinpath(train_dir, data_dir) for data_dir in data_dirs]
     val_data_dirs = [joinpath(val_dir, data_dir) for data_dir in data_dirs]
     test_data_dirs = [joinpath(test_dir, data_dir) for data_dir in data_dirs]
 
+    # Collect all of the labeled activations
     train_x, train_y, train_labels = collect_all_activations_labeled(train_data_dirs, 1)
     val_x, val_y, val_labels = collect_all_activations_labeled(val_data_dirs, 1)
     test_x, test_y, test_labels = collect_all_activations_labeled(test_data_dirs, 1)
 
+    # Get the distribution parameters for the training data
     dt = get_dist(train_x)
 
+    # Preprocess all of the data based upon the statistics of the training data
     train_x = feature_preprocess(dt, scaling, train_x)
     val_x = feature_preprocess(dt, scaling, val_x)
     test_x = feature_preprocess(dt, scaling, test_x)
 
+    # Construct the split dataset struct
     data_struct = DataSplit(
         train_x,
         train_y,
@@ -233,8 +241,8 @@ function load_orbits(data_dir::AbstractString, data_dirs::Vector{String}, scalin
         test_labels
     )
 
+    # Return the single object containing the data
     return data_struct
-    # return X_train, y_train, train_labels, X_test, y_test, test_labels
 end
 
 # """
@@ -1474,6 +1482,13 @@ function safe_unpack(experiment_name::AbstractString)
     end
 end
 
+"""
+Loads the default orbit data configuration.
+
+# Arguments
+- `data_dir::AbstractString`: the relative/absolute directory containing the data.
+- `scaling::Float`: the sigmoid scaling parameter, default `scaling=2.0`
+"""
 function load_default_orbit_data(data_dir::AbstractString ; scaling::Float=2.0)
     # Select which data entries to use for the experiment
     data_selection = [
@@ -1504,16 +1519,6 @@ function load_default_orbit_data(data_dir::AbstractString ; scaling::Float=2.0)
 
     return data, data_indexed, class_labels, n_classes
 end
-# function load_orbit_data(data_dir::AbstractString, data_selection::Vector{String} ;scaling::Float=2.0)
-#     # Load the data names and class labels from the selection
-#     # data_dirs, class_labels = get_orbit_names(data_selection)
-
-#     # Load the data
-#     data = load_orbits(data_dir, scaling)
-
-#     # Return the
-#     return data
-# end
 
 # """
 #     permuted(d::Dict, data::DataSplit, opts::opts_DDVFA)

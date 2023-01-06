@@ -70,7 +70,7 @@ data_dirs, class_labels = get_orbit_names(data_selection)
 n_classes = length(data_dirs)
 
 # Load the data
-data = load_orbits(data_dir, scaling)
+data = load_orbits(data_dir, data_dirs, scaling)
 
 # Sort/reload the data as indexed components
 data_indexed = get_indexed_data(data)

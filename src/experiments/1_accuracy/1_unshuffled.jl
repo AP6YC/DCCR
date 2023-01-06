@@ -76,7 +76,7 @@ data_dirs, class_labels = get_orbit_names(data_selection)
 n_classes = length(data_dirs)
 
 # Load the data
-data = load_orbits(data_dir, scaling)
+data = load_orbits(data_dir, data_dirs, scaling)
 
 # Create the DDVFA module and set the data config
 ddvfa = DDVFA(opts)
