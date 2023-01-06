@@ -40,7 +40,6 @@ Returns the sigmoid function on x.
 - `x::Real`: the float or int to compute the sigmoid function upon.
 """
 function sigmoid(x::Real)
-# return 1.0 / (1.0 + exp(-x))
     return one(x) / (one(x) + exp(-x))
 end
 
@@ -164,19 +163,107 @@ Abstract type for Data structs that represent features as vectors of matrices.
 abstract type VectoredData <: Data end
 
 """
+Definition of features as a matrix of floating-point numbers of dimension (feature_dim, n_samples).
+"""
+const Features = Matrix{Float}
+
+"""
+Definition of targets as a vector of integers.
+"""
+const Targets = Vector{Int}
+
+"""
+Definition of labels as a vector of strings.
+"""
+const Labels = Vector{String}
+
+"""
+A single dataset of features, targets, and human-readable string labels.
+"""
+struct LabeledDataset
+    """
+    Collection of features in the labeled dataset.
+    """
+    x::Features
+
+    """
+    Targets corresponding to the features.
+    """
+    y::Targets
+
+    """
+
+    """
+    labels::Labels
+end
+
+"""
+A single dataset of vectored labeled data with features, targets, and human-readable string labels.
+"""
+struct VectorLabeledData
+    """
+    A vector of features matrices.
+    """
+    train_x::Vector{Features}
+
+    """
+    A vector of targets corresponding to the features.
+    """
+    train_y::Vector{Targets}
+
+    """
+    String labels corresponding to the targets.
+    """
+    train_labels::Labels
+end
+
+"""
 A basic struct for encapsulating the components of supervised training.
 """
 mutable struct DataSplit <: MatrixData
+    """
+    Training features of shape (feature_dim, n_samples).
+    """
     train_x::Matrix{Float}
+
+    """
+    Training labels as positive integers.
+    """
     train_y::Vector{Int}
+
+    """
+    Strings corresponding to the names of each integer training label.
+    """
     train_labels::Vector{String}
 
+    """
+    Validation features of shape (feature_dim, n_samples).
+    """
     val_x::Matrix{Float}
+
+    """
+    Validation labels as positive integers.
+    """
     val_y::Vector{Int}
+
+    """
+    Strings corresponding to the names of each integer validation label.
+    """
     val_labels::Vector{String}
 
+    """
+    Test features of shape (feature_dim, n_samples).
+    """
     test_x::Matrix{Float}
+
+    """
+    Test labels as positive integers.
+    """
     test_y::Vector{Int}
+
+    """
+    Strings corresponding to the names of each integer test label.
+    """
     test_labels::Vector{String}
 end
 
@@ -479,7 +566,6 @@ Get two lists of the training and testing accuracies.
 - `n_classes::Integer`: the number of total classes in the test set.
 """
 function get_tt_accuracies(data::MatrixData, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Integer)
-# function get_tt_accuracies(data::Union{DataSplit, DataSplitCombined}, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Int)
     # TRAIN: Get the percent correct for each class
     train_accuracies = get_accuracies(data.train_y, y_hat_train, n_classes)
 
