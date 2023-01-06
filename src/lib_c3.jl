@@ -34,9 +34,10 @@ include("colors.jl")
 # -----------------------------------------------------------------------------
 
 """
-    sigmoid(x::Real)
+Returns the sigmoid function on x.
 
-Return the sigmoid function on x.
+# Arguments
+- `x::Real`: the float or int to compute the sigmoid function upon.
 """
 function sigmoid(x::Real)
 # return 1.0 / (1.0 + exp(-x))
@@ -44,21 +45,24 @@ function sigmoid(x::Real)
 end
 
 """
-    collect_activations(data_dir::String)
+Returns the activations from a single directory.
 
-Return the activations from a single directory
+# Arguments
+- `data_dir::AbstractString`: the single data directory to load the features from.
 """
-function collect_activations(data_dir::String)
+function collect_activations(data_dir::AbstractString)
     data_full = readdlm(joinpath(data_dir, "average_features.csv"), ',')
     return data_full
 end
 
 """
-    collect_all_activations(data_dirs::Array, cell::Int)
-
 Return just the yolo activations from a list of data directories.
+
+# Arguments
+- `data_dirs::AbstractArray`: the data directories to load the yolo activations from.
+- `cell::Integer`: the number of cells corresponding to the windowing procedure.
 """
-function collect_all_activations(data_dirs::Array, cell::Int)
+function collect_all_activations(data_dirs::AbstractArray, cell::Integer)
     data_grand = []
     for data_dir in data_dirs
         data_dir_full = joinpath(data_dir, string(cell))
@@ -73,16 +77,20 @@ function collect_all_activations(data_dirs::Array, cell::Int)
 end
 
 """
-    collect_all_activations_labeled(data_dirs::Vector{String}, cell::Int)
-
 Return the yolo activations, training targets, and condensed labels list from a list of data directories.
+
+# Arguments
+- `data_dirs::Vector{String}`: the directories to load the data from.
+- `cell::Integer`: the number of cells to use in the windowed averaging procedure.
 """
-function collect_all_activations_labeled(data_dirs::Vector{String}, cell::Int)
+function collect_all_activations_labeled(data_dirs::Vector{String}, cell::Integer)
+    # The final dimension is 128 (YOLOv3 feature size) times the number of cells
     top_dim = 128*cell
+    # Initialized the output dataset, targets, and their string labels
     data_grand = Matrix{Float64}(undef, top_dim, 0)
     targets = Vector{Int64}()
     labels = Vector{String}()
-    # for data_dir in data_dirs
+    # Iterate over each data directory
     for i = 1:length(data_dirs)
         # Get the full local data directory
         data_dir = data_dirs[i]
@@ -108,35 +116,57 @@ function collect_all_activations_labeled(data_dirs::Vector{String}, cell::Int)
         # Concatenate the most recent batch with the grand dataset
         data_grand = [data_grand data_full]
     end
+
+    # Return the final dataset, its target values, and the string labels
     return data_grand, targets, labels
 end
 
 """
-    get_dist(data::RealMatrix)
-
 Get the distribution parameters for preprocessing.
+
+# Arguments
+- `data::RealMatrix`: a 2-D matrix of features for computing the Gaussian statistics of.
 """
 function get_dist(data::RealMatrix)
     return fit(ZScoreTransform, data, dims=2)
 end
 
 """
-    function_preprocess(dt::ZScoreTransform, scaling::Real, data::RealMatrix)
-
 Preprocesses one dataset of features, scaling and squashing along the feature axes.
+
+# Arguments
+- `dt::ZScoreTransform`: the Gaussian statistics of the features.
+- `scaling::Real`: the sigmoid scaling parameter.
+- `data::RealMatrix`: the 2-D matrix of features to transform.
 """
 function feature_preprocess(dt::ZScoreTransform, scaling::Real, data::RealMatrix)
+    # Normalize the dataset via the ZScoreTransform
     new_data = StatsBase.transform(dt, data)
+    # Squash the data sigmoidally with the scaling parameter
     new_data = sigmoid.(scaling*new_data)
+    # Return the normalized and scaled data
     return new_data
 end
 
 """
-    DataSplit
+Abstract supertype for all Data structs in this library.
+"""
+abstract type Data end
 
+"""
+Abstract type for Data structs that represent features as matrices.
+"""
+abstract type MatrixData <: Data end
+
+"""
+Abstract type for Data structs that represent features as vectors of matrices.
+"""
+abstract type VectoredData <: Data end
+
+"""
 A basic struct for encapsulating the components of supervised training.
 """
-mutable struct DataSplit
+mutable struct DataSplit <: MatrixData
     train_x::Matrix{Float}
     train_y::Vector{Int}
     train_labels::Vector{String}
@@ -151,11 +181,9 @@ mutable struct DataSplit
 end
 
 """
-    DataSplitIndexed
-
 A basic struct for encapsulating the components of supervised training.
 """
-mutable struct DataSplitIndexed
+mutable struct DataSplitIndexed <: VectoredData
     train_x::Vector{Matrix{Float}}
     train_y::Vector{Vector{Int}}
     train_labels::Vector{String}
@@ -170,11 +198,9 @@ mutable struct DataSplitIndexed
 end
 
 """
-    DataSplitCombined
-
 A struct for combining training and validation data, containing only train and test splits.
 """
-mutable struct DataSplitCombined
+mutable struct DataSplitCombined <: MatrixData
     train_x::Matrix{Float}
     train_y::Vector{Int}
     train_labels::Vector{String}
@@ -184,10 +210,15 @@ mutable struct DataSplitCombined
     test_labels::Vector{String}
 end
 
+"""
+Constructs a DataSplitCombined from an existing DataSplit by consolidating the training and validation data.
+
+# Arguments
+- `data::DataSplit`: the DataSplit struct for consolidating validation features and labels into the training data.
+"""
 function DataSplitCombined(data::DataSplit)
-    # println(size(data.train_x))
-    # println(size(data.val_x))
-    DataSplitCombined(
+    # Consolidate and return the struct in one step
+    return DataSplitCombined(
         hcat(data.train_x, data.val_x),
         vcat(data.train_y, data.val_y),
         vcat(data.train_labels, data.val_labels),
@@ -245,67 +276,17 @@ function load_orbits(data_dir::AbstractString, data_dirs::Vector{String}, scalin
     return data_struct
 end
 
-# """
-#     load_val_orbits(data_dir::String, scaling::Real)
-
-# Load the orbits data and preprocess the features.
-
-# This uses training data for validation because of a problem with the val
-# distribution at the time of this writing.
-# """
-# function load_val_orbits(data_dir::String, scaling::Real)
-#     train_dir = joinpath(data_dir, "LBs")
-#     # val_dir = joinpath(data_dir, "Val")
-#     test_dir = joinpath(data_dir, "EBs")
-
-#     train_data_dirs = [joinpath(train_dir, data_dir) for data_dir in data_dirs]
-#     # val_data_dirs = [joinpath(val_dir, data_dir) for data_dir in data_dirs]
-#     test_data_dirs = [joinpath(test_dir, data_dir) for data_dir in data_dirs]
-
-#     train_x, train_y, train_labels = collect_all_activations_labeled(train_data_dirs, 1)
-#     # val_x, val_y, val_labels = collect_all_activations_labeled(val_data_dirs, 1)
-#     test_x, test_y, test_labels = collect_all_activations_labeled(test_data_dirs, 1)
-
-#     dt = get_dist(train_x)
-
-#     train_x = feature_preprocess(dt, scaling, train_x)
-#     test_x = feature_preprocess(dt, scaling, test_x)
-
-#     data_struct = DataSplit(
-#         train_x,
-#         train_y,
-#         train_labels,
-#         val_x,
-#         val_y,
-#         val_labels,
-#         test_x,
-#         test_y,
-#         test_labels
-#     )
-
-#     return data_struct
-#     # return X_train, y_train, train_labels, X_test, y_test, test_labels
-# end
-
 """
-    get_indexed_data(data::DataSplit)
-
 Create a DataSplitIndexed object from a DataSplit.
+
+# Arguments
+- `data::DataSplit`: the DataSplit to separate into vectors of matrices.
 """
 function get_indexed_data(data::DataSplit)
     # Assume the same number of classes in each category
     n_classes = length(unique(data.train_y))
 
-    # train_x = Vector{RealMatrix}()
-    # train_y = Vector{IntegerVector}()
-    # train_labels = Vector{String}()
-    # val_x = Vector{RealMatrix}()
-    # val_y = Vector{IntegerVector}()
-    # val_labels = Vector{String}()
-    # test_x = Vector{RealMatrix}()
-    # test_y = Vector{IntegerVector}()
-    # test_labels = Vector{String}()
-
+    # Construct empty fields
     train_x = Vector{Matrix{Float}}()
     train_y = Vector{Vector{Int}}()
     train_labels = Vector{String}()
@@ -316,6 +297,7 @@ function get_indexed_data(data::DataSplit)
     test_y = Vector{Vector{Int}}()
     test_labels = Vector{String}()
 
+    # Iterate over every class
     for i = 1:n_classes
         i_train = findall(x -> x == i, data.train_y)
         push!(train_x, data.train_x[:, i_train])
@@ -348,9 +330,11 @@ function get_indexed_data(data::DataSplit)
 end
 
 """
-    get_deindexed_data(data::DataSplitIndexed, order::IntegerVector)
-
 Turn a DataSplitIndexed into a DataSplit with the given train/test order.
+
+# Arguments
+- `data::DataSplitIndexed`: the indexed data to consolidate back into a DataSplit.
+- `order::IntegerVector`: the order used by the indexed data for correctly deindexing.
 """
 function get_deindexed_data(data::DataSplitIndexed, order::IntegerVector)
     dim = 128
@@ -379,6 +363,7 @@ function get_deindexed_data(data::DataSplitIndexed, order::IntegerVector)
     val_labels = data.val_labels[order]
     test_labels = data.test_labels[order]
 
+    # Construct the DataSplit
     data_struct = DataSplit(
         train_x,
         train_y,
@@ -395,9 +380,10 @@ function get_deindexed_data(data::DataSplitIndexed, order::IntegerVector)
 end
 
 """
-    get_orbit_names(selection::Vector{String})
-
 Map the experiment orbit names to their data directories and plotting class labels.
+
+# Arguments
+- `selection::Vector{String}`: the selection of labels corresponding to both data directories and plotting labels.
 """
 function get_orbit_names(selection::Vector{String})
     # Data directory names
@@ -438,20 +424,26 @@ function get_orbit_names(selection::Vector{String})
 end
 
 """
-    get_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
-
 Wrapper method for getting the raw confusion matrix.
+
+# Arguments
+- `y::IntegerVector`: the target values.
+- `y_hat::IntegerVector`: the agent's estimates.
+- `n_classes::Integer`: the number of total classes in the test set.
 """
-function get_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
+function get_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Integer)
     return confusmat(n_classes, y, y_hat)
 end
 
 """
-    get_normalized_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
-
 Get the normalized confusion matrix.
+
+# Arguments
+- `y::IntegerVector`: the target values.
+- `y_hat::IntegerVector`: the agent's estimates.
+- `n_classes::Integer`: the number of total classes in the test set.
 """
-function get_normalized_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
+function get_normalized_confusion(y::IntegerVector, y_hat::IntegerVector, n_classes::Integer)
     cm = get_confusion(y, y_hat, n_classes)
     # total = sum(cm, dims=1)
     total = sum(cm, dims=2)'
@@ -460,11 +452,14 @@ function get_normalized_confusion(y::IntegerVector, y_hat::IntegerVector, n_clas
 end
 
 """
-    get_accuracies(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
-
 Get a list of the percentage accuracies.
+
+# Arguments
+- `y::IntegerVector`: the target values.
+- `y_hat::IntegerVector`: the agent's estimates.
+- `n_classes::Integer`: the number of total classes in the test set.
 """
-function get_accuracies(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
+function get_accuracies(y::IntegerVector, y_hat::IntegerVector, n_classes::Integer)
     cm = get_confusion(y, y_hat, n_classes)
     correct = [cm[i,i] for i = 1:n_classes]
     # total = sum(cm, dims=1)
@@ -475,24 +470,31 @@ function get_accuracies(y::IntegerVector, y_hat::IntegerVector, n_classes::Int)
 end
 
 """
-    get_tt_accuracies(data::Union{DataSplit, DataSplitCombined}, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Int)
+Get two lists of the training and testing accuracies.
 
-Get two lists of the training and testing accuracies
+# Arguments
+- `data::MatrixData`: the training and testing dataset, containing a vector of training and testing labels `data.train_y` and `data.test_y`.
+- `y::IntegerVector`: the target values.
+- `y_hat::IntegerVector`: the agent's estimates.
+- `n_classes::Integer`: the number of total classes in the test set.
 """
-function get_tt_accuracies(data::Union{DataSplit, DataSplitCombined}, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Int)
+function get_tt_accuracies(data::MatrixData, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Integer)
+# function get_tt_accuracies(data::Union{DataSplit, DataSplitCombined}, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Int)
     # TRAIN: Get the percent correct for each class
     train_accuracies = get_accuracies(data.train_y, y_hat_train, n_classes)
 
     # TEST: Get the percent correct for each class
     test_accuracies = get_accuracies(data.test_y, y_hat, n_classes)
 
+    # Return the list of accuracy values for each class in training and testing
     return train_accuracies, test_accuracies
 end
 
 """
-    get_n_categories(ddvfa::DDVFA)
-
 Returns both the number of F2 categories and total number of weights per class as two lists.
+
+# Arguments
+- `ddvfa::DDVFA`: the DDVFA module to calculate the statistics for.
 """
 function get_n_categories(ddvfa::DDVFA)
     # Save the number of F2 nodes and total categories per class
@@ -515,9 +517,11 @@ function get_n_categories(ddvfa::DDVFA)
 end
 
 """
-    get_manual_split(data::RealMatrix, targets::IntegerVector)
+Wrapper of `stratifiedobs`, returns a manual train/test x/y split from a data matrix and labels using MLDataUtils.
 
-Wrapper, returns a manual train/test x/y split from a data matrix and labels using MLDataUtils.
+# Arguments
+- `data::RealMatrix`: the feature data to split into training and testing.
+- `targets::IntegerVector`: the labels corresponding to the data to split into training and testing.
 """
 function get_manual_split(data::RealMatrix, targets::IntegerVector)
     (X_train, y_train), (X_test, y_test) = stratifiedobs((data, targets))
@@ -525,9 +529,11 @@ function get_manual_split(data::RealMatrix, targets::IntegerVector)
 end
 
 """
-    df_column_to_matrix(df::DataFrame, row::Symbol)
-
 Convert a column of lists in a DataFrame into a matrix for analysis.
+
+# Arguments
+- `df::DataFrame`: the DataFrame containing the column of lists.
+- `row::Symbol`: the symbolic name of the row in the DataFrame to convert into a matrix.
 """
 function df_column_to_matrix(df::DataFrame, row::Symbol)
     lists = df[!, row]
@@ -1443,16 +1449,21 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     tagsave(sim_save_name, fulld)
 end
 
-# Packed data directory
+"""
+The packed data directory as a DrWatson-style path function.
+"""
 packed_dir(args...) = datadir("packed", args...)
 
-# Unpacked data directory
+"""
+The unpacked data directory as a DrWatson-style path function.
+"""
 unpacked_dir(args...) = datadir("unpacked", args...)
 
 """
-    pack_data(experiment_name::String)
-
 Packs the data under the provided experiment name folder into an LFS-tracked tarball.
+
+# Arguments
+- `experiment_name::AbstractString`: the name of the file destination to pack from the `unpacked_dir` to the `packed_dir`.
 """
 function pack_data(experiment_name::AbstractString)
     from_dir = unpacked_dir(experiment_name)
@@ -1461,9 +1472,10 @@ function pack_data(experiment_name::AbstractString)
 end
 
 """
-    unpack_data(experiment_name::String)
-
 Unpacks data at the provided experiment name tarball into a working directory.
+
+# Arguments
+- `experiment_name::AbstractString`: the name of the file to unpack from the `packed_dir` to the `unpacked_dir`.
 """
 function unpack_data(experiment_name::AbstractString)
     from_file = packed_dir(experiment_name * ".tar")
@@ -1472,11 +1484,13 @@ function unpack_data(experiment_name::AbstractString)
 end
 
 """
-    safe_unpack(experiment_name::String)
-
 If the provided experiment unpacked directory does not exist, this unpacks it.
+
+# Arguments
+- `experiment_name::AbstractString`: the name of the file to unpack from the `packed_dir` to the `unpacked_dir`.
 """
 function safe_unpack(experiment_name::AbstractString)
+    # If the unpacked data directory does not already exist, unpack to it
     if !isdir(unpacked_dir(experiment_name))
         unpack_data(experiment_name)
     end
@@ -1517,6 +1531,7 @@ function load_default_orbit_data(data_dir::AbstractString ; scaling::Float=2.0)
     # Sort/reload the data as indexed components
     data_indexed = get_indexed_data(data)
 
+    # Return the original data, indexed data, class labels, and the number of classes for convenience
     return data, data_indexed, class_labels, n_classes
 end
 

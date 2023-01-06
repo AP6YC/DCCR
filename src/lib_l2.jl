@@ -24,8 +24,9 @@ using
 # Pretty indentation in JSON files
 const JSON_INDENT = 4
 
-# Valid block types
+# Valid types of certain options
 const BLOCK_TYPES = ["train", "test"]
+const LOG_STATES = ["complete", "incomplete"]
 
 # -----------------------------------------------------------------------------
 # STRUCTS
@@ -37,7 +38,14 @@ Sequence numbers for a block and experience.
 Taken from l2logger_template.
 """
 struct SequenceNums
+    """
+    The block number.
+    """
     block_num::Int
+
+    """
+    The experience number.
+    """
     exp_num::Int
 end
 
@@ -47,9 +55,24 @@ Experience block for an agent.
 Taken from l2logger_template.
 """
 struct Experience
+    """
+    The task name.
+    """
     task_name::String
+
+    """
+    The sequence numbers (block and experience count).
+    """
     seq_nums::SequenceNums
+
+    """
+    The block type, valid values are ∈ $(BLOCK_TYPES).
+    """
     block_type::String
+
+    """
+    Flag for updating the model (i.e., true is to train, false is to classify).
+    """
     update_model::Bool
 end
 
@@ -62,7 +85,15 @@ const ExperienceQueue = Deque{Experience}
 Container for the ExperienceQueue and some statistics about it.
 """
 struct ExperienceQueueContainer
+    """
+    The ExperienceQueue itself.
+    """
     queue::ExperienceQueue
+
+    """
+    The statistics about the queue.
+    **NOTE** These statistics reflect the queue at construction, not after any processing.
+    """
     stats::Dict{String, Any}
 end
 
@@ -295,11 +326,12 @@ end
 """
 
 # Arguments
-- `exp::Experience`:
-- `results::Dict`:
-- `status::AbstractString`:
+- `data_logger::PyObject`: the l2logger DataLogger.
+- `exp::Experience`: the experience that the agent just processed.
+- `results::Dict`: the results from the agent's experience.
+- `status::AbstractString`: the if the experience was processed
 """
-function log_data(data_logger, exp::Experience, results::Dict, params::Dict ; status::AbstractString="complete")
+function log_data(data_logger::PyObject, exp::Experience, results::Dict, params::Dict ; status::AbstractString="complete")
     seq = exp.seq_nums
     worker = "9_l2metrics"
     record = Dict(
@@ -317,11 +349,21 @@ function log_data(data_logger, exp::Experience, results::Dict, params::Dict ; st
 end
 
 """
+Evaluates a single agent on a single experience, training or testing as needed.
+
+# Arguments
+- `agent::Agent`: the agent to evaluate.
+- `exp::Experience`: the experience to use for training/testing.
+"""
+function evaluate_agent(agent::Agent, exp::Experience)
+end
+
+"""
 Runs an agent's scenario.
 
 # Arguments
 - `agent::Agent`: a struct that contains an `agent` and `scenario`.
-- `data_logger`: a l2logger object.
+- `data_logger::PyObject`: a l2logger object.
 """
 function run_scenario(agent::Agent, data_logger::PyObject)
     # Initialize the "last sequence"
