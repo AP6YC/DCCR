@@ -87,11 +87,11 @@ ddvfa.config = DataConfig(0, 1, 128)
 # -----------------------------------------------------------------------------
 
 # Train in batch
-y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
+y_hat_train = train!(ddvfa, data.train.x, y=data.train.y)
 y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
 
 # Calculate performance on training data, testing data, and with get_bmu
-perf_train = performance(y_hat_train, data.train_y)
+perf_train = performance(y_hat_train, data.train.y)
 perf_test = performance(y_hat, data.test_y)
 
 # Format each performance number for comparison

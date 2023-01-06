@@ -84,7 +84,7 @@ ddvfa.config = DataConfig(0, 1, 128)
 # -----------------------------------------------------------------------------
 
 # Get the data dimensions
-dim, n_train = size(data.train_x)
+dim, n_train = size(data.train.x)
 _, n_test = size(data.test_x)
 
 # Create the estimate containers

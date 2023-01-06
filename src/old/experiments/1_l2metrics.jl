@@ -110,15 +110,15 @@ function run_one(art::DDVFA, data::FLIRL2MSplitCombined, class_id::Integer, bloc
         for i = 1:n_data
             performances[i] = (y_hat_test[i] == data.test_y[class_id][i])
         end
-        # test_accuracies[ix] = AdaptiveResonance.performance(y_hat_test, data.train_y)
+        # test_accuracies[ix] = AdaptiveResonance.performance(y_hat_test, data.train.y)
     elseif mode == "train"
-        n_data = length(data.train_y[class_id])
-        y_hat = train!(art, data.train_x[class_id], y=data.train_y[class_id])
+        n_data = length(data.train.y[class_id])
+        y_hat = train!(art, data.train.x[class_id], y=data.train.y[class_id])
 
         # Create a performances destination that is explicitly a vector of floats
         performances = zeros(Float64, n_data)
         for i = 1:n_data
-            performances[i] = (y_hat[i] == data.train_y[class_id][i])
+            performances[i] = (y_hat[i] == data.train.y[class_id][i])
         end
     else
         error()

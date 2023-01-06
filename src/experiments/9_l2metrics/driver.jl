@@ -84,7 +84,7 @@ agent.agent.config = DataConfig(0, 1, 128)
 run_scenario(agent, data_logger)
 
 # # Get the data dimensions
-# dim, n_train = size(data.train_x)
+# dim, n_train = size(data.train.x)
 # _, n_test = size(data.test_x)
 
 # Create the estimate containers
@@ -118,8 +118,8 @@ run_scenario(agent, data_logger)
 #             # local_y_hat = AdaptiveResonance.classify(ddvfa, data.val_x, get_bmu=true)
 #             # local_val = get_accuracies(data.val_y, local_y_hat, n_classes)
 #             # Training data
-#             local_y_hat = AdaptiveResonance.classify(ddvfa, data.train_x, get_bmu=true)
-#             local_val = get_accuracies(data.train_y, local_y_hat, n_classes)
+#             local_y_hat = AdaptiveResonance.classify(ddvfa, data.train.x, get_bmu=true)
+#             local_val = get_accuracies(data.train.y, local_y_hat, n_classes)
 #             local_vals = hcat(local_vals, local_val')
 #         end
 #     end

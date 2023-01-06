@@ -76,9 +76,9 @@ n_classes = length(data_dirs)
 # Load the orbit data
 data = load_orbits(data_dir, data_dirs, scaling)
 
-i_train = randperm(length(data.train_y))
-data.train_x = data.train_x[:, i_train]
-data.train_y = data.train_y[i_train]
+i_train = randperm(length(data.train.y))
+data.train.x = data.train.x[:, i_train]
+data.train.y = data.train.y[i_train]
 
 # (X_train, y_train), (X_test, y_test) = stratifiedobs((data, targets))
 
@@ -90,11 +90,11 @@ ddvfa.config = DataConfig(0, 1, 128)
 # -----------------------------------------------------------------------------
 
 # Train in batch
-y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
+y_hat_train = train!(ddvfa, data.train.x, y=data.train.y)
 y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
 
 # Calculate performance on training data, testing data, and with get_bmu
-perf_train = performance(y_hat_train, data.train_y)
+perf_train = performance(y_hat_train, data.train.y)
 perf_test = performance(y_hat, data.test_y)
 
 # Format each performance number for comparison

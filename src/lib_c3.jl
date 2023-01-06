@@ -192,110 +192,97 @@ struct LabeledDataset
     y::Targets
 
     """
-
+    Human-readable labels corresponding to the target values.
     """
     labels::Labels
 end
 
 """
+A constructor for LabeledDataset that merges two other LabeledDatasets.
+"""
+function LabeledDataset(d1::LabeledDataset, d2::LabeledDataset)
+    return LabeledDataset(
+        hcat(d1.x, d2.x),
+        vcat(d1.y, d2.y),
+        vcat(d1.labels, d2.labels),
+    )
+end
+
+"""
 A single dataset of vectored labeled data with features, targets, and human-readable string labels.
 """
-struct VectorLabeledData
+struct VectorLabeledDataset
     """
     A vector of features matrices.
     """
-    train_x::Vector{Features}
+    x::Vector{Features}
 
     """
     A vector of targets corresponding to the features.
     """
-    train_y::Vector{Targets}
+    y::Vector{Targets}
 
     """
     String labels corresponding to the targets.
     """
-    train_labels::Labels
+    labels::Labels
 end
 
 """
 A basic struct for encapsulating the components of supervised training.
 """
-mutable struct DataSplit <: MatrixData
+struct DataSplit <: MatrixData
     """
-    Training features of shape (feature_dim, n_samples).
+    Training dataset.
     """
-    train_x::Matrix{Float}
+    train::LabeledDataset
 
     """
-    Training labels as positive integers.
+    Validation dataset.
     """
-    train_y::Vector{Int}
+    val::LabeledDataset
 
     """
-    Strings corresponding to the names of each integer training label.
+    Test dataset.
     """
-    train_labels::Vector{String}
-
-    """
-    Validation features of shape (feature_dim, n_samples).
-    """
-    val_x::Matrix{Float}
-
-    """
-    Validation labels as positive integers.
-    """
-    val_y::Vector{Int}
-
-    """
-    Strings corresponding to the names of each integer validation label.
-    """
-    val_labels::Vector{String}
-
-    """
-    Test features of shape (feature_dim, n_samples).
-    """
-    test_x::Matrix{Float}
-
-    """
-    Test labels as positive integers.
-    """
-    test_y::Vector{Int}
-
-    """
-    Strings corresponding to the names of each integer test label.
-    """
-    test_labels::Vector{String}
+    test::LabeledDataset
 end
 
 """
 A basic struct for encapsulating the components of supervised training.
 """
-mutable struct DataSplitIndexed <: VectoredData
-    train_x::Vector{Matrix{Float}}
-    train_y::Vector{Vector{Int}}
-    train_labels::Vector{String}
+struct DataSplitIndexed <: VectoredData
+    """
+    Training vectorized dataset.
+    """
+    train::VectorLabeledDataset
 
-    val_x::Vector{Matrix{Float}}
-    val_y::Vector{Vector{Int}}
-    val_labels::Vector{String}
+    """
+    Validation vectorized dataset.
+    """
+    val::VectorLabeledDataset
 
-    test_x::Vector{Matrix{Float}}
-    test_y::Vector{Vector{Int}}
-    test_labels::Vector{String}
+    """
+    Test vectorized dataset.
+    """
+    test::VectorLabeledDataset
 end
 
 """
 A struct for combining training and validation data, containing only train and test splits.
 """
-mutable struct DataSplitCombined <: MatrixData
-    train_x::Matrix{Float}
-    train_y::Vector{Int}
-    train_labels::Vector{String}
+struct DataSplitCombined <: MatrixData
+    """
+    Training dataset.
+    """
+    train::LabeledDataset
 
-    test_x::Matrix{Float}
-    test_y::Vector{Int}
-    test_labels::Vector{String}
+    """
+    Testing dataset.
+    """
+    test::LabeledDataset
 end
+
 
 """
 Constructs a DataSplitCombined from an existing DataSplit by consolidating the training and validation data.
@@ -304,14 +291,10 @@ Constructs a DataSplitCombined from an existing DataSplit by consolidating the t
 - `data::DataSplit`: the DataSplit struct for consolidating validation features and labels into the training data.
 """
 function DataSplitCombined(data::DataSplit)
-    # Consolidate and return the struct in one step
+    # Consolidate trainind and validation, and return the struct in one step
     return DataSplitCombined(
-        hcat(data.train_x, data.val_x),
-        vcat(data.train_y, data.val_y),
-        vcat(data.train_labels, data.val_labels),
-        data.test_x,
-        data.test_y,
-        data.test_labels
+        LabeledDataset(data.train, data.val),
+        data.test,
     )
 end
 
@@ -348,15 +331,24 @@ function load_orbits(data_dir::AbstractString, data_dirs::Vector{String}, scalin
 
     # Construct the split dataset struct
     data_struct = DataSplit(
-        train_x,
-        train_y,
-        train_labels,
-        val_x,
-        val_y,
-        val_labels,
-        test_x,
-        test_y,
-        test_labels
+        # Training
+        LabeledDataset(
+            train_x,
+            train_y,
+            train_labels,
+        ),
+        # Validation
+        LabeledDataset(
+            val_x,
+            val_y,
+            val_labels,
+        ),
+        # Testing
+        LabeledDataset(
+            test_x,
+            test_y,
+            test_labels
+        ),
     )
 
     # Return the single object containing the data
@@ -371,7 +363,7 @@ Create a DataSplitIndexed object from a DataSplit.
 """
 function get_indexed_data(data::DataSplit)
     # Assume the same number of classes in each category
-    n_classes = length(unique(data.train_y))
+    n_classes = length(unique(data.train.y))
 
     # Construct empty fields
     train_x = Vector{Matrix{Float}}()
@@ -386,32 +378,38 @@ function get_indexed_data(data::DataSplit)
 
     # Iterate over every class
     for i = 1:n_classes
-        i_train = findall(x -> x == i, data.train_y)
-        push!(train_x, data.train_x[:, i_train])
-        push!(train_y, data.train_y[i_train])
-        i_val = findall(x -> x == i, data.val_y)
-        push!(val_x, data.val_x[:, i_val])
-        push!(val_y, data.val_y[i_val])
-        i_test = findall(x -> x == i, data.test_y)
-        push!(test_x, data.test_x[:, i_test])
-        push!(test_y, data.test_y[i_test])
+        i_train = findall(x -> x == i, data.train.y)
+        push!(train_x, data.train.x[:, i_train])
+        push!(train_y, data.train.y[i_train])
+        i_val = findall(x -> x == i, data.val.y)
+        push!(val_x, data.val.x[:, i_val])
+        push!(val_y, data.val.y[i_val])
+        i_test = findall(x -> x == i, data.test.y)
+        push!(test_x, data.test.x[:, i_test])
+        push!(test_y, data.test.y[i_test])
     end
 
-    train_labels = data.train_labels
-    val_labels = data.val_labels
-    test_labels = data.test_labels
+    train_labels = data.train.labels
+    val_labels = data.val.labels
+    test_labels = data.test.labels
 
     # Construct the indexed data split
     data_indexed = DataSplitIndexed(
-        train_x,
-        train_y,
-        train_labels,
-        val_x,
-        val_y,
-        val_labels,
-        test_x,
-        test_y,
-        test_labels
+        VectorLabeledDataset(
+            train_x,
+            train_y,
+            train_labels,
+        ),
+        VectorLabeledDataset(
+            val_x,
+            val_y,
+            val_labels,
+        ),
+        VectorLabeledDataset(
+            test_x,
+            test_y,
+            test_labels,
+        ),
     )
     return data_indexed
 end
@@ -438,29 +436,35 @@ function get_deindexed_data(data::DataSplitIndexed, order::IntegerVector)
     test_labels = Vector{String}()
 
     for i in order
-        train_x = hcat(train_x, data.train_x[i])
-        train_y = vcat(train_y, data.train_y[i])
-        val_x = hcat(val_x, data.val_x[i])
-        val_y = vcat(val_y, data.val_y[i])
-        test_x = hcat(test_x, data.test_x[i])
-        test_y = vcat(test_y, data.test_y[i])
+        train_x = hcat(train_x, data.train.x[i])
+        train_y = vcat(train_y, data.train.y[i])
+        val_x = hcat(val_x, data.val.x[i])
+        val_y = vcat(val_y, data.val.y[i])
+        test_x = hcat(test_x, data.test.x[i])
+        test_y = vcat(test_y, data.test.y[i])
     end
 
-    train_labels = data.train_labels[order]
-    val_labels = data.val_labels[order]
-    test_labels = data.test_labels[order]
+    train_labels = data.train.labels[order]
+    val_labels = data.val.labels[order]
+    test_labels = data.test.labels[order]
 
     # Construct the DataSplit
     data_struct = DataSplit(
-        train_x,
-        train_y,
-        train_labels,
-        val_x,
-        val_y,
-        val_labels,
-        test_x,
-        test_y,
-        test_labels
+        LabeledDataset(
+            train_x,
+            train_y,
+            train_labels,
+        ),
+        LabeledDataset(
+            val_x,
+            val_y,
+            val_labels,
+        ),
+        LabeledDataset(
+            test_x,
+            test_y,
+            test_labels
+        ),
     )
 
     return data_struct
@@ -560,17 +564,17 @@ end
 Get two lists of the training and testing accuracies.
 
 # Arguments
-- `data::MatrixData`: the training and testing dataset, containing a vector of training and testing labels `data.train_y` and `data.test_y`.
+- `data::MatrixData`: the training and testing dataset, containing a vector of training and testing labels `data.train.y` and `data.test.y`.
 - `y::IntegerVector`: the target values.
 - `y_hat::IntegerVector`: the agent's estimates.
 - `n_classes::Integer`: the number of total classes in the test set.
 """
 function get_tt_accuracies(data::MatrixData, y_hat_train::IntegerVector, y_hat::IntegerVector, n_classes::Integer)
     # TRAIN: Get the percent correct for each class
-    train_accuracies = get_accuracies(data.train_y, y_hat_train, n_classes)
+    train_accuracies = get_accuracies(data.train.y, y_hat_train, n_classes)
 
     # TEST: Get the percent correct for each class
-    test_accuracies = get_accuracies(data.test_y, y_hat, n_classes)
+    test_accuracies = get_accuracies(data.test.y, y_hat, n_classes)
 
     # Return the list of accuracy values for each class in training and testing
     return train_accuracies, test_accuracies
@@ -700,8 +704,6 @@ end
 # end
 
 """
-    create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
-
 Returns a handle to a labeled and annotated heatmap plot of the confusion matrix.
 """
 function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
@@ -738,8 +740,8 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
     nrow, ncol = size(norm_cm)
     ann = [
         (
-            i-.5,
-            j-.5,
+            i-0.5,
+            j-0.5,
             text(
                 round(plot_cm[j,i], digits=2),
                 fontsize,
@@ -772,8 +774,6 @@ function create_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector
 end
 
 """
-    create_custom_confusion_heatmap(class_labels::Vector{String}, y::IntegerVector, y_hat::IntegerVector)
-
 Returns a handle to a labeled and annotated heatmap plot of the confusion matrix.
 """
 function create_custom_confusion_heatmap(class_labels::Vector{String}, norm_cm)
@@ -844,8 +844,6 @@ function create_custom_confusion_heatmap(class_labels::Vector{String}, norm_cm)
 end
 
 """
-    create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels)
-
 Return a grouped bar chart with class accuracies.
 """
 function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels ; percentages=false)
@@ -888,8 +886,6 @@ function create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels ; per
 end
 
 """
-    create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels)
-
 Return a grouped bar chart with comparison bars.
 """
 function create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels ; percentages=false, extended=false)
@@ -903,8 +899,8 @@ function create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels ; per
 
     # Get the training and testing accuracies
     # train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
-    test_accuracies = get_accuracies(data.test_y, y_hat, n_classes)
-    test_accuracies_val = get_accuracies(data.test_y, y_hat_val, n_classes)
+    test_accuracies = get_accuracies(data.test.y, y_hat, n_classes)
+    test_accuracies_val = get_accuracies(data.test.y, y_hat_val, n_classes)
 
     # If we had a dumping category, pop the last results to get back
     @info test_accuracies
@@ -949,8 +945,6 @@ function create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels ; per
 end
 
 """
-    create_boxplot(data::RealMatrix, class_labels::Vector{String})
-
 Return a colored and formatted boxplot of the data.
 """
 function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false, bounds_override=[])
@@ -1012,8 +1006,6 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percent
 end
 
 """
-    create_inverted_boxplot(data::RealMatrix, class_labels::Vector{String})
-
 Return a colored and formatted boxplot of the data.
 """
 function create_inverted_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false)
@@ -1079,8 +1071,6 @@ function create_inverted_boxplot(data::RealMatrix, class_labels::Vector{String} 
 end
 
 """
-    create_condensed_plot(y_hat, class_labels)
-
 Create and return a simplified condensed scenario plot.
 """
 function create_condensed_plot(perfs, class_labels, percentages=true)
@@ -1118,8 +1108,6 @@ function create_condensed_plot(perfs, class_labels, percentages=true)
 end
 
 """
-    create_complex_condensed_plot(y_hat, vals, class_labels)
-
 Create and return a complex condensed scenario plot.
 """
 function create_complex_condensed_plot(perfs, vals, class_labels, percentages=true)
@@ -1187,8 +1175,6 @@ function create_complex_condensed_plot(perfs, vals, class_labels, percentages=tr
 end
 
 """
-    create_complex_condensed_plot_alt(y_hat, vals, class_labels)
-
 Create and return an alternate complex condensed scenario plot.
 """
 function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentages=true)
@@ -1313,13 +1299,16 @@ end
 # -----------------------------------------------------------------------------
 
 """
-    shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
-
 Runs a single Monte Carlo simulation of training/testing on shuffled samples.
+
+# Arguments
+- `d::Dict`: a logging dictionary storing simulation parameters.
+- `data::DataSplit`: a train/test split of features and labels.
+- `opts::opts_DDVFA`: the options for DDVFA construction.
 """
 function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
     # Infer the number of classes
-    n_classes = length(unique(data.train_y))
+    n_classes = length(unique(data.train.y))
 
     # Get the random seed for the experiment
     seed = d["seed"]
@@ -1331,17 +1320,17 @@ function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
 
     # Shuffle the data with a new random seed
     Random.seed!(seed)
-    i_train = randperm(length(data.train_y))
-    data.train_x = data.train_x[:, i_train]
-    data.train_y = data.train_y[i_train]
+    i_train = randperm(length(data.train.y))
+    data.train.x = data.train.x[:, i_train]
+    data.train.y = data.train.y[i_train]
 
     # Train and test in batch
-    y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
-    y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+    y_hat_train = train!(ddvfa, data.train.x, y=data.train.y)
+    y_hat = AdaptiveResonance.classify(ddvfa, data.test.x, get_bmu=true)
 
     # Calculate performance on training data, testing data, and with get_bmu
-    train_perf = performance(y_hat_train, data.train_y)
-    test_perf = performance(y_hat, data.test_y)
+    train_perf = performance(y_hat_train, data.train.y)
+    test_perf = performance(y_hat, data.test.y)
 
     # Save the number of F2 nodes and total categories per class
     n_F2, n_categories = get_n_categories(ddvfa)
@@ -1349,7 +1338,7 @@ function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
     n_categories_sum = sum(n_categories)
 
     # Get the normalized confusion Matrix
-    norm_cm = get_normalized_confusion(data.test_y, y_hat, n_classes)
+    norm_cm = get_normalized_confusion(data.test.y, y_hat, n_classes)
 
     # Get the train/test accuracies
     train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
@@ -1374,9 +1363,12 @@ function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
 end
 
 """
-    permuted(d::Dict, data::DataSplit, opts::opts_DDVFA)
-
 Runs a single Monte Carlo simulation of training/testing on shuffled samples.
+
+# Arguments
+- `d::Dict`: a logging dictionary storing simulation parameters.
+- `data::DataSplitIndexed`: an indexed train/test split of features and labels.
+- `opts::opts_DDVFA`: the options for DDVFA construction.
 """
 function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
     # Get the train/test order for the experiment
@@ -1391,12 +1383,12 @@ function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
     local_data = get_deindexed_data(data_indexed, order)
 
     # Train and test in batch
-    y_hat_train = train!(ddvfa, local_data.train_x, y=local_data.train_y)
-    y_hat = AdaptiveResonance.classify(ddvfa, local_data.test_x, get_bmu=true)
+    y_hat_train = train!(ddvfa, local_data.train.x, y=local_data.train.y)
+    y_hat = AdaptiveResonance.classify(ddvfa, local_data.test.x, get_bmu=true)
 
     # Calculate performance on training data, testing data, and with get_bmu
-    train_perf = performance(y_hat_train, local_data.train_y)
-    test_perf = performance(y_hat, local_data.test_y)
+    train_perf = performance(y_hat_train, local_data.train.y)
+    test_perf = performance(y_hat, local_data.test.y)
 
     # Save the number of F2 nodes and total categories per class
     n_F2, n_categories = get_n_categories(ddvfa)
@@ -1404,7 +1396,7 @@ function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
     n_categories_sum = sum(n_categories)
 
     # Get the normalized confusion Matrix
-    norm_cm = get_normalized_confusion(local_data.test_y, y_hat, n_classes)
+    norm_cm = get_normalized_confusion(local_data.test.y, y_hat, n_classes)
 
     # Get the train/test accuracies
     train_accuracies, test_accuracies = get_tt_accuracies(local_data, y_hat_train, y_hat, n_classes)
@@ -1434,13 +1426,16 @@ function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
 end
 
 """
-    unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
-
 Runs a single Monte Carlo simulation of supervised training and unsupervised training/testing.
+
+# Arguments
+- `d::Dict`: a logging dictionary storing simulation parameters.
+- `data::DataSplitCombined`: a train/test split of features and labels.
+- `opts::opts_DDVFA`: the options for DDVFA construction.
 """
 function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     # Infer the number of classes
-    n_classes = length(unique(data.train_y))
+    n_classes = length(unique(data.train.y))
 
     # Get the random seed for the experiment
     seed = d["seed"]
@@ -1452,43 +1447,43 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
 
     # Shuffle the data with a new random seed
     Random.seed!(seed)
-    i_train = randperm(length(data.train_y))
-    data.train_x = data.train_x[:, i_train]
-    data.train_y = data.train_y[i_train]
+    i_train = randperm(length(data.train.y))
+    data.train.x = data.train.x[:, i_train]
+    data.train.y = data.train.y[i_train]
 
     # Get the number of samples in the training dataset to split it up
-    n_samples = length(data.train_y)
+    n_samples = length(data.train.y)
     i_split = Int(floor(0.8*n_samples))
 
     # Split the original training dataset into train (supervised) and val (unsupervised)
-    local_train_x = data.train_x[:, 1:i_split]
-    local_train_y = data.train_y[1:i_split]
-    local_val_x = data.train_x[:, i_split+1:end]
-    local_val_y = data.train_y[i_split+1:end]
+    local_train_x = data.train.x[:, 1:i_split]
+    local_train_y = data.train.y[1:i_split]
+    local_val_x = data.train.x[:, i_split+1:end]
+    local_val_y = data.train.y[i_split+1:end]
 
     # --- SUPERVISED ---
 
     # Train and test in batch
     y_hat_train = train!(ddvfa, local_train_x, y=local_train_y)
-    y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+    y_hat = AdaptiveResonance.classify(ddvfa, data.test.x, get_bmu=true)
 
     # Calculate performance on training data, testing data, and with get_bmu
     train_perf = performance(y_hat_train, local_train_y)
-    test_perf = performance(y_hat, data.test_y)
+    test_perf = performance(y_hat, data.test.y)
 
     # --- UNSUPERVISED ---
 
     # Train in batch, unsupervised
-    # y_hat_train_val = train!(ddvfa, data.val_x, y=data.val_y)
+    # y_hat_train_val = train!(ddvfa, data.val.x, y=data.val.y)
     y_hat_train_val = train!(ddvfa, local_val_x)
     # If the category is not in 1:6, replace the label as 7 for the new/incorrect bin
     replace!(x -> !(x in collect(1:n_classes)) ? 7 : x, ddvfa.labels)
     replace!(x -> !(x in collect(1:n_classes)) ? 7 : x, y_hat_train_val)
-    y_hat_val = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+    y_hat_val = AdaptiveResonance.classify(ddvfa, data.test.x, get_bmu=true)
 
     # Calculate performance on second training data, testing data, and with get_bmu
     train_perf_val = performance(y_hat_train_val, local_val_y)
-    test_perf_val = performance(y_hat_val, data.test_y)
+    test_perf_val = performance(y_hat_val, data.test.y)
 
     # Save the number of F2 nodes and total categories per class
     n_F2, n_categories = get_n_categories(ddvfa)
@@ -1496,8 +1491,8 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     n_categories_sum = sum(n_categories)
 
     # Get the normalized confusion matrices
-    norm_cm = get_normalized_confusion(data.test_y, y_hat, n_classes)
-    norm_cm_val = get_normalized_confusion(data.test_y, y_hat_val, n_classes + 1)
+    norm_cm = get_normalized_confusion(data.test.y, y_hat, n_classes)
+    norm_cm_val = get_normalized_confusion(data.test.y, y_hat_val, n_classes + 1)
 
     # Get the train/test accuracies
     # train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)
@@ -1505,11 +1500,11 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     # TRAIN: Get the percent correct for each class
     train_accuracies = get_accuracies(local_train_y, y_hat_train, n_classes)
     # TEST: Get the percent correct for each class
-    test_accuracies = get_accuracies(data.test_y, y_hat, n_classes)
+    test_accuracies = get_accuracies(data.test.y, y_hat, n_classes)
     # TRAIN: Get the percent correct for each class
     train_accuracies_val = get_accuracies(local_val_y, y_hat_train_val, n_classes+1)
     # TEST: Get the percent correct for each class
-    test_accuracies_val = get_accuracies(data.test_y, y_hat_val, n_classes+1)
+    test_accuracies_val = get_accuracies(data.test.y, y_hat_val, n_classes+1)
 
     # Deepcopy the simulation dict and add results entries
     fulld = deepcopy(d)
@@ -1537,11 +1532,17 @@ end
 
 """
 The packed data directory as a DrWatson-style path function.
+
+# Arguments
+- `args...`: string arguments a subsequent file or folders.
 """
 packed_dir(args...) = datadir("packed", args...)
 
 """
 The unpacked data directory as a DrWatson-style path function.
+
+# Arguments
+- `args...`: string arguments a subsequent file or folders.
 """
 unpacked_dir(args...) = datadir("unpacked", args...)
 
@@ -1602,9 +1603,6 @@ function load_default_orbit_data(data_dir::AbstractString ; scaling::Float=2.0)
         "pr_morning",
     ]
 
-    # Sigmoid input scaling
-    # scaling = 2.0
-
     # Load the data names and class labels from the selection
     data_dirs, class_labels = get_orbit_names(data_selection)
 
@@ -1639,12 +1637,12 @@ end
 #     data = get_deindexed_data(data_indexed, order)
 
 #     # Train and test in batch
-#     y_hat_train = train!(ddvfa, data.train_x, y=data.train_y)
-#     y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+#     y_hat_train = train!(ddvfa, data.train.x, y=data.train.y)
+#     y_hat = AdaptiveResonance.classify(ddvfa, data.test.x, get_bmu=true)
 
 #     # Calculate performance on training data, testing data, and with get_bmu
-#     train_perf = performance(y_hat_train, data.train_y)
-#     test_perf = performance(y_hat, data.test_y)
+#     train_perf = performance(y_hat_train, data.train.y)
+#     test_perf = performance(y_hat, data.test.y)
 
 #     # Save the number of F2 nodes and total categories per class
 #     n_F2, n_categories = get_n_categories(ddvfa)
@@ -1652,7 +1650,7 @@ end
 #     n_categories_sum = sum(n_categories)
 
 #     # Get the normalized confusion Matrix
-#     norm_cm = get_normalized_confusion(data.test_y, y_hat, n_classes)
+#     norm_cm = get_normalized_confusion(data.test.y, y_hat, n_classes)
 
 #     # Get the train/test accuracies
 #     train_accuracies, test_accuracies = get_tt_accuracies(data, y_hat_train, y_hat, n_classes)

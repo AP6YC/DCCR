@@ -74,7 +74,7 @@ for ix = 1:n_classes
         "type" => "train",
         "regimes" => [Dict(
             "task" => class_labels[ix],
-            "count" => length(data_indexed.train_y[ix]),
+            "count" => length(data_indexed.train.y[ix]),
         )],
     )
     push!(SCENARIO, train_step)
@@ -84,7 +84,7 @@ for ix = 1:n_classes
     for jx = 1:n_classes
         local_regime = Dict(
             "task" => class_labels[jx],
-            "count" => length(data_indexed.test_y[jx]),
+            "count" => length(data_indexed.test.y[jx]),
         )
         push!(regimes, local_regime)
     end
