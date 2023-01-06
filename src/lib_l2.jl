@@ -82,6 +82,11 @@ Alias for a queue of Experiences.
 const ExperienceQueue = Deque{Experience}
 
 """
+Alias for a statistics dictionary being string keys mapping to any object.
+"""
+const StatsDict = Dict{String, Any}
+
+"""
 Container for the ExperienceQueue and some statistics about it.
 """
 struct ExperienceQueueContainer
@@ -94,7 +99,7 @@ struct ExperienceQueueContainer
     The statistics about the queue.
     **NOTE** These statistics reflect the queue at construction, not after any processing.
     """
-    stats::Dict{String, Any}
+    stats::StatsDict
 end
 
 """
@@ -105,7 +110,7 @@ Creates a queue of Experiences from the scenario dictionary.
 """
 function ExperienceQueueContainer(scenario_dict::AbstractDict)
     # Create an empty statistics container
-    stats = Dict{String, Any}(
+    stats = StatsDict(
         "length" => 0,
         "n_blocks" => 0,
         "n_train" => 0,
@@ -125,7 +130,7 @@ function ExperienceQueueContainer(scenario_dict::AbstractDict)
         # Get the block type as "train" or "test"
         block_type = block["type"]
         # Verify the block type
-        check_block_type(block_type)
+        sanitize_block_type(block_type)
         # Stats on the blocks
         if block_type == "train"
             stats["n_train"] += 1
@@ -170,13 +175,28 @@ abstract type Agent end
 DDVFA-based L2 agent.
 """
 struct DDVFAAgent <: Agent
+    """
+    The DDVFA module.
+    """
     agent::DDVFA
+
+    """
+    Parameters used for l2logging.
+    """
     params::Dict
+
+    """
+    Container for the Experience Queue
+    """
     scenario::ExperienceQueueContainer
 end
 
 """
 Overload of the show function for ExperienceQueueContainer.
+
+# Arguments
+- `io::IO`: the current IO stream.
+- `cont::ExperienceQueueContainer`: the ExperienceQueueContainer to print/display.
 """
 function Base.show(io::IO, cont::ExperienceQueueContainer)
     # compact = get(io, :compact, false)
@@ -195,6 +215,10 @@ end
 
 """
 Overload of the show function for ExperienceQueue.
+
+# Arguments
+- `io::IO`: the current IO stream.
+- `cont::ExperienceQueueContainer`: the ExperienceQueueContainer to print/display.
 """
 function Base.show(io::IO, queue::ExperienceQueue)
     # compact = get(io, :compact, false)
@@ -209,6 +233,10 @@ end
 
 """
 Overload of the show function for DDVFAAgent.
+
+# Arguments
+- `io::IO`: the current IO stream.
+- `cont::DDVFAAgent`: the DDVFAAgent to print/display.
 """
 function Base.show(io::IO, agent::DDVFAAgent)
 # function Base.show(io::IO, ::MIME"text/plain", agent::DDVFAAgent)
@@ -224,13 +252,42 @@ end
 # CONSTRUCTOR METHODS
 # -----------------------------------------------------------------------------
 
-function check_block_type(block_type::AbstractString)
-    # Verify that we have a correct block type
+"""
+Sanitizes a selection within a list of acceptable options.
+
+# Arguments
+- `selection_type::AbstractString`: a string describing the option in case it is misused.
+- `selection::Any`: a single selection from a list
+"""
+function sanitize_in_list(selection_type::AbstractString, selection::T, acceptable::Vector{T}) where T <: Any
+    # Verify that we have a correct selection
     try
-        @assert block_type in BLOCK_TYPES
+        @assert selection in acceptable
     catch
-        error("block_type must be one of the following: $(BLOCK_TYPES)")
+        error("$(selection_type) must be one of the following: $(acceptable)")
     end
+end
+
+"""
+Sanitize the selected block type against the BLOCK_TYPES constant.
+
+# Arguments
+- `block_type::AbstractString`: the selected block type.
+"""
+function sanitize_block_type(block_type::AbstractString)
+    # Verify that we have a correct block type
+    sanitize_in_list("block_type", block_type, BLOCK_TYPES)
+end
+
+"""
+Sanitize the selected log state against the LOG_STATES constant.
+
+# Arguments
+- `log_state::AbstractString`: the selected log state.
+"""
+function sanitize_log_state(log_state::AbstractString)
+    # Verify that we have a correct log state
+    sanitize_in_list("log_state", log_state, LOG_STATES)
 end
 
 """
@@ -243,7 +300,7 @@ Constructs an Experience, setting the update_model field based upon the block ty
 """
 function Experience(task_name::AbstractString, seq_nums::SequenceNums, block_type::AbstractString)
     # Verify the block type
-    check_block_type(block_type)
+    sanitize_block_type(block_type)
 
     # Construct and return the Experience
     return Experience(
@@ -272,7 +329,7 @@ function DDVFAAgent(scenario_dict::AbstractDict ; kwargs...)
     exp_container = ExperienceQueueContainer(scenario_dict)
 
     # Create the params object for Logging
-    params = Dict{String, Any}()
+    params = StatsDict()
     for (key, value) in kwargs
         params[string(key)] = value
     end
@@ -324,6 +381,7 @@ function is_complete(agent::Agent)
 end
 
 """
+Logs data from an L2 experience.
 
 # Arguments
 - `data_logger::PyObject`: the l2logger DataLogger.
@@ -356,6 +414,8 @@ Evaluates a single agent on a single experience, training or testing as needed.
 - `exp::Experience`: the experience to use for training/testing.
 """
 function evaluate_agent(agent::Agent, exp::Experience)
+
+
 end
 
 """

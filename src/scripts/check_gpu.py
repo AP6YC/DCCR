@@ -1,12 +1,13 @@
 """
     check_gpu.py
 
-Description:
-    This script checks and prints the GPUs available.
-    Previously using torch, now checks using tensorflow.
+# Description
+This script checks and prints the GPUs available.
+Previously using torch, now checks using tensorflow.
 
-Author: Sasha Petrenko <sap625@mst.edu> @AP6YC
-Date: 6/3/2022
+# Authors
+- Sasha Petrenko <sap625@mst.edu> @AP6YC
+- Date: 6/3/2022
 """
 
 # -----------------------------------------------------------------------------
