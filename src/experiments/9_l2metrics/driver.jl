@@ -60,9 +60,8 @@ data_logger = l2logger.DataLogger(
     scenario_info,
 )
 
-# Construct the agent from the scenario
-agent = DDVFAAgent(
-    scenario,
+# Create the DDVFA options for both initialization and logging
+ddvfa_opts = opts_DDVFA(
     # DDVFA options
     gamma = 5.0,
     gamma_ref = 1.0,
@@ -71,6 +70,11 @@ agent = DDVFAAgent(
     rho_ub = 0.7,
     similarity = :single,
     display = false,
+)
+# Construct the agent from the scenario
+agent = DDVFAAgent(
+    ddvfa_opts,
+    scenario,
 )
 
 # Specify the input data configuration
