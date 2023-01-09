@@ -117,7 +117,8 @@ Checks if the agent is done with its scenario queue.
 """
 function is_complete(agent::Agent)::Bool
     # Return a bool if the agent is complete with the scenario
-    return (length(agent.scenario.queue) == 0)
+    # return (length(agent.scenario.queue) == 0)
+    return isempty(agent.scenario.queue)
 end
 
 """
@@ -206,18 +207,24 @@ Runs an agent's scenario.
 """
 function run_scenario(agent::Agent, data::VectoredData, data_logger::PyObject)
     # Initialize the "last sequence"
-    last_seq = SequenceNums(-1, -1, -1)
+    # last_seq = SequenceNums(-1, -1, -1)
 
+    # Initialize the progressbar
+    n_exp = length(agent.scenario.queue)
+    # block_log_string = "Block 1"
+    p = Progress(n_exp; showspeed=true)
     # Iterate while the agent's scenario is incomplete
     while !is_complete(agent)
         # Get the next experience
         exp = popfirst!(agent.scenario.queue)
         # Get the current sequence number
-        cur_seq = exp.seq_nums
+        # cur_seq = exp.seq_nums
         # Logging
-        if last_seq.block_num != cur_seq.block_num
-            @info "New block: $(cur_seq.block_num)"
-        end
+        next!(p; showvalues = [
+            # (:Block, cur_seq.block_num),
+            (:Block, exp.seq_nums.block_num),
+            (:Type, exp.block_type),
+        ])
         # Evaluate the agent on the experience
         results = evaluate_agent!(agent, exp, data)
 
@@ -225,7 +232,7 @@ function run_scenario(agent::Agent, data::VectoredData, data_logger::PyObject)
         log_data(data_logger, exp, results, agent.params)
 
         # Loop reflection
-        last_seq = cur_seq
+        # last_seq = cur_seq
     end
 
     return
