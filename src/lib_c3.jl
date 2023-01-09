@@ -1621,7 +1621,7 @@ function load_default_orbit_data(data_dir::AbstractString ; scaling::Float=2.0)
     data_indexed = get_indexed_data(data)
 
     # Return the original data, indexed data, class labels, and the number of classes for convenience
-    return data, data_indexed, class_labels, n_classes
+    return data, data_indexed, class_labels, data_selection, n_classes
 end
 
 # """

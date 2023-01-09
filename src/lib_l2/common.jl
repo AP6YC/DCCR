@@ -74,6 +74,3 @@ Loads the JSON file, interpreted as a dictionary.
 function json_load(filepath::AbstractString)
     return JSON.parsefile(filepath)
 end
-
-# function fields_to_dict!(dict::AbstractDict, options::)
-# end

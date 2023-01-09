@@ -64,7 +64,7 @@ json_save(config_file, config_dict)
 # -----------------------------------------------------------------------------
 
 # Load the default data configuration
-data, data_indexed, class_labels, n_classes = load_default_orbit_data(data_dir)
+data, data_indexed, class_labels, data_selection, n_classes = load_default_orbit_data(data_dir)
 
 # Build the scenario vector
 SCENARIO = []
@@ -73,7 +73,8 @@ for ix = 1:n_classes
     train_step = Dict(
         "type" => "train",
         "regimes" => [Dict(
-            "task" => class_labels[ix],
+            # "task" => class_labels[ix],
+            "task" => data_selection[ix],
             "count" => length(data_indexed.train.y[ix]),
         )],
     )
@@ -83,7 +84,8 @@ for ix = 1:n_classes
     regimes = []
     for jx = 1:n_classes
         local_regime = Dict(
-            "task" => class_labels[jx],
+            # "task" => class_labels[jx],
+            "task" => data_selection[jx],
             "count" => length(data_indexed.test.y[jx]),
         )
         push!(regimes, local_regime)

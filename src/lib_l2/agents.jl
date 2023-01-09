@@ -58,13 +58,7 @@ function DDVFAAgent(ddvfa_opts::opts_DDVFA)
 
     # Create the params object for Logging
     params = StatsDict()
-    # Use all of the DDVFA options for the logging parameters
-    # for (key, value) in ddvfa_opts
-    #     params[string(key)] = value
-    # end
-    for name in fieldnames(opts_DDVFA)
-        params[string(name)] = getfield(ddvfa_opts, name)
-    end
+    fields_to_dict!(params, ddvfa_opts)
 
     # Construct and return the DDVFAAgent
     return DDVFAAgent(
@@ -126,6 +120,22 @@ function is_complete(agent::Agent)::Bool
     return (length(agent.scenario.queue) == 0)
 end
 
+"""
+Gets an integer index of where a string name appears in a list of strings.
+
+# Arguments
+- `labels::`
+"""
+function get_index_from_name(labels::Vector{T}, name::AbstractString) where T <: AbstractString
+    # Findall results in a list, even of only one entry
+    results = findall(x -> x == name, labels)
+    # If the list is longer than 1, error
+    if length(results) > 1
+        error("Labels list contains multiple instances of $name")
+    end
+    # If no error, return the first (and only) entry of the reverse search
+    return results[1]
+end
 
 """
 Evaluates a single agent on a single experience, training or testing as needed.
@@ -134,20 +144,31 @@ Evaluates a single agent on a single experience, training or testing as needed.
 - `agent::Agent`: the agent to evaluate.
 - `exp::Experience`: the experience to use for training/testing.
 """
-function evaluate_agent(agent::Agent, experience::Experience, data::MatrixData)
+function evaluate_agent!(agent::Agent, experience::Experience, data::VectoredData)
+    # Disect the experience
+    dataset_index = get_index_from_name(data.train.labels, experience.task_name)
+    datum_index = experience.seq_nums.task_num
 
-    # # Sanitize the block type as train or test
-    # sanitize_block_type(experience.block_type)
-
-    # # if experience.block_type == "train":
-    # if experience.update_model
-    #     train!(agent.agent, data.train)
-    # # elseif experience.block_type == "test":
-    # else
-    #     classify(agent.agent, )
-    # end
+    # If we are updating the model, run the training function
+    if experience.update_model
+        sample = data.train.x[dataset_index][:, datum_index]
+        label = data.train.y[dataset_index][datum_index]
+        y_hat = AdaptiveResonance.train!(agent.agent, sample, y=label)
+    # elseif experience.block_type == "test":
+    else
+        sample = data.test.x[dataset_index][:, datum_index]
+        label = data.test.y[dataset_index][datum_index]
+        y_hat = AdaptiveResonance.classify(agent.agent, sample)
+    end
+    results = Dict(
+        "performance" => y_hat == label ? 1.0 : 0.0,
+    )
     # agent.agent
-    return
+    # # Artificially create some results
+    # results = Dict(
+    #     "performance" => 0.0,
+    # )
+    return results
 end
 
 """
@@ -183,11 +204,9 @@ Runs an agent's scenario.
 - `agent::Agent`: a struct that contains an `agent` and `scenario`.
 - `data_logger::PyObject`: a l2logger object.
 """
-function run_scenario(agent::Agent, data_logger::PyObject)
-    # Load the data
-
+function run_scenario(agent::Agent, data::VectoredData, data_logger::PyObject)
     # Initialize the "last sequence"
-    last_seq = SequenceNums(-1, -1)
+    last_seq = SequenceNums(-1, -1, -1)
 
     # Iterate while the agent's scenario is incomplete
     while !is_complete(agent)
@@ -199,10 +218,9 @@ function run_scenario(agent::Agent, data_logger::PyObject)
         if last_seq.block_num != cur_seq.block_num
             @info "New block: $(cur_seq.block_num)"
         end
-        # Artificially create some results
-        results = Dict(
-            "performance" => 0.0,
-        )
+        # Evaluate the agent on the experience
+        results = evaluate_agent!(agent, exp, data)
+
         # Log the data
         log_data(data_logger, exp, results, agent.params)
 

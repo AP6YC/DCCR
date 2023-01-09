@@ -42,7 +42,7 @@ scenario = json_load(configs_dir("scenario.json"))
 # -----------------------------------------------------------------------------
 
 # Load the default data configuration
-data, data_indexed, class_labels, n_classes = load_default_orbit_data(data_dir)
+data, data_indexed, class_labels, data_selection, n_classes = load_default_orbit_data(data_dir)
 
 # -----------------------------------------------------------------------------
 # EXPERIMENT
@@ -85,7 +85,7 @@ agent.agent.config = DataConfig(0, 1, 128)
 # -----------------------------------------------------------------------------
 
 # Run the scenario
-run_scenario(agent, data_logger)
+run_scenario(agent, data_indexed, data_logger)
 
 # # Get the data dimensions
 # dim, n_train = size(data.train.x)

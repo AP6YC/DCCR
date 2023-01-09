@@ -27,6 +27,11 @@ struct SequenceNums
     The experience number.
     """
     exp_num::Int
+
+    """
+    The task-specific count.
+    """
+    task_num::Int
 end
 
 """
