@@ -38,7 +38,11 @@ DIR = results_dir("logs")
 NAME = "9_l2metrics_logger"
 COLS = Dict(
     # "metrics_columns" => "reward",
-    "metrics_columns" => ["performance",],
+    "metrics_columns" => [
+        "performance",
+        "art_match",
+        "art_activation",
+    ],
     "log_format_version" => "1.0",
 )
 META = Dict(

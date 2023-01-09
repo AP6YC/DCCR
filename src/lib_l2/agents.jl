@@ -163,6 +163,8 @@ function evaluate_agent!(agent::Agent, experience::Experience, data::VectoredDat
     end
     results = Dict(
         "performance" => y_hat == label ? 1.0 : 0.0,
+        "art_match" => agent.agent.M,
+        "art_activation" => agent.agent.T,
     )
     # agent.agent
     # # Artificially create some results

@@ -3,7 +3,7 @@
 set dest_name=%1
 set src_log=%1
 
-set metrics=(performance)
+set metrics=(performance, art_match, art_activation)
 
 set out_dir=work\results\9_l2metrics\l2metrics\%dest_name%
 set src_dir=work\results\9_l2metrics\logs\%src_log%
