@@ -1,5 +1,5 @@
 """
-    gen_scenario.jl
+    2_gen_scenario.jl
 
 # Description
 Generates the scenario and config files for l2logger and l2metrics experiments.

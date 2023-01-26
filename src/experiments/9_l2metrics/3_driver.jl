@@ -1,5 +1,5 @@
 """
-    driver.jl
+    3_driver.jl
 
 # Description
 Runs the l2 condensed scenario specified by the gen_scenario.jl file.

@@ -1,5 +1,5 @@
 """
-    setup_l2_packages.jl
+    1_setup_l2_packages.jl
 
 # Description
 This script sets up the PyCall environment for the l2metrics experiment.
@@ -14,8 +14,8 @@ This script sets up the PyCall environment for the l2metrics experiment.
 # Setup the project environment
 using DrWatson
 
-# Setup the PyCall environment
-include(projectdir("src", "setup_pycall_env.jl"))
+# Build the PyCall environment
+include(projectdir("src", "build_pyenv.jl"))
 
 # Load Conda after setting and building the PyCall environment
 using Conda

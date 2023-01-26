@@ -1,5 +1,9 @@
-# using PyCall
-using Pkg
+"""
+    set_pyenv.jl
+
+# Description
+Sets the Python environment variable in an idempotent manner.
+"""
 
 # Point to the correct Python environment
 if !haskey(ENV, "PYTHON")
@@ -10,8 +14,3 @@ if !haskey(ENV, "PYTHON")
         ENV["PYTHON"] = ""
     end
 end
-
-Pkg.build("PyCall")
-
-# Load PyCall and Conda after setting the default environment
-using PyCall
