@@ -30,3 +30,5 @@ include("1_setup_l2_packages.jl")
 include("2_gen_scenario.jl")
 # Run the l2 experiment and generate logs
 include("3_driver.jl")
+# Generate the metrics
+include("4_l2metrics_julia.jl")

@@ -12,23 +12,10 @@ Runs the l2 condensed scenario specified by the gen_scenario.jl file.
 # SETUP
 # -----------------------------------------------------------------------------
 
-# if !haskey(ENV, "PYTHON")
-#     PYTHON_ENV = raw"C:\Users\Sasha\Anaconda3\envs\l2mmetrics\python.exe"
-#     if isfile(PYTHON_ENV)
-#         ENV["PYTHON"] = PYTHON_ENV
-#     else
-#         ENV["PYTHON"] = ""
-#     end
-# end
-
 # Load dependencies
 using
-    PyCall,
     DrWatson,
     AdaptiveResonance
-
-# Load the l2logger PyCall dependency
-l2logger = pyimport("l2logger.l2logger")
 
 # Experiment save directory name
 experiment_top = "9_l2metrics"
@@ -36,8 +23,11 @@ experiment_top = "9_l2metrics"
 # DCCR project files
 include(projectdir("src", "setup.jl"))
 
-# Special folders for this experiment
+# Special l2 setup for this experiment (setting the pyenv, etc.)
 include(projectdir("src", "setup_l2.jl"))
+
+# Load the l2logger PyCall dependency
+l2logger = pyimport("l2logger.l2logger")
 
 # Load the config and scenario
 config = json_load(configs_dir("config.json"))

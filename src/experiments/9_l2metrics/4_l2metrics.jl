@@ -2,11 +2,15 @@
     4_l2metrics.jl
 
 # Description
-Runs the l2metrics on the latest logs from within Julia.
+Runs the l2metrics batch script from within Julia.
 
 # Authors
 - Sasha Petrenko <sap625@mst.edu>
 """
+
+# -----------------------------------------------------------------------------
+# SETUP
+# -----------------------------------------------------------------------------
 
 using
     PyCall,
@@ -19,22 +23,13 @@ experiment_top = "9_l2metrics"
 # DCCR project files
 include(projectdir("src", "setup.jl"))
 
-# Special folders for this experiment
-# include(projectdir("src", "setup_l2.jl"))
-
-# # Setup the PyCall environment
-# include(projectdir("src", "setup_pycall_env.jl"))
+# Get the location of the last log
 last_log = readdir(results_dir("logs"))[end]
 
-# metrics = [
-#     "performance",
-#     "art_match",
-#     "art_activation",
-# ]
-
+# Get the batch script location
 exp_dir(args...) = projectdir("src", "experiments", experiment_top, args...)
 l2m_script = "4_l2metrics.bat"
 full_l2m_script = exp_dir(l2m_script)
 
+# Run the command for the batch script
 run(`cmd /c activate l2mmetrics \&\& $full_l2m_script $last_log`)
-# run(`cmd /c activate l2mmetrics \&\& dir $()`)
