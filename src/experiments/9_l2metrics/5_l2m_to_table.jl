@@ -17,9 +17,9 @@ desired_metrics = [
     "backward_transfer_ratio",
 ]
 pretty_rows = [
-    "Performance",
     "Activation",
     "Match",
+    "Performance",
 ]
 
 # Point to the directory of the most recent metrics
@@ -46,7 +46,7 @@ end
 # Make a dataframe with the array entries
 new_df = DataFrame(
     Metric = pretty_rows,
-    PMM = new_metric_array[:, 1],
+    PM = new_metric_array[:, 1],
     FTR = new_metric_array[:, 2],
     BTR = new_metric_array[:, 3],
 )
