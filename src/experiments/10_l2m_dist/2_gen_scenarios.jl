@@ -42,100 +42,102 @@ orders = collect(permutations(orders))
 #     "order" => collect(permutations(orders))
 # )
 
+
+# Load the default data configuration
+data, data_indexed, class_labels, data_selection, n_classes = load_default_orbit_data(data_dir)
+
 # -----------------------------------------------------------------------------
-# CONFIG FILE
+# ITERATE
 # -----------------------------------------------------------------------------
 
-# DIR = results_dir("logs")
-# NAME = "9_l2metrics_logger"
-# COLS = Dict(
-#     # "metrics_columns" => "reward",
-#     "metrics_columns" => [
-#         "performance",
-#         "art_match",
-#         "art_activation",
-#     ],
-#     "log_format_version" => "1.0",
-# )
-# META = Dict(
-#     "author" => "Sasha Petrenko",
-#     "complexity" => "1-low",
-#     "difficulty" => "2-medium",
-#     "scenario_type" => "custom",
-# )
+# Iterate over every permutation
+for order in orders
+    # Point to the permutation's own folder
+    exp_dir(args...) = configs_dir(join(order), args...)
+    # Make the permutation folder
+    mkpath(exp_dir())
+    # Point to the config and scenario files within the experiment folder
+    config_file = exp_dir("config.json")
+    scenario_file = exp_dir("scenario.json")
 
-# # Create the config dict
-# config_dict = Dict(
-#     "DIR" => DIR,
-#     "NAME" => NAME,
-#     "COLS" => COLS,
-#     "META" => META,
-# )
+    # -------------------------------------------------------------------------
+    # CONFIG FILE
+    # -------------------------------------------------------------------------
 
-# # Point to config and scenario files
-# config_file = configs_dir("config.json")
-# scenario_file = configs_dir("scenario.json")
+    DIR = results_dir("logs")
+    NAME = "9_l2metrics_logger"
+    COLS = Dict(
+        # "metrics_columns" => "reward",
+        "metrics_columns" => [
+            "performance",
+            "art_match",
+            "art_activation",
+        ],
+        "log_format_version" => "1.0",
+    )
+    META = Dict(
+        "author" => "Sasha Petrenko",
+        "complexity" => "1-low",
+        "difficulty" => "2-medium",
+        "scenario_type" => "custom",
+    )
 
+    # Create the config dict
+    config_dict = Dict(
+        "DIR" => DIR,
+        "NAME" => NAME,
+        "COLS" => COLS,
+        "META" => META,
+    )
 
-# # Write the config file
-# json_save(config_file, config_dict)
+    # Write the config file
+    json_save(config_file, config_dict)
 
-# # -----------------------------------------------------------------------------
-# # SCENARIO FILE
-# # -----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # SCENARIO FILE
+    # -------------------------------------------------------------------------
 
-# # Load the default data configuration
-# data, data_indexed, class_labels, data_selection, n_classes = load_default_orbit_data(data_dir)
+    # Build the scenario vector
+    SCENARIO = []
+    # for ix = 1:n_classes
+    for ix in order
+        # Create a train step and push
+        train_step = Dict(
+            "type" => "train",
+            "regimes" => [Dict(
+                # "task" => class_labels[ix],
+                "task" => data_selection[ix],
+                "count" => length(data_indexed.train.y[ix]),
+            )],
+        )
+        push!(SCENARIO, train_step)
 
-# # Build the scenario vector
-# SCENARIO = []
-# for ix = 1:n_classes
-#     # Create a train step and push
-#     train_step = Dict(
-#         "type" => "train",
-#         "regimes" => [Dict(
-#             # "task" => class_labels[ix],
-#             "task" => data_selection[ix],
-#             "count" => length(data_indexed.train.y[ix]),
-#         )],
-#     )
-#     push!(SCENARIO, train_step)
+        # Create all test steps and push
+        regimes = []
+        for jx = 1:n_classes
+            local_regime = Dict(
+                # "task" => class_labels[jx],
+                "task" => data_selection[jx],
+                "count" => length(data_indexed.test.y[jx]),
+            )
+            push!(regimes, local_regime)
+        end
 
-#     # Create all test steps and push
-#     regimes = []
-#     for jx = 1:n_classes
-#         local_regime = Dict(
-#             # "task" => class_labels[jx],
-#             "task" => data_selection[jx],
-#             "count" => length(data_indexed.test.y[jx]),
-#         )
-#         push!(regimes, local_regime)
-#     end
+        test_step = Dict(
+            "type" => "test",
+            "regimes" => regimes,
+        )
 
-#     test_step = Dict(
-#         "type" => "test",
-#         "regimes" => regimes,
-#     )
+        push!(SCENARIO, test_step)
+    end
 
-#     push!(SCENARIO, test_step)
+    # Make scenario list into a dict entry
+    scenario_dict = Dict(
+        "scenario" => SCENARIO,
+    )
 
-#     # # Create all test steps and push
-#     # for jx = 1:n_classes
-#     #     test_step = Dict(
-#     #         "type" => "test",
-#     #         "regimes" => [Dict(
-#     #             "task" => class_labels[jx],
-#     #             "count" => length(data_indexed.test_y[jx]),
-#     #         )],
-#     #     )
-#     #     push!(SCENARIO, test_step)
-#     # end
-# end
+    # Save the scenario
+    json_save(scenario_file, scenario_dict)
 
-# # Make scenario list into a dict entry
-# scenario_dict = Dict(
-#     "scenario" => SCENARIO,
-# )
+end
 
-# # Save the scenario
-# json_save(scenario_file, scenario_dict)
