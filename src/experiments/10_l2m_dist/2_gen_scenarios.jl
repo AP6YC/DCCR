@@ -64,7 +64,7 @@ for order in orders
     # CONFIG FILE
     # -------------------------------------------------------------------------
 
-    DIR = results_dir("logs")
+    DIR = results_dir("logs", join(order))
     NAME = "9_l2metrics_logger"
     COLS = Dict(
         # "metrics_columns" => "reward",
