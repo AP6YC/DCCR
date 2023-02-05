@@ -6,8 +6,12 @@
 const JSON_INDENT = 4
 
 # Valid types of certain options
-const BLOCK_TYPES = ["train", "test"]
-const LOG_STATES = ["complete", "incomplete"]
+if !@isdefined BLOCK_TYPES
+    const BLOCK_TYPES = ["train", "test"]
+end
+if !@isdefined LOG_STATES
+    const LOG_STATES = ["complete", "incomplete"]
+end
 
 # -----------------------------------------------------------------------------
 # FUNCTIONS
