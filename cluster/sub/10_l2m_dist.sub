@@ -20,7 +20,7 @@ date
 ls -la
 
 # Activate the virtual environment for the project
-source $VENV_DIR/bin/activate
+source activate $VENV_DIR
 
 # Run the full experiment from one Julia script
 $JULIA_BIN $PROJECT_DIR/src/experiments/10_l2m_dist/3_dist_driver.jl $N_TASKS
