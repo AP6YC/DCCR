@@ -12,7 +12,7 @@ N_TASKS=31
 
 # Variables, directories, etc.
 PROJECT_DIR=$HOME/dev/DCCR
-VENV_DIR=$HOME/miniconda3/envs/l2m
+VENV_DIR=$HOME/envs/l2m
 JULIA_BIN=$HOME/julia
 
 # Date and current folder
@@ -20,7 +20,8 @@ date
 ls -la
 
 # Activate the virtual environment for the project
-source activate $VENV_DIR
+# source activate $VENV_DIR
+souce $VENV_DIR/bin/activate
 
 # Run the full experiment from one Julia script
 $JULIA_BIN $PROJECT_DIR/src/experiments/10_l2m_dist/3_dist_driver.jl $N_TASKS
