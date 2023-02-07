@@ -14,6 +14,12 @@ Runs the l2 condensed scenario specified by the gen_scenario.jl file.
 
 using Distributed
 
+# addprocs(24, exeflags="--project=.")
+# If we parallelize from the command line
+if !isempty(ARGS)
+    addprocs(parse(Int, ARGS[1]), exeflags="--project=.")
+end
+
 @everywhere begin
     # Load dependencies
     using
@@ -96,8 +102,25 @@ using Distributed
 end
 
 
+# # Parallel map the sims
+# pmap(local_sim, dicts)
+
+# # Close the workers after simulation
+# # rmprocs(workers())
 
 
+# Save the data into a binary
+# pack_data(experiment_top)
+
+println("--- Simulation complete ---")
+
+# Close the workers after simulation
+# rmprocs(workers())
+
+# Close the workers after simulation
+if !isempty(ARGS)
+    rmprocs(workers())
+end
 
 
 
