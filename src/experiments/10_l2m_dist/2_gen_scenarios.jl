@@ -34,14 +34,11 @@ include(projectdir("src", "setup_l2.jl"))
 # SETUP ORDERS
 # -----------------------------------------------------------------------------
 
+# Get a list of the order indices
 orders = collect(1:6)
 
-# Set the simulation parameters
+# Create an iterator for all permutations and make it into a list
 orders = collect(permutations(orders))
-# orders = Dict{String, Any}(
-#     "order" => collect(permutations(orders))
-# )
-
 
 # Load the default data configuration
 data, data_indexed, class_labels, data_selection, n_classes = load_default_orbit_data(data_dir)

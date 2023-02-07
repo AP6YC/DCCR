@@ -50,14 +50,14 @@ end
     # -----------------------------------------------------------------------------
 
     function run_scenario_permuation(
-        order::Vector{String},
+        order::Vector{Int},
         # config_dir_perm::AbstractString,
         data_indexed::VectoredData,
     )
-
+        text_order = String(join(order))
         # Load the config and scenario
-        config = json_load(configs_dir(join(order), "config.json"))
-        scenario = json_load(configs_dir(join(order), "scenario.json"))
+        config = json_load(configs_dir(join(text_order), "config.json"))
+        scenario = json_load(configs_dir(join(text_order), "scenario.json"))
 
         # Setup the scenario_info dictionary as a function of the config and scenario
         scenario_info = config["META"]
@@ -101,13 +101,14 @@ end
 
 end
 
+# Get a list of the order indices
+orders = collect(1:6)
 
-# # Parallel map the sims
-# pmap(local_sim, dicts)
+# Create an iterator for all permutations and make it into a list
+orders = collect(permutations(orders))
 
-# # Close the workers after simulation
-# # rmprocs(workers())
-
+# Parallel map the sims
+pmap(local_sim, orders)
 
 # Save the data into a binary
 # pack_data(experiment_top)
