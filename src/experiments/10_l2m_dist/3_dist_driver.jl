@@ -12,7 +12,9 @@ Runs the l2 condensed scenario specified by the gen_scenario.jl file.
 # SETUP
 # -----------------------------------------------------------------------------
 
-using Distributed
+using
+    Distributed,
+    Combinatorics
 
 # addprocs(24, exeflags="--project=.")
 # If we parallelize from the command line
@@ -56,8 +58,8 @@ end
     )
         text_order = String(join(order))
         # Load the config and scenario
-        config = json_load(configs_dir(join(text_order), "config.json"))
-        scenario = json_load(configs_dir(join(text_order), "scenario.json"))
+        config = json_load(configs_dir(text_order, "config.json"))
+        scenario = json_load(configs_dir(text_order, "scenario.json"))
 
         # Setup the scenario_info dictionary as a function of the config and scenario
         scenario_info = config["META"]

@@ -1,14 +1,12 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --ntasks=32
+#SBATCH --ntasks=1
 #SBATCH -J DCCR-7
 #SBATCH -o /home/sap625/logs/out/%j.out
 #SBATCH -e /home/sap625/logs/err/%j.err
 #SBATCH --mail-user=sap625@mst.edu
 #SBATCH --mail-type=end
 #SBATCH --time=24:00:00
-
-N_TASKS=31
 
 # Variables, directories, etc.
 PROJECT_DIR=$HOME/dev/DCCR
@@ -24,7 +22,7 @@ ls -la
 source $VENV_DIR/bin/activate
 
 # Run the full experiment from one Julia script
-$JULIA_BIN $PROJECT_DIR/src/experiments/10_l2m_dist/3_dist_driver.jl $N_TASKS
+$JULIA_BIN $PROJECT_DIR/src/experiments/10_l2m_dist/3_dist_driver.jl
 
 # End with echoes
 echo --- END OF CUDA CHECK ---
