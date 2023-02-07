@@ -101,6 +101,8 @@ end
         run_scenario(agent, data_indexed, data_logger)
     end
 
+    local_sim(order) = run_scenario_permuation(order, data_indexed)
+
 end
 
 # Get a list of the order indices
