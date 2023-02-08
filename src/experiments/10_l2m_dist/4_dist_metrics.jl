@@ -13,6 +13,7 @@ Runs the l2metrics on the latest logs from within Julia.
 # -----------------------------------------------------------------------------
 
 using
+    Combinatorics,
     PyCall,
     Revise,
     DrWatson
@@ -20,7 +21,7 @@ using
 # Experiment save directory name
 experiment_top = "10_l2m_dist"
 log_dir_name = "logs"
-metrics_dir_name = "l2m"
+metrics_dir_name = "l2metrics"
 conda_env_name = "l2m"
 
 # Declare all of the metrics being calculated
@@ -37,14 +38,33 @@ include(projectdir("src", "setup.jl"))
 # GENERATE METRICS
 # -----------------------------------------------------------------------------
 
-# Get the most recent log directory name
-last_log = readdir(results_dir(log_dir_name))[end]
+# Get a list of the order indices
+orders = collect(1:6)
 
-# Set the full source and output directories
-src_dir(args...) = results_dir(log_dir_name, last_log, args...)
-out_dir(args...) = results_dir(metrics_dir_name, last_log, args...)
+# Create an iterator for all permutations and make it into a list
+orders = collect(permutations(orders))
 
-# Iterate over every metric
-for metric in metrics
-    run(`cmd /c activate $conda_env_name \&\& python -m l2metrics -p $metric -o $metric -O $(out_dir(metric)) -l $(src_dir())`)
+# Iterate over every one of the order folders
+for order in orders
+    # String of the permutation order
+    text_order = String(join(order))
+
+    # Get the most recent log directory name
+    last_log = readdir(results_dir(log_dir_name, text_order))[end]
+
+    # Set the full source directory
+    src_dir = results_dir(log_dir_name, last_log)
+
+    # Iterate over every metric
+    for metric in metrics
+        # Point to the output directory for this metric
+        out_dir = results_dir(metrics_dir_name, last_log, metric)
+        # Set the common python l2metrics command
+        l2metrics_command = "python -m l2metrics -p $metric -o $metric -O $out_dir -l $src_dir --no-plot"
+        if Sys.iswindows()
+            run(`cmd /c activate $conda_env_name \&\& $l2metrics_command`)
+        elseif Sys.isunix()
+            run(`$l2metrics_command`)
+        end
+    end
 end

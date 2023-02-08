@@ -185,7 +185,7 @@ Logs data from an L2 experience.
 """
 function log_data(data_logger::PyObject, experience::Experience, results::Dict, params::Dict ; status::AbstractString="complete")
     seq = experience.seq_nums
-    worker = "9_l2metrics"
+    worker = "l2metrics"
     record = Dict(
         "block_num" => seq.block_num,
         "block_type" => experience.block_type,
