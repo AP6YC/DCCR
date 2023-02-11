@@ -53,14 +53,15 @@ for order in orders
     last_log = readdir(results_dir(log_dir_name, text_order))[end]
 
     # Set the full source directory
-    src_dir = results_dir(log_dir_name, last_log)
+    src_dir = results_dir(log_dir_name, text_order, last_log)
 
     # Iterate over every metric
     for metric in metrics
         # Point to the output directory for this metric
-        out_dir = results_dir(metrics_dir_name, last_log, metric)
+        out_dir = results_dir(metrics_dir_name, text_order, last_log, metric)
+        mkpath(out_dir)
         # Set the common python l2metrics command
-        l2metrics_command = "python -m l2metrics -p $metric -o $metric -O $out_dir -l $src_dir --no-plot"
+        l2metrics_command = `python -m l2metrics --no-plot -p $metric -o $metric -O $out_dir -l $src_dir`
         if Sys.iswindows()
             run(`cmd /c activate $conda_env_name \&\& $l2metrics_command`)
         elseif Sys.isunix()
