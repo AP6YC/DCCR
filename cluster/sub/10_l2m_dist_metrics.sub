@@ -25,7 +25,7 @@ ls -la
 source $VENV_DIR/bin/activate
 
 # Run the full experiment from one Julia script
-$JULIA_BIN $PROJECT_DIR/src/experiments/10_l2m_dist/3_dist_driver.jl $N_TASKS
+$JULIA_BIN $PROJECT_DIR/src/experiments/10_l2m_dist/4_dist_metrics_par.jl $N_TASKS
 
 # End with echoes
 echo --- END OF CUDA CHECK ---
