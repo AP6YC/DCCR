@@ -115,7 +115,7 @@ orders = collect(permutations(orders))
 pmap(local_sim, orders)
 
 # Save the data into a binary
-pack_data(experiment_top)
+# pack_data(experiment_top)
 
 println("--- Simulation complete ---")
 

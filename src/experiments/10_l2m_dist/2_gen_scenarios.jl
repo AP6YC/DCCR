@@ -62,7 +62,7 @@ for order in orders
     # -------------------------------------------------------------------------
 
     DIR = results_dir("logs", join(order))
-    NAME = "9_l2metrics_logger"
+    NAME = "l2metrics_logger"
     COLS = Dict(
         # "metrics_columns" => "reward",
         "metrics_columns" => [
