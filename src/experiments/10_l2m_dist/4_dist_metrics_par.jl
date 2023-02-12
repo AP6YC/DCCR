@@ -49,7 +49,7 @@ end
 
     # Iterate over every one of the order folders
     # for order in orders
-    function local_sim(order::Vector{Integer})
+    function local_sim(order::Vector{Int64})
         # String of the permutation order
         text_order = String(join(order))
 
