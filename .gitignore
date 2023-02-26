@@ -6,6 +6,9 @@ dev/
 
 # Project results ignores
 
+# l2metrics transfer file
+/l2metrics.tar.gz
+
 # Ignore work files/folders
 work/**
 # Except for subfolders
