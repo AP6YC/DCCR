@@ -9,6 +9,7 @@ Collects the l2metrics into a table with statistics.
 """
 
 using
+    CSV,
     DrWatson,
     DataFrames,
     Revise,
@@ -100,4 +101,17 @@ for perm in readdir(perms_dir)
     #     write(f, new_df_tex)
     # end
 
+end
+
+# Point to the save directory
+savedir(args...) = results_dir("processed", args...)
+# packingdir(args...) = packed_dir(experiment_top)
+
+mkpath(savedir())
+# mkpath(packingdir())
+
+# Save the raw metrics
+for (metric, df) in mets
+    savefile = savedir(metric * ".csv")
+    CSV.write(savefile, df)
 end
