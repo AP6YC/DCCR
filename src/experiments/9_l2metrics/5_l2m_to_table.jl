@@ -1,6 +1,6 @@
 using
     DrWatson,
-    DataFrames
+    DataFrames,
     Revise,
     JSON,
     Latexify

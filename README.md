@@ -17,7 +17,16 @@ Deep Clustering Context Recognition (DCCR); materials for the upcoming ICML pape
 
 ## Usage
 
-TODO
+Interactive:
+
+```shell
+sinteractive --time=03:00:00 --ntasks=16 --nodes=1
+```
+
+Interactive CUDA:
+```shell
+sinteractive -p cuda --time=03:00:00 --gres=gpu:1
+```
 
 ## File Structure
 
