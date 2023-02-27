@@ -1453,18 +1453,18 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     # Shuffle the data with a new random seed
     Random.seed!(seed)
     i_train = randperm(length(data.train.y))
-    data.train.x = data.train.x[:, i_train]
-    data.train.y = data.train.y[i_train]
+    pre_train_x = data.train.x[:, i_train]
+    pre_train_y = data.train.y[i_train]
 
     # Get the number of samples in the training dataset to split it up
-    n_samples = length(data.train.y)
+    n_samples = length(pre_train_y)
     i_split = Int(floor(0.8*n_samples))
 
     # Split the original training dataset into train (supervised) and val (unsupervised)
-    local_train_x = data.train.x[:, 1:i_split]
-    local_train_y = data.train.y[1:i_split]
-    local_val_x = data.train.x[:, i_split+1:end]
-    local_val_y = data.train.y[i_split+1:end]
+    local_train_x = pre_train_x[:, 1:i_split]
+    local_train_y = pre_train_y[1:i_split]
+    local_val_x = pre_train_x[:, i_split+1:end]
+    local_val_y = pre_train_y[i_split+1:end]
 
     # --- SUPERVISED ---
 
