@@ -70,7 +70,7 @@ sim_params = Dict{String, Any}(
         gamma_ref = 1.0,
         rho_lb = 0.45,
         rho_ub = 0.7,
-        method = "single"
+        similarity = :single,
     )
 
     # Sigmoid input scaling

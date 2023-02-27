@@ -56,7 +56,7 @@ opts = opts_DDVFA(
     # rho=0.45,
     rho_lb = 0.45,
     rho_ub = 0.7,
-    method = "single"
+    similarity = :single,
 )
 
 # Sigmoid input scaling
