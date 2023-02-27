@@ -952,7 +952,7 @@ end
 """
 Return a colored and formatted boxplot of the data.
 """
-function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false, bounds_override=[])
+function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false, bounds_override=[], violin_bandwidth=0.01)
     # Get the number of sample vectors
     # n_samples = size(n_w_matrix)[1]
     n_samples = size(data)[1]
@@ -972,6 +972,7 @@ function create_boxplot(data::RealMatrix, class_labels::Vector{String} ; percent
         linewidth=0,
         color_palette=COLORSCHEME,
         fontfamily=FONTFAMILY,
+        bandwidth=violin_bandwidth,
     )
 
     # Overlay a transparent box plot
@@ -1013,7 +1014,7 @@ end
 """
 Return a colored and formatted boxplot of the data.
 """
-function create_inverted_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false)
+function create_inverted_boxplot(data::RealMatrix, class_labels::Vector{String} ; percentages=false, bounds_override=[])
     # Get the number of sample vectors
     n_samples = size(data)[1]
     # Vectorize the data along the columns
@@ -1055,10 +1056,22 @@ function create_inverted_boxplot(data::RealMatrix, class_labels::Vector{String} 
         order=1,
     )
 
+    # if percentages
+    #     # ylims!(p, (-Inf, 1))
+    #     # ylims!(p, (0.6, 1))
+    #     ylims!(p, PERCENTAGES_BOUNDS)
+    # end
+
     if percentages
+        # Set the bounds
+        if !isempty(bounds_override)
+            local_bounds = bounds_override
+        else
+            local_bounds = PERCENTAGES_BOUNDS
+        end
         # ylims!(p, (-Inf, 1))
         # ylims!(p, (0.6, 1))
-        ylims!(p, PERCENTAGES_BOUNDS)
+        ylims!(p, local_bounds)
     end
 
     # Format the plot

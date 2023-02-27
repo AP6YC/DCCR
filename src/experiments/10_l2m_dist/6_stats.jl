@@ -9,6 +9,8 @@ Generates the statistics for all permutations of the generated l2metrics.
 """
 
 using
+    CSV,
+    DrWatson,
     DataFrames,
     Statistics
 

@@ -12,8 +12,10 @@ Same as 7_analyze.jl, with just the difference plot generation section
 # FILE SETUP
 # -----------------------------------------------------------------------------
 
-using Revise
-using DrWatson
+using
+    Revise,
+    DrWatson,
+    StatsPlots
 
 # Experiment save directory name
 experiment_top = "7_unsupervised_mc"
@@ -69,12 +71,17 @@ data_dirs, class_labels = get_orbit_names(data_selection)
 
 # Training to testing difference performance
 diff_perf_matrix = df_column_to_matrix(df, :a_te) .- df_column_to_matrix(df, :a_tev)[:, 1:6]
-p_diff_perf = create_boxplot(diff_perf_matrix, class_labels, percentages=true, bounds_override=(-0.1, 0.1))
+# diff_perf_matrix = df_column_to_matrix(df, :a_te)
+# diff_perf_matrix = df_column_to_matrix(df, :a_tev)[:, 1:6] .- df_column_to_matrix(df, :a_te)
+# diff_perf_matrix = df_column_to_matrix(df, :a_te) - df_column_to_matrix(df, :a_tev)[:, 1:6]
+p_diff_perf = create_boxplot(diff_perf_matrix, class_labels, percentages=true, bounds_override=(-0.1, 0.1), violin_bandwidth=0.005)
+# p_diff_perf = create_inverted_boxplot(diff_perf_matrix, class_labels, percentages=true)
 ylabel!("Context Testing Accuracy Difference")
-display(p_diff_perf)
 # Save the plot
 savefig(p_diff_perf, results_dir(diff_perf_plot_name))
 savefig(p_diff_perf, paper_results_dir(diff_perf_plot_name))
+# Display the plot
+display(p_diff_perf)
 
 # # Normalized confusion heatmap
 # # norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
