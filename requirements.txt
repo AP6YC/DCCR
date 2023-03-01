@@ -1,6 +1,6 @@
 l2metrics
 l2logger
+scikit-learn
 jupyterlab
 pandas
 numpy
-ctypes
