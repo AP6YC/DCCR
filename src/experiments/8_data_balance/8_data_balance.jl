@@ -16,8 +16,10 @@ Timeline:
 # FILE SETUP
 # -----------------------------------------------------------------------------
 
-using Revise
-using DrWatson
+using
+    Revise,
+    DataStructures,
+    DrWatson
 
 # Experiment save directory name
 experiment_top = "8_data_balance"
@@ -30,7 +32,7 @@ include(projectdir("src", "setup.jl"))
 # -----------------------------------------------------------------------------
 
 # Manually entered sizes of the data
-data_sizes = Dict(
+data_sizes = OrderedDict(
     "DOTD" => Dict(
         "train" => 337,
         "test" => 348,
@@ -68,6 +70,12 @@ test_vec = [data_sizes[key]["test"] for (key, _) in data_sizes]
 n_classes = length(train_vec)
 n_train = sum(train_vec)
 n_test = sum(test_vec)
+
+# Sums
+# class_totals = train_vec + test_vec
+class_totals = [data_sizes[key]["train"] + data_sizes[key]["test"] for (key, _) in data_sizes]
+n_samples = n_train + n_test
+@info "Sums:" class_totals n_train n_test n_samples
 
 # OLD
 

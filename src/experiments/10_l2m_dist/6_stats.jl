@@ -58,9 +58,12 @@ for (metric, df) in dfs
     # First entry is the pretty name of the metric
     push!(new_entry, pretty_rows[metric])
     # Iterate over every l2metric symbol
-    for ix = 1:length(syms)
-        push!(new_entry, "$(mean(df[:, :pm])) ± $(var(df[:, :pm]))")
+    for sym in syms
+        push!(new_entry, "$(mean(df[:, sym])) ± $(var(df[:, sym]))")
     end
+    # for ix = 1:length(syms)
+    #     push!(new_entry, "$(mean(df[:, syms[ix]])) ± $(var(df[:, syms[ix]]))")
+    # end
     # Add the entry to the output stats df
     push!(out_df, new_entry)
 end
