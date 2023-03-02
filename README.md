@@ -9,6 +9,7 @@ Deep Clustering Context Recognition (DCCR); materials for the upcoming ICML pape
 - [DCCR](#dccr)
   - [Table of Contents](#table-of-contents)
   - [Usage](#usage)
+  - [Installation](#installation)
   - [File Structure](#file-structure)
   - [Contributing](#contributing)
   - [History](#history)
@@ -24,8 +25,16 @@ sinteractive --time=03:00:00 --ntasks=16 --nodes=1
 ```
 
 Interactive CUDA:
+
 ```shell
 sinteractive -p cuda --time=03:00:00 --gres=gpu:1
+```
+
+## Installation
+
+```shell
+conda install -y pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
+pip install avalanche-lib[all] jupyterlab
 ```
 
 ## File Structure

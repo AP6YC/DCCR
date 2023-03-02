@@ -4,3 +4,5 @@ scikit-learn
 jupyterlab
 pandas
 numpy
+# pytorch
+# git+https://github.com/ContinualAI/avalanche.git
