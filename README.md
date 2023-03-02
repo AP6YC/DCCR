@@ -34,7 +34,7 @@ sinteractive -p cuda --time=03:00:00 --gres=gpu:1
 
 ```shell
 conda install -y pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
-pip install avalanche-lib[all] jupyterlab ipywidgets julia scikit-learn pandas
+pip install avalanche-lib[all] jupyterlab ipywidgets julia scikit-learn pandas ipdb tqdm
 ```
 
 ## File Structure
