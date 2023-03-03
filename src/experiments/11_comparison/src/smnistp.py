@@ -123,13 +123,26 @@ def SplitMNISTPreprocessed(
     # Create the custom feature extractor
     fe = FeatureExtractor()
 
-    # Get the features (and statistics) from the training dataset
-    features_train = fe.process(mnist_train)
-    mnist_train.data = features_train
-    ipdb.set_trace()
+    # Point to the filenames
+    train_file = Path("models/mnist_train.pt")
+    test_file = Path("models/mnist_test.pt")
 
-    # Use the training statistics for transforming the test dataset
-    features_test = fe.process(mnist_test)
+    # If we have the files, simply load
+    if train_file.is_file() and test_file.is_file():
+        features_train = torch.load(train_file)
+        features_test = torch.load(test_file)
+    # Otherwise, generate the features and save
+    else:
+        # Get the features (and statistics) from the training dataset
+        features_train = fe.process(mnist_train)
+        # Use the training statistics for transforming the test dataset
+        features_test = fe.process(mnist_test)
+        # Save
+        torch.save(features_train, train_file)
+        torch.save(features_test, test_file)
+
+    # ipdb.set_trace()
+    mnist_train.data = features_train
     mnist_test.data = features_test
 
     mnist_train.transform = None

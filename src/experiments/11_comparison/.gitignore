@@ -1,2 +1,5 @@
 tb_data/
 log.txt
+
+models/*
+!models/.gitkeep

@@ -1,6 +1,8 @@
 import julia
 julia.install()
 
+import time
+
 from pathlib import Path
 
 # # Point to the top of the project relative to this script
@@ -83,13 +85,20 @@ class DDVFAStrategy():
             batch_size=256,
         )
         print(experience.dataset.__len__())
-        for mb in tqdm(train_data_loader):
+        # for mb in tqdm(train_data_loader):
+        jl_eval = 0.0
+        pbar = tqdm(train_data_loader)
+        for mb in pbar:
             data, labels, tasks = mb
             # jl.features = self.ext_features(data)
-            jl.features = data.numpy().transpose()
+            jl.features = data.squeeze().numpy().transpose()
             jl.labels = labels.numpy()
             # ipdb.set_trace()
+            start_time = time.time()
             jl.eval("train!(art, features, y=labels)")
+            end_time = time.time()
+            jl_eval = end_time - start_time
+            pbar.set_postfix({"jl time": jl_eval})
 
     def eval(self, experience):
         eval_dataset = experience.dataset
@@ -107,8 +116,11 @@ class DDVFAStrategy():
         for mb in tqdm(eval_data_loader):
             data, labels, tasks = mb
             # jl.features = self.ext_features(data)
-            jl.features = data.numpy().transpose()
+
+            jl.features = data.squeeze().numpy().transpose()
+            # start = time.time()
             jl.eval("y_hats = classify(art, features, get_bmu=true)")
+            # end = time.time()
             y_hats = jl.y_hats
             # ipdb.set_trace()
             perfs.append(accuracy_score(labels, y_hats))
