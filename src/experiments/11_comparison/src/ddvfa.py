@@ -75,6 +75,9 @@ class DDVFAStrategy():
 
     #     return avg_features
 
+    def jl_train(self):
+        jl.eval("y_hats = train!(art, features, y=labels)")
+
     def train(self, experience):
         train_dataset = experience.dataset
         t = experience.task_label
@@ -95,19 +98,25 @@ class DDVFAStrategy():
             data, labels, tasks = mb
             # jl.features = self.ext_features(data)
             jl.features = data.squeeze().numpy().transpose()
-            jl.labels = labels.numpy()
+            jl.labels = labels.numpy() + 1
             # ipdb.set_trace()
 
             start_time = time.time()
-            jl.eval("y_hats = train!(art, features, y=labels)")
+            self.jl_train()
             end_time = time.time()
             jl_eval = end_time - start_time
             pbar.set_postfix({"jl time": jl_eval})
 
-            y_hats = jl.y_hats
+            y_hats = jl.y_hats - 1
             perfs.append(accuracy_score(labels, y_hats))
 
         return mean(perfs)
+
+    def jl_eval(self):
+        if jl.eval("length(unique(art.labels))") == 1:
+            jl.y_hats = jl.eval("unique(art.labels)").repeat(len(jl.labels))
+        else:
+            jl.eval("y_hats = classify(art, features, get_bmu=true)")
 
     def eval(self, experience):
         eval_dataset = experience.dataset
@@ -130,14 +139,15 @@ class DDVFAStrategy():
             # jl.features = self.ext_features(data)
 
             jl.features = data.squeeze().numpy().transpose()
-
+            jl.labels = labels.numpy() + 1
             start_time = time.time()
-            jl.eval("y_hats = classify(art, features, get_bmu=true)")
+            # jl.eval("y_hats = classify(art, features, get_bmu=true)")
+            self.jl_eval()
             end_time = time.time()
             jl_eval = end_time - start_time
             pbar.set_postfix({"jl time": jl_eval})
 
-            y_hats = jl.y_hats
+            y_hats = jl.y_hats - 1
             perfs.append(accuracy_score(labels, y_hats))
 
         return mean(perfs)
