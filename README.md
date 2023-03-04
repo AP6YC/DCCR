@@ -33,9 +33,18 @@ sinteractive -p cuda --time=03:00:00 --gres=gpu:1 --ntasks=32 --nodes=1 --mem-pe
 
 ## Installation
 
+Windows (with Conda):
+
 ```shell
 conda install -y pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
 pip install avalanche-lib[all] jupyterlab ipywidgets julia scikit-learn pandas ipdb tqdm
+```
+
+Foundry:
+
+```shell
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116 avalanche-lib[all] jupyterlab ipywidgets julia scikit-learn pandas ipdb tqdm
 ```
 
 ## File Structure
