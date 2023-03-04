@@ -1,6 +1,6 @@
 # %%
-import julia
-julia.install()
+# import julia
+# julia.install()
 
 from pathlib import Path
 
@@ -22,10 +22,13 @@ benchmark = SplitMNISTPreprocessed(
 )
 
 # %%
-from src.ddvfa import DDVFAStrategy
+from src.ddvfa_foundry import DDVFAStrategy
 
 # Create the Strategy Instance
-cl_strategy = DDVFAStrategy(projectdir())
+cl_strategy = DDVFAStrategy(
+    projectdir(),
+    runtime="/home/sap625/julia",
+)
 
 # Training Loop
 print('Starting experiment...')
