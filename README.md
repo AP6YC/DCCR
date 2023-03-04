@@ -28,6 +28,7 @@ Interactive CUDA:
 
 ```shell
 sinteractive -p cuda --time=03:00:00 --gres=gpu:1
+sinteractive -p cuda --time=03:00:00 --gres=gpu:1 --ntasks=32 --nodes=1 --mem-per-cpu=2000
 ```
 
 ## Installation
