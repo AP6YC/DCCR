@@ -36,8 +36,10 @@ class DDVFAStrategy():
     # def __init__(self, preprocessed=False):
     def __init__(self,
         projectdir,
-        runtime="julia",
+        # runtime="julia",
     ):
+        # SETTING UP THE RUNTIME INSIDE THE CLASS DOESN'T WORK FOR SOME REASON
+        # I'VE SPENT TOO LONG DEBUGGING THIS AND NOT ENOUGH TIME ON MY DISSERTATION
         # # Install PyCall?
         # julia.install(julia=runtime)
 
@@ -48,7 +50,6 @@ class DDVFAStrategy():
         # )
 
         # Point to the actual global namespace
-        # from julia import Main
         self.jl = Main
 
         # Setup/activate the project

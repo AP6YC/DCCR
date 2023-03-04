@@ -22,7 +22,7 @@ benchmark = SplitMNISTPreprocessed(
 # Create the Strategy Instance
 cl_strategy = DDVFAStrategy(
     projectdir(),
-    # runtime="/home/sap625/julia",
+    runtime="/home/sap625/julia",
 )
 
 # Training Loop
@@ -38,19 +38,21 @@ for exp_id, experience in enumerate(benchmark.train_stream):
     print('Training results:')
     print(train_results)
 
-    print('Computing accuracy on the current test set')
-    test_results.append(cl_strategy.eval(benchmark.test_stream[exp_id]))
-    print('Testing completed')
-    print('Testing results:')
-    print(test_results)
+    # print('Computing accuracy on the current test set')
+    # test_results.append(cl_strategy.eval(benchmark.test_stream[exp_id]))
+    # print('Testing completed')
+    # print('Testing results:')
+    # print(test_results)
     # results.append(cl_strategy.eval(scenario.test_stream))
 
-print(test_results, train_results)
+for exp_id, experience in enumerate(benchmark.test_stream):
+    print("Computing accuracies")
+    test_results.append(cl_strategy.eval(experience))
 
+print("--- INDIVIDUAL RESULTS ---")
+print(test_results)
+avg_perf = sum(test_results)/len(test_results)
+print("--- FINAL TEST RESULT ---")
+print(avg_perf)
 
-
-# print(jl.eval("AdaptiveResonance.get_n_weights(art)"))
-# print(jl.eval("size(art.F2)"))
-# print(jl.eval("art.labels"))
-# print(1 == jl.eval("length(unique(art.labels))"))
-# print(type(jl.eval("unique(art.labels)")))
+# print(test_results, train_results)
