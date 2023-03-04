@@ -1,6 +1,7 @@
-# %%
-# import julia
-# julia.install()
+# THIS MUST BE IMPORTED FIRST, AND I DON'T KNOW WHY
+from src.ddvfa_foundry import DDVFAStrategy
+# THIS IS IMPORTED NEXT, AND I STILL DON'T KNOW WHY
+from src.smnistp import SplitMNISTPreprocessed
 
 from pathlib import Path
 
@@ -11,18 +12,12 @@ def projectdir(*args):
 def print_allocated_memory():
    print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
 
-# %%
-from src.smnistp import SplitMNISTPreprocessed
-
 benchmark = SplitMNISTPreprocessed(
     # n_experiences=5,
     n_experiences=10,
     shuffle=False,
     # replace_existing=True,
 )
-
-# %%
-from src.ddvfa_foundry import DDVFAStrategy
 
 # Create the Strategy Instance
 cl_strategy = DDVFAStrategy(
@@ -50,11 +45,8 @@ for exp_id, experience in enumerate(benchmark.train_stream):
     print(test_results)
     # results.append(cl_strategy.eval(scenario.test_stream))
 
-# %%
 print(test_results, train_results)
 
-# # %%
-# from julia import Main as jl
 
 # print(jl.eval("AdaptiveResonance.get_n_weights(art)"))
 # print(jl.eval("size(art.F2)"))

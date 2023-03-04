@@ -1,27 +1,22 @@
 import julia
-# julia.install()
+
+runtime="/home/sap625/julia"
+julia.install(julia=runtime)
+
+jl_run = julia.Julia(
+    runtime=runtime,
+    compiled_modules=False,
+)
+
+from julia import Main
 
 import time
 
-# from pathlib import Path
-
-# # # Point to the top of the project relative to this script
-# def projectdir(*args):
-#     return str(Path.cwd().joinpath("..", "..", "..", *args).resolve())
-
-def print_allocated_memory():
-   print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
-
-
-
 
 from torch.utils.data import DataLoader
-# from julia import Main as jl
-# from julia import Julia
 from sklearn.metrics import accuracy_score
 import ipdb
 import torch
-# from torchvision.transforms import Lambda
 from tqdm import tqdm
 
 from torchvision.models import resnet50, resnet18
@@ -32,7 +27,8 @@ from torchvision.models.feature_extraction import create_feature_extractor
 from sklearn.metrics import accuracy_score
 from statistics import mean
 
-# jl = Julia(runtime="~/julia")
+def print_allocated_memory():
+   print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
 
 class DDVFAStrategy():
     """DDVFA Strategy"""
@@ -40,24 +36,30 @@ class DDVFAStrategy():
     # def __init__(self, preprocessed=False):
     def __init__(self,
         projectdir,
-        # runtime="julia",
-        runtime="/home/sap625/julia",
+        runtime="julia",
     ):
-        julia.install(julia=runtime)
-        self.jl = julia.Julia(
-            runtime=runtime,
-            compiled_modules=False,
-            # {"project": projectdir},
-        )
+        # # Install PyCall?
+        # julia.install(julia=runtime)
 
+        # # Setup the runtime
+        # self.jl_run = julia.Julia(
+        #     runtime=runtime,
+        #     compiled_modules=False,
+        # )
+
+        # Point to the actual global namespace
+        # from julia import Main
+        self.jl = Main
+
+        # Setup/activate the project
         self.jl.project_dir = projectdir
         self.jl.eval("using Pkg; Pkg.activate(project_dir)")
-
+        # Setup the ART module
         self.jl.eval("using AdaptiveResonance")
         self.jl.eval("art = DDVFA(rho_lb=0.4, rho_ub=0.75)")
         # jl.eval("art = DDVFA(rho_lb=0.5, rho_ub=0.75)")
-        # jl.eval("art.config = DataConfig(0, 1.0, 49)")
-        self.jl.eval("art.config = DataConfig(0, 1.0, 196)")
+        self.jl.eval("art.config = DataConfig(0, 1.0, 49)")
+        # self.jl.eval("art.config = DataConfig(0, 1.0, 196)")
 
     def jl_train(self):
         self.jl.eval("y_hats = train!(art, features, y=labels)")
@@ -97,10 +99,10 @@ class DDVFAStrategy():
         return mean(perfs)
 
     def jl_eval(self):
-        if jl.eval("length(unique(art.labels))") == 1:
-            jl.y_hats = jl.eval("unique(art.labels)").repeat(len(jl.labels))
+        if self.jl.eval("length(unique(art.labels))") == 1:
+            self.jl.y_hats = self.jl.eval("unique(art.labels)").repeat(len(self.jl.labels))
         else:
-            jl.eval("y_hats = classify(art, features, get_bmu=true)")
+            self.jl.eval("y_hats = classify(art, features, get_bmu=true)")
 
     def eval(self, experience):
         eval_dataset = experience.dataset

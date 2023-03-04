@@ -42,8 +42,8 @@ class DDVFAStrategy():
         jl.eval("using AdaptiveResonance")
         jl.eval("art = DDVFA(rho_lb=0.4, rho_ub=0.75)")
         # jl.eval("art = DDVFA(rho_lb=0.5, rho_ub=0.75)")
-        # jl.eval("art.config = DataConfig(0, 1.0, 49)")
-        jl.eval("art.config = DataConfig(0, 1.0, 196)")
+        jl.eval("art.config = DataConfig(0, 1.0, 49)")
+        # jl.eval("art.config = DataConfig(0, 1.0, 196)")
 
         # self.preprocessed = preprocessed
         # if not self.preprocessed:
