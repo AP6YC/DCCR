@@ -1,7 +1,7 @@
 # THIS MUST BE IMPORTED FIRST, AND I DON'T KNOW WHY
 from src.ddvfa_foundry import DDVFAStrategy
 # THIS IS IMPORTED NEXT, AND I STILL DON'T KNOW WHY
-from src.smnistp import SplitMNISTPreprocessed
+from src.datasets.smnistp import SplitMNISTPreprocessed
 
 from pathlib import Path
 
@@ -37,13 +37,6 @@ for exp_id, experience in enumerate(benchmark.train_stream):
     print('Training completed')
     print('Training results:')
     print(train_results)
-
-    # print('Computing accuracy on the current test set')
-    # test_results.append(cl_strategy.eval(benchmark.test_stream[exp_id]))
-    # print('Testing completed')
-    # print('Testing results:')
-    # print(test_results)
-    # results.append(cl_strategy.eval(scenario.test_stream))
 
 for exp_id, experience in enumerate(benchmark.test_stream):
     print("Computing accuracies")

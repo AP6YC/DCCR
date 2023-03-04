@@ -1,16 +1,18 @@
 # THIS MUST BE IMPORTED FIRST, AND I DON'T KNOW WHY
 from src.ddvfa_foundry import DDVFAStrategy
 # THIS IS IMPORTED NEXT, AND I STILL DON'T KNOW WHY
-from src.smnistp import SplitMNISTPreprocessed
+from src.datasets.smnistp import SplitMNISTPreprocessed
 
-from pathlib import Path
+from utils import projectdir, print_allocated_memory
 
-# # Point to the top of the project relative to this script
-def projectdir(*args):
-    return str(Path.cwd().joinpath("..", "..", "..", *args).resolve())
+# from pathlib import Path
 
-def print_allocated_memory():
-   print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
+# # # Point to the top of the project relative to this script
+# def projectdir(*args):
+#     return str(Path.cwd().joinpath("..", "..", "..", *args).resolve())
+
+# def print_allocated_memory():
+#    print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
 
 benchmark = SplitMNISTPreprocessed(
     # n_experiences=5,

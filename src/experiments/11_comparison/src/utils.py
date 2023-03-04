@@ -6,10 +6,3 @@ def projectdir(*args):
 
 def print_allocated_memory():
    print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
-
-# %%
-from src.datasets.smnistp import SplitMNISTPreprocessed
-
-
-from src import fake_julia_module
-
