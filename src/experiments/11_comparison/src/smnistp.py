@@ -3,7 +3,7 @@ from avalanche.benchmarks.classic.cmnist import *
 from .feature_extractor import FeatureExtractor
 from torchvision.transforms import Lambda
 import ipdb
-
+from torch.utils.data import TensorDataset
 
 
 from pathlib import Path
@@ -124,13 +124,20 @@ def SplitMNISTPreprocessed(
     fe = FeatureExtractor()
 
     # Point to the filenames
-    train_file = Path("models/mnist_train.pt")
-    test_file = Path("models/mnist_test.pt")
+    file_dir = Path("models")
+
+    train_file = file_dir.joinpath("mnist_train.pt")
+    train_targets_file = file_dir.joinpath("mnist_train_targets.pt")
+    test_file = file_dir.joinpath("mnist_test.pt")
+    test_targets_file = file_dir.joinpath("mnist_test_targets.pt")
 
     # If we have the files, simply load
     if train_file.is_file() and test_file.is_file():
         features_train = torch.load(train_file)
+        targets_train = torch.load(train_targets_file)
+
         features_test = torch.load(test_file)
+        targets_test = torch.load(test_targets_file)
     # Otherwise, generate the features and save
     else:
         # Get the features (and statistics) from the training dataset
@@ -141,16 +148,31 @@ def SplitMNISTPreprocessed(
         torch.save(features_train, train_file)
         torch.save(features_test, test_file)
 
-    # ipdb.set_trace()
-    mnist_train.data = features_train
-    mnist_test.data = features_test
+        targets_train = mnist_train.targets
+        targets_test = mnist_test.targets
+        torch.save(targets_train, train_targets_file)
+        torch.save(targets_test, test_targets_file)
 
-    mnist_train.transform = None
-    mnist_test.transform = None
+
+    # ipdb.set_trace()
+    # mnist_train.old_data = mnist_train.data
+    # mnist_train.data = features_train
+    # mnist_test.data = features_test
+
+    # mnist_train.targets = targets_train
+    # mnist_test.targets = targets_test
+
+    # mnist_train.transform = None
+    # mnist_test.transform = None
+
+    dataset_train = TensorDataset(features_train, targets_train)
+    dataset_test = TensorDataset(features_test, targets_test)
 
     return nc_benchmark(
-        train_dataset=mnist_train,
-        test_dataset=mnist_test,
+        # train_dataset=mnist_train,
+        # test_dataset=mnist_test,
+        train_dataset=dataset_train,
+        test_dataset=dataset_test,
         n_experiences=n_experiences,
         task_labels=return_task_id,
         seed=seed,

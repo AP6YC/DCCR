@@ -22,8 +22,11 @@ class FeatureExtractor():
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+        # self.layer = 'layer4'
+        self.layer = 'layer1'
+
         # Use torch FX and load to the device
-        self.mod = create_feature_extractor(rn, {'layer4': 'layer4'})
+        self.mod = create_feature_extractor(rn, {self.layer: self.layer})
         self.mod = self.mod.to(self.device)
         # Evaluation model
         self.mod.eval()
@@ -38,7 +41,7 @@ class FeatureExtractor():
     def ext_features(self, img):
         img = img.to(self.device)
         prep = self.preprocess(img)
-        features = self.mod(prep)['layer4']
+        features = self.mod(prep)[self.layer]
         return features
 
     @torch.no_grad()
@@ -52,6 +55,7 @@ class FeatureExtractor():
             dataset=dataset,
             pin_memory=True,
             batch_size=256,
+            shuffle=False,
         )
 
         outs = []
