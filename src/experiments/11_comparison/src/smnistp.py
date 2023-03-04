@@ -49,7 +49,8 @@ def SplitMNISTPreprocessed(
     class_ids_from_zero_in_each_exp: bool = False,
     train_transform: Optional[Any] = _default_mnist_train_transform,
     eval_transform: Optional[Any] = _default_mnist_eval_transform,
-    dataset_root: Union[str, Path] = None
+    dataset_root: Union[str, Path] = None,
+    replace_existing: bool = False,
 ):
     """
     Creates a CL benchmark using the MNIST dataset.
@@ -112,34 +113,38 @@ def SplitMNISTPreprocessed(
     :returns: A properly initialized :class:`NCScenario` instance.
     """
 
-    # Load the dataset
-    mnist_train, mnist_test = get_mnist_dataset(dataset_root)
-
-    # Set the transform to grayscale-to-RGB for the feature extractor
-    trans = Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x)
-    mnist_train.transform = trans
-    mnist_test.transform = trans
-
     # Create the custom feature extractor
     fe = FeatureExtractor()
 
-    # Point to the filenames
+    # Point to the directory containing the model files and create it if necessary
     file_dir = Path("models")
+    file_dir.mkdir(parents=True, exist_ok=True)
 
+    # Declare the filenames
     train_file = file_dir.joinpath("mnist_train.pt")
     train_targets_file = file_dir.joinpath("mnist_train_targets.pt")
     test_file = file_dir.joinpath("mnist_test.pt")
     test_targets_file = file_dir.joinpath("mnist_test_targets.pt")
 
     # If we have the files, simply load
-    if train_file.is_file() and test_file.is_file():
+    if train_file.is_file() and test_file.is_file() and not replace_existing:
+        # Load the training data and targets
         features_train = torch.load(train_file)
         targets_train = torch.load(train_targets_file)
 
+        # Load the test targets and targets
         features_test = torch.load(test_file)
         targets_test = torch.load(test_targets_file)
     # Otherwise, generate the features and save
     else:
+        # Load the dataset
+        mnist_train, mnist_test = get_mnist_dataset(dataset_root)
+
+        # Set the transform to grayscale-to-RGB for the feature extractor
+        trans = Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x)
+        mnist_train.transform = trans
+        mnist_test.transform = trans
+
         # Get the features (and statistics) from the training dataset
         features_train = fe.process(mnist_train)
         # Use the training statistics for transforming the test dataset
@@ -153,24 +158,11 @@ def SplitMNISTPreprocessed(
         torch.save(targets_train, train_targets_file)
         torch.save(targets_test, test_targets_file)
 
-
     # ipdb.set_trace()
-    # mnist_train.old_data = mnist_train.data
-    # mnist_train.data = features_train
-    # mnist_test.data = features_test
-
-    # mnist_train.targets = targets_train
-    # mnist_test.targets = targets_test
-
-    # mnist_train.transform = None
-    # mnist_test.transform = None
-
     dataset_train = TensorDataset(features_train, targets_train)
     dataset_test = TensorDataset(features_test, targets_test)
 
     return nc_benchmark(
-        # train_dataset=mnist_train,
-        # test_dataset=mnist_test,
         train_dataset=dataset_train,
         test_dataset=dataset_test,
         n_experiences=n_experiences,

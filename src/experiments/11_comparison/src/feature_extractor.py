@@ -9,9 +9,14 @@ from torchvision.models.feature_extraction import create_feature_extractor
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+import ipdb
+
 class FeatureExtractor():
 
-    def __init__(self, sigmoid_scaling = 3):
+    def __init__(self,
+        layer: str = 'layer4',
+        sigmoid_scaling: float = 3.0,
+    ):
         self.sigmoid_scaling = sigmoid_scaling
 
         # Create the extraction network
@@ -23,7 +28,7 @@ class FeatureExtractor():
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # self.layer = 'layer4'
-        self.layer = 'layer1'
+        self.layer = layer
 
         # Use torch FX and load to the device
         self.mod = create_feature_extractor(rn, {self.layer: self.layer})
@@ -62,11 +67,13 @@ class FeatureExtractor():
         for mb in tqdm(data_loader):
             data, labels = mb
             features = self.ext_features(data)
+            # ipdb.set_trace()
             features = self.avg_features(features)
             outs.append(features)
 
         # Create a new tensor for the averaged features of all samples
         outs = torch.cat(outs)
+        # ipdb.set_trace()
 
         # Set the stats from the averaged features of the dataset
         if (self.mean is None) and (self.std is None):

@@ -18,6 +18,7 @@ benchmark = SplitMNISTPreprocessed(
     # n_experiences=5,
     n_experiences=10,
     shuffle=False,
+    # replace_existing=True,
 )
 
 # %%
@@ -49,12 +50,11 @@ for exp_id, experience in enumerate(benchmark.train_stream):
 # %%
 print(test_results, train_results)
 
+# # %%
+# from julia import Main as jl
 
-# %%
-from julia import Main as jl
-
-print(jl.eval("AdaptiveResonance.get_n_weights(art)"))
-print(jl.eval("size(art.F2)"))
-print(jl.eval("art.labels"))
-print(1 == jl.eval("length(unique(art.labels))"))
-print(type(jl.eval("unique(art.labels)")))
+# print(jl.eval("AdaptiveResonance.get_n_weights(art)"))
+# print(jl.eval("size(art.F2)"))
+# print(jl.eval("art.labels"))
+# print(1 == jl.eval("length(unique(art.labels))"))
+# print(type(jl.eval("unique(art.labels)")))
