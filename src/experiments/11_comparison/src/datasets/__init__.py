@@ -1,0 +1,4 @@
+from .scifar10p import SplitCIFAR10Preprocessed
+from .scifar100p import SplitCIFAR100Preprocessed
+from .smnistp import SplitMNISTPreprocessed
+from .stiny_imagenetp import SplitTinyImageNetPreprocessed

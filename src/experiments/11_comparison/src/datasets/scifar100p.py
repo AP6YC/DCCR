@@ -1,3 +1,4 @@
+from .utils import process_dataset
 
 import random
 from pathlib import Path
@@ -16,7 +17,6 @@ from avalanche.benchmarks.utils import concat_datasets_sequentially
 from avalanche.benchmarks import nc_benchmark, NCScenario
 
 from torchvision.transforms import Lambda
-
 
 
 _default_cifar100_train_transform = transforms.Compose(
@@ -133,8 +133,8 @@ def SplitCIFAR100Preprocessed(
     )
 
     return nc_benchmark(
-        train_dataset=cifar_train,
-        test_dataset=cifar_test,
+        train_dataset=dataset_train,
+        test_dataset=dataset_test,
         n_experiences=n_experiences,
         task_labels=return_task_id,
         seed=seed,
@@ -142,8 +142,10 @@ def SplitCIFAR100Preprocessed(
         shuffle=shuffle,
         per_exp_classes={0: 50} if first_exp_with_half_classes else None,
         class_ids_from_zero_in_each_exp=class_ids_from_zero_in_each_exp,
-        train_transform=train_transform,
-        eval_transform=eval_transform,
+        train_transform=None,
+        eval_transform=None,
+        # train_transform=train_transform,
+        # eval_transform=eval_transform,
     )
 
 

@@ -1,3 +1,5 @@
+from .utils import process_dataset
+
 from pathlib import Path
 from typing import Sequence, Optional, Union, Any
 
@@ -130,8 +132,8 @@ def SplitCIFAR10Preprocessed(
     )
 
     return nc_benchmark(
-        train_dataset=cifar_train,
-        test_dataset=cifar_test,
+        train_dataset=dataset_train,
+        test_dataset=dataset_test,
         n_experiences=n_experiences,
         task_labels=return_task_id,
         seed=seed,
