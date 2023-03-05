@@ -1,3 +1,4 @@
+from avalanche.benchmarks import NCScenario
 
 def iterative_scenario(benchmark: NCScenario, cl_strategy) -> tuple[list, list]:
     """Iteratively trains and tests on one experience at a time.

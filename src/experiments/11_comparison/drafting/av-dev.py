@@ -3,7 +3,7 @@ from src.ddvfa_foundry import DDVFAStrategy
 # THIS IS IMPORTED NEXT, AND I STILL DON'T KNOW WHY
 from src.datasets.smnistp import SplitMNISTPreprocessed
 
-from utils import projectdir, print_allocated_memory, set_seed
+from src.utils import projectdir, print_allocated_memory, set_seed
 
 # from pathlib import Path
 
@@ -13,6 +13,9 @@ from utils import projectdir, print_allocated_memory, set_seed
 
 # def print_allocated_memory():
 #    print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
+
+
+set_seed(0)
 
 benchmark = SplitMNISTPreprocessed(
     # n_experiences=5,

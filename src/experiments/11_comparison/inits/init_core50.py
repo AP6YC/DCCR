@@ -12,7 +12,7 @@ transform = transforms.Compose([
 ])
 
 # Get the scratch directory
-dataset_root = scratchdir()
+dataset_root = scratchdir("core50")
 
 # benchmark_instance = CORe50(scenario="nicv2_79", mini=False)
 benchmark = CORe50(
