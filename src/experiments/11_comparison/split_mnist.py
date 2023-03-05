@@ -2,15 +2,8 @@
 from src.ddvfa_foundry import DDVFAStrategy
 # THIS IS IMPORTED NEXT, AND I STILL DON'T KNOW WHY
 from src.datasets.smnistp import SplitMNISTPreprocessed
-
-from pathlib import Path
-
-# # Point to the top of the project relative to this script
-def projectdir(*args):
-    return str(Path.cwd().joinpath("..", "..", "..", *args).resolve())
-
-def print_allocated_memory():
-   print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
+# Import all utilities
+from utils import projectdir, print_allocated_memory, set_seed
 
 benchmark = SplitMNISTPreprocessed(
     # n_experiences=5,
@@ -28,19 +21,22 @@ cl_strategy = DDVFAStrategy(
 # Training Loop
 print('Starting experiment...')
 
-test_results = []
-train_results = []
-for exp_id, experience in enumerate(benchmark.train_stream):
-    print("Start of experience ", experience.current_experience)
+# Run the condensed scenario and get the final training and testing results
+train_results, test_results = fast_condensed_scenario(benchmark, cl_strategy)
 
-    train_results.append(cl_strategy.train(experience))
-    print('Training completed')
-    print('Training results:')
-    print(train_results)
+# test_results = []
+# train_results = []
+# for exp_id, experience in enumerate(benchmark.train_stream):
+#     print("Start of experience ", experience.current_experience)
 
-for exp_id, experience in enumerate(benchmark.test_stream):
-    print("Computing accuracies")
-    test_results.append(cl_strategy.eval(experience))
+#     train_results.append(cl_strategy.train(experience))
+#     print('Training completed')
+#     print('Training results:')
+#     print(train_results)
+
+# for exp_id, experience in enumerate(benchmark.test_stream):
+#     print("Computing accuracies")
+#     test_results.append(cl_strategy.eval(experience))
 
 print("--- INDIVIDUAL RESULTS ---")
 print(test_results)
