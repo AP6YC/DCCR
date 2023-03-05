@@ -62,5 +62,5 @@ def ddvfa_splitcifar10(override_args=None):
     return train_results, test_results, avg_perf
 
 if __name__ == "__main__":
-    train_results, test_results, avg_perf = ddvfa_splitmnist()
+    train_results, test_results, avg_perf = ddvfa_splitcifar10()
     print(train_results, test_results, avg_perf)

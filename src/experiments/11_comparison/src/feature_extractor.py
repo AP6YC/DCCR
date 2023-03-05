@@ -1,6 +1,6 @@
 # mnist_train.data.shape
 import torch
-# import ipdb
+
 from torchvision.transforms import Normalize
 from torchvision.models import resnet50, resnet18
 from torchvision.models import ResNet50_Weights, ResNet18_Weights
