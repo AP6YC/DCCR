@@ -1,5 +1,7 @@
 from .utils import process_dataset
 
+import ipdb
+
 from pathlib import Path
 from typing import Sequence, Optional, Union, Any
 
@@ -122,6 +124,10 @@ def SplitCIFAR10Preprocessed(
     :returns: A properly initialized :class:`NCScenario` instance.
     """
     cifar_train, cifar_test = get_cifar10_dataset(dataset_root)
+
+    # Manually set the initial transforms
+    cifar_train.transform = train_transform
+    cifar_test.transform = eval_transform
 
     # Preprocess the dataset
     dataset_train, dataset_test = process_dataset(

@@ -13,7 +13,7 @@ def print_allocated_memory():
    print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
 
 def scratchdir(name):
-    dataset_root = Path("/lustre", "scratch", "sap625", name)
+    dataset_root = Path("/lustre", "scratch", "sap625", "data", name)
     dataset_root.mkdir(parents=True, exist_ok=True)
     return dataset_root
 

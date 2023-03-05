@@ -124,6 +124,10 @@ def SplitCIFAR100Preprocessed(
     """
     cifar_train, cifar_test = get_cifar100_dataset(dataset_root)
 
+    # Manually set the initial transforms
+    cifar_train.transform = train_transform
+    cifar_test.transform = eval_transform
+
     # Preprocess the dataset
     dataset_train, dataset_test = process_dataset(
         cifar_train,

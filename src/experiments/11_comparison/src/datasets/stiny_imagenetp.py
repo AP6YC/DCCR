@@ -120,6 +120,9 @@ def SplitTinyImageNetPreprocessed(
     train_set, test_set = _get_tiny_imagenet_dataset(dataset_root)
 
     # pdb.set_trace()
+    # Manually set the initial transforms
+    train_set.transform = train_transform
+    test_set.transform = eval_transform
 
     # Preprocess the dataset
     dataset_train, dataset_test = process_dataset(
