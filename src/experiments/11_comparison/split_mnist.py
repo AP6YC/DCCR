@@ -6,6 +6,8 @@ from src.datasets.smnistp import SplitMNISTPreprocessed
 from src.utils import projectdir, print_allocated_memory, set_seed, create_default_args
 from src.scenarios import fast_condensed_scenario
 
+import torch
+
 def ddvfa_splitmnist(override_args=None):
     # Set the args using the continual-learning-baselines util
     args = create_default_args(
