@@ -2,7 +2,10 @@
 # from avalanche.benchmarks.classic.cmnist import *
 # from .feature_extractor import FeatureExtractor
 # from torchvision.transforms import Lambda
-# import ipdb
+
+import ipdb
+
+
 # from torch.utils.data import TensorDataset
 from .utils import process_dataset
 
@@ -121,6 +124,11 @@ def SplitMNISTPreprocessed(
 
     # Load the MNIST dataset
     mnist_train, mnist_test = get_mnist_dataset(dataset_root)
+
+    # Manually set the initial transforms
+    mnist_train.transform = train_transform
+    mnist_test.transform = eval_transform
+    # ipdb.set_trace()
 
     # Preprocess the dataset
     dataset_train, dataset_test = process_dataset(
