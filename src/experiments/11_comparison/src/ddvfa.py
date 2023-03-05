@@ -1,3 +1,15 @@
+"""
+    ddvfa.py
+
+# Description
+This file contains an old definition of an Avalanche `strategy` using DDVFA.
+
+This is a bit of an abuse of the framework, but it is done because creating a
+DDVFA `model` requires creating an entirely new `strategy` that doesn't assume
+the use of an optimizer and subsequent gradient-based training, which will be
+done in due time.
+"""
+
 import julia
 julia.install()
 

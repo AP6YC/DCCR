@@ -1,11 +1,16 @@
 """
+    ddvfa_foundry.py
 
-# Description:
+# Description
 
 Definition of the DDVFA module for the linux cluster running these experiments.
-
+This is a separate file from ddvfa.py due to pyjulia problems on the cluster.
+This file defines an Avalanche `strategy` using DDVFA.
+This is a bit of an abuse of the framework, but it is done because creating a
+DDVFA `model` requires creating an entirely new `strategy` that doesn't assume
+the use of an optimizer and subsequent gradient-based training, which will be
+done in due time.
 """
-
 
 # Good ol' pyjulia problems:
 # https://pyjulia.readthedocs.io/en/latest/troubleshooting.html#your-python-interpreter-is-statically-linked-to-libpython
@@ -40,17 +45,34 @@ from torchvision.models.feature_extraction import create_feature_extractor
 from sklearn.metrics import accuracy_score
 from statistics import mean
 
+from typing import Union
+from pathlib import Path
+
+
 def print_allocated_memory():
    print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
 
 class DDVFAStrategy():
-    """DDVFA Strategy"""
+    """DDVFAStrategy : a DDVFA module implemented as an Avalanche strategy.
+
+    This should really be a model, but that would require creating an Avalanche
+    strategy that doesn't use an optimizer (left as an exercise for the reader).
+    """
 
     # def __init__(self, preprocessed=False):
     def __init__(self,
-        projectdir,
+        projectdir: Union[str, Path],
         # runtime="julia",
     ):
+        """Creates a DDVFA Avalanche strategy.
+
+        Requires the directory containing the pre-instantiated Julia project.
+
+        Parameters
+        ----------
+        projectdir : Union[str, Path]
+            Directory containing the pre-instantiated Julia project directory.
+        """
         # SETTING UP THE RUNTIME INSIDE THE CLASS DOESN'T WORK FOR SOME REASON
         # I'VE SPENT TOO LONG DEBUGGING THIS AND NOT ENOUGH TIME ON MY DISSERTATION
         # # Install PyCall?
@@ -95,21 +117,25 @@ class DDVFAStrategy():
         perfs = []
         pbar = tqdm(train_data_loader)
         for mb in pbar:
+            # Extract the elements of the minibatch
             data, labels, tasks = mb
-            # jl.features = self.ext_features(data)
+            # Load the features and labels into the Julia workspace
             self.jl.features = data.squeeze().numpy().transpose()
-            self.jl.labels = labels.numpy() + 1
-            # ipdb.set_trace()
+            self.jl.labels = labels.numpy() + 1     # Julia's 1-indexing
 
+            # Training with timing
             start_time = time.time()
             self.jl_train()
             end_time = time.time()
             jl_eval = end_time - start_time
             pbar.set_postfix({"jl time": jl_eval})
 
+            # Extract the training classification estimates
             y_hats = self.jl.y_hats - 1
+            # Append the accuracy for the minibatch
             perfs.append(accuracy_score(labels, y_hats))
 
+        # Return the mean performance across all samples
         return mean(perfs)
 
     def jl_eval(self):
@@ -135,58 +161,24 @@ class DDVFAStrategy():
         perfs = []
         pbar = tqdm(eval_data_loader)
         for mb in pbar:
+            # Extract the elements of the minibatch
             data, labels, tasks = mb
-            # jl.features = self.ext_features(data)
 
+            # Load the features and labels into the Julia workspace
             self.jl.features = data.squeeze().numpy().transpose()
             self.jl.labels = labels.numpy() + 1
+
+            # Eval with timing
             start_time = time.time()
-            # jl.eval("y_hats = classify(art, features, get_bmu=true)")
             self.jl_eval()
             end_time = time.time()
             jl_eval = end_time - start_time
             pbar.set_postfix({"jl time": jl_eval})
 
+            # Extract the target estimates
             y_hats = self.jl.y_hats - 1
+            # Append the accuracy of the minibatch
             perfs.append(accuracy_score(labels, y_hats))
 
+        # Return the average performance across all minibatches
         return mean(perfs)
-        # j.samples = mb
-        # y_hats = j.eval("classify(art, samples)")
-        # accuracy_score(y_test, y_hat)
-
-# print_allocated_memory()
-
-
-
-
-        # self.preprocessed = preprocessed
-        # if not self.preprocessed:
-            # rn = resnet50()
-            # self.weights = ResNet18_Weights.DEFAULT
-            # # rn = resnet18(pretrained=True)
-            # rn = resnet18(weights=self.weights)
-            # self.mod = create_feature_extractor(rn, {'layer4': 'layer4'})
-            # self.mod = self.mod.to('cuda')
-            # self.mod.eval()
-            # # self.weights = ResNet50_Weights.DEFAULT
-            # self.preprocess = self.weights.transforms()
-            # self.min = 0.0
-            # self.max = 32.0
-            # self.mult_factor = 1 / (self.max - self.min) * 2
-
-    # def ext_features(self, img):
-    #     with torch.no_grad():
-    #         img = img.to('cuda')
-    #         prep = self.preprocess(img)
-    #         features = self.mod(prep)['layer4']
-    #         # avg_features = features.mean(dim=1).flatten(start_dim=1).detach().cpu().numpy()
-    #         avg_features = features.detach().mean(dim=1).flatten(start_dim=1)
-    #         # avg_features = (avg_features - self.min) / (self.max - self.min) * 2 - 1
-    #         avg_features = ((avg_features - self.min) * self.mult_factor - 1) * 3
-    #         avg_features = avg_features.sigmoid().cpu().numpy().transpose()
-    #         # avg_features = features.mean(dim=1).flatten(start_dim=1).cpu().numpy()
-    #         # ipdb.set_trace()
-    #         # avg_features.flatten().detach().numpy()
-
-    #     return avg_features
