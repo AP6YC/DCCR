@@ -1,3 +1,7 @@
+from .utils import process_dataset
+
+import pdb
+
 from pathlib import Path
 from typing import Union, Any, Optional
 
@@ -29,8 +33,14 @@ _default_eval_transform = transforms.Compose(
     ]
 )
 
+def _get_tiny_imagenet_dataset(dataset_root):
+    train_set = TinyImagenet(root=dataset_root, train=True)
 
-def SplitTinyImageNetPermuted(
+    test_set = TinyImagenet(root=dataset_root, train=False)
+
+    return train_set, test_set
+
+def SplitTinyImageNetPreprocessed(
     n_experiences=10,
     *,
     return_task_id=False,
@@ -40,7 +50,8 @@ def SplitTinyImageNetPermuted(
     class_ids_from_zero_in_each_exp: bool = False,
     train_transform: Optional[Any] = _default_train_transform,
     eval_transform: Optional[Any] = _default_eval_transform,
-    dataset_root: Union[str, Path] = None
+    dataset_root: Union[str, Path] = None,
+    replace_existing: bool = False,
 ):
     """
     Creates a CL benchmark using the Tiny ImageNet dataset.
@@ -102,17 +113,30 @@ def SplitTinyImageNetPermuted(
     :returns: A properly initialized :class:`NCScenario` instance.
     """
 
+    # Load the tiny imagenet dataset
     train_set, test_set = _get_tiny_imagenet_dataset(dataset_root)
 
+    pdb.set_trace()
+
+    # Preprocess the dataset
+    dataset_train, dataset_test = process_dataset(
+        train_set,
+        test_set,
+        "tiny_imagenet",
+        replace_existing,
+    )
+
     return nc_benchmark(
-        train_dataset=train_set,
-        test_dataset=test_set,
+        train_dataset=dataset_train,
+        test_dataset=dataset_test,
         n_experiences=n_experiences,
         task_labels=return_task_id,
         seed=seed,
         fixed_class_order=fixed_class_order,
         shuffle=shuffle,
         class_ids_from_zero_in_each_exp=class_ids_from_zero_in_each_exp,
-        train_transform=train_transform,
-        eval_transform=eval_transform,
+        train_transform=None,
+        eval_transform=None,
+        # train_transform=train_transform,
+        # eval_transform=eval_transform,
     )

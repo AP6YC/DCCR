@@ -1,7 +1,9 @@
 from ..feature_extractor import FeatureExtractor
 
 # from .feature_extractor import FeatureExtractor
-import ipdb
+# import ipdb
+# import pdb
+
 from torchvision.transforms import Lambda
 from torch.utils.data import TensorDataset
 
@@ -35,9 +37,9 @@ def process_dataset(raw_train, raw_test, name, replace_existing):
     # Otherwise, generate the features and save
     else:
         # Set the transform to grayscale-to-RGB for the feature extractor
-        trans = Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x)
-        raw_train.transform = trans
-        raw_test.transform = trans
+        # trans = Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x)
+        # raw_train.transform = trans
+        # raw_test.transform = trans
 
         # Get the features (and statistics) from the training dataset
         features_train = fe.process(raw_train)

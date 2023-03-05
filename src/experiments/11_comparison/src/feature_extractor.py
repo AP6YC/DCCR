@@ -9,7 +9,8 @@ from torchvision.models.feature_extraction import create_feature_extractor
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import ipdb
+# import ipdb
+# import pdb
 
 class FeatureExtractor():
 
@@ -66,6 +67,7 @@ class FeatureExtractor():
         outs = []
         for mb in tqdm(data_loader):
             data, labels = mb
+            # pdb.set_trace()
             features = self.ext_features(data)
             # ipdb.set_trace()
             features = self.avg_features(features)
