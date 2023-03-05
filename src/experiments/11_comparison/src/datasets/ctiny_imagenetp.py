@@ -1,6 +1,6 @@
 from .utils import process_dataset
 
-import pdb
+# import pdb
 
 from pathlib import Path
 from typing import Union, Any, Optional
@@ -116,7 +116,7 @@ def SplitTinyImageNetPreprocessed(
     # Load the tiny imagenet dataset
     train_set, test_set = _get_tiny_imagenet_dataset(dataset_root)
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
     # Preprocess the dataset
     dataset_train, dataset_test = process_dataset(
