@@ -1,14 +1,14 @@
 """
-    split_cifar10.py
+    split_cifar100.py
 
 # Description
-This experiment implements a DDVFA strategy on the Split-CIFAR10 dataset.
+This experiment implements a DDVFA strategy on the Split-CIFAR100 dataset.
 """
 
 # THIS MUST BE IMPORTED FIRST, AND I DON'T KNOW WHY
 from src.ddvfa_foundry import DDVFAStrategy
 # THIS IS IMPORTED NEXT, AND I STILL DON'T KNOW WHY
-from src.datasets import SplitCIFAR10Preprocessed
+from src.datasets import SplitCIFAR100Preprocessed
 # Import all utilities and scenarios
 from src.utils import (
     projectdir,
@@ -23,10 +23,10 @@ from src.scenarios import fast_condensed_scenario
 from typing import Optional, Tuple
 import torch
 
-def ddvfa_splitcifar10(
+def ddvfa_splitcifar100(
     override_args: Optional[dict]=None
 ) -> Tuple[list, list, float]:
-    """DDVFA Avalanche strategy on the Split-CIFAR10 benchmark in a fast
+    """DDVFA Avalanche strategy on the Split-CIFAR100 benchmark in a fast
     condensed scenario.
 
     Parameters
@@ -48,7 +48,7 @@ def ddvfa_splitcifar10(
             # 'learning_rate': 1e-3,
             # 'train_mb_size': 200,
             'seed': None,
-            'dataset_root': scratchdir("cifar10"),
+            'dataset_root': scratchdir("cifar100"),
             # 'runtime': "/home/sap625/julia",
         },
         override_args
@@ -64,11 +64,8 @@ def ddvfa_splitcifar10(
         else "cpu"
     )
 
-    # Get the scratch directory
-    # dataset_root = scratchdir("cifar10")
-
     # Create the benchmark dataset
-    benchmark = SplitCIFAR10Preprocessed(
+    benchmark = SplitCIFAR100Preprocessed(
         n_experiences=5,
         # n_experiences=10,
         shuffle=False,
@@ -98,5 +95,5 @@ def ddvfa_splitcifar10(
     return train_results, test_results, avg_perf
 
 if __name__ == "__main__":
-    train_results, test_results, avg_perf = ddvfa_splitcifar10()
+    train_results, test_results, avg_perf = ddvfa_splitcifar100()
     print(train_results, test_results, avg_perf)

@@ -1,3 +1,12 @@
+"""
+    colors.py
+
+# Description
+A collection of custom colors for plotting.
+"""
+
+# COLOR-SAFE
+
 # Okabe ito colors in hex
 okabe_ito = [
     "#000000",       # black
