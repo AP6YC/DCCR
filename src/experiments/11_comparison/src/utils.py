@@ -10,6 +10,10 @@ def projectdir(*args):
 def print_allocated_memory():
    print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
 
+def scratchdir():
+    dataset_root = Path("/lustre", "scratch", "sap625", "core50")
+    dataset_root.mkdir(parents=True, exist_ok=True)
+    return dataset_root
 
 def set_seed(seed):
     if seed is None:
