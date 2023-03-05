@@ -1,10 +1,10 @@
-# Import all of the names from the file that we want to extend
-from avalanche.benchmarks.classic.cmnist import *
-from .feature_extractor import FeatureExtractor
-from torchvision.transforms import Lambda
-import ipdb
-from torch.utils.data import TensorDataset
-
+# # Import all of the names from the file that we want to extend
+# from avalanche.benchmarks.classic.cmnist import *
+# from .feature_extractor import FeatureExtractor
+# from torchvision.transforms import Lambda
+# import ipdb
+# from torch.utils.data import TensorDataset
+from .utils import process_dataset
 
 from pathlib import Path
 from typing import Optional, Sequence, Union, Any
@@ -113,54 +113,61 @@ def SplitMNISTPreprocessed(
     :returns: A properly initialized :class:`NCScenario` instance.
     """
 
-    # Create the custom feature extractor
-    fe = FeatureExtractor()
+    mnist_train, mnist_test = get_mnist_dataset(dataset_root)
+    dataset_train, dataset_test = process_dataset(
+        mnist_train,
+        mnist_test,
+        "mnist",
+        replace_existing,
+    )
+    # # Create the custom feature extractor
+    # fe = FeatureExtractor()
 
-    # Point to the directory containing the model files and create it if necessary
-    file_dir = Path("models")
-    file_dir.mkdir(parents=True, exist_ok=True)
+    # # Point to the directory containing the model files and create it if necessary
+    # file_dir = Path("models")
+    # file_dir.mkdir(parents=True, exist_ok=True)
 
-    # Declare the filenames
-    train_file = file_dir.joinpath("mnist_train.pt")
-    train_targets_file = file_dir.joinpath("mnist_train_targets.pt")
-    test_file = file_dir.joinpath("mnist_test.pt")
-    test_targets_file = file_dir.joinpath("mnist_test_targets.pt")
+    # # Declare the filenames
+    # train_file = file_dir.joinpath("mnist_train.pt")
+    # train_targets_file = file_dir.joinpath("mnist_train_targets.pt")
+    # test_file = file_dir.joinpath("mnist_test.pt")
+    # test_targets_file = file_dir.joinpath("mnist_test_targets.pt")
 
-    # If we have the files, simply load
-    if train_file.is_file() and test_file.is_file() and not replace_existing:
-        # Load the training data and targets
-        features_train = torch.load(train_file)
-        targets_train = torch.load(train_targets_file)
+    # # If we have the files, simply load
+    # if train_file.is_file() and test_file.is_file() and not replace_existing:
+    #     # Load the training data and targets
+    #     features_train = torch.load(train_file)
+    #     targets_train = torch.load(train_targets_file)
 
-        # Load the test targets and targets
-        features_test = torch.load(test_file)
-        targets_test = torch.load(test_targets_file)
-    # Otherwise, generate the features and save
-    else:
-        # Load the dataset
-        mnist_train, mnist_test = get_mnist_dataset(dataset_root)
+    #     # Load the test targets and targets
+    #     features_test = torch.load(test_file)
+    #     targets_test = torch.load(test_targets_file)
+    # # Otherwise, generate the features and save
+    # else:
+    #     # Load the dataset
+    #     mnist_train, mnist_test = get_mnist_dataset(dataset_root)
 
-        # Set the transform to grayscale-to-RGB for the feature extractor
-        trans = Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x)
-        mnist_train.transform = trans
-        mnist_test.transform = trans
+    #     # Set the transform to grayscale-to-RGB for the feature extractor
+    #     trans = Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x)
+    #     mnist_train.transform = trans
+    #     mnist_test.transform = trans
 
-        # Get the features (and statistics) from the training dataset
-        features_train = fe.process(mnist_train)
-        # Use the training statistics for transforming the test dataset
-        features_test = fe.process(mnist_test)
-        # Save
-        torch.save(features_train, train_file)
-        torch.save(features_test, test_file)
+    #     # Get the features (and statistics) from the training dataset
+    #     features_train = fe.process(mnist_train)
+    #     # Use the training statistics for transforming the test dataset
+    #     features_test = fe.process(mnist_test)
+    #     # Save
+    #     torch.save(features_train, train_file)
+    #     torch.save(features_test, test_file)
 
-        targets_train = mnist_train.targets
-        targets_test = mnist_test.targets
-        torch.save(targets_train, train_targets_file)
-        torch.save(targets_test, test_targets_file)
+    #     targets_train = mnist_train.targets
+    #     targets_test = mnist_test.targets
+    #     torch.save(targets_train, train_targets_file)
+    #     torch.save(targets_test, test_targets_file)
 
-    # ipdb.set_trace()
-    dataset_train = TensorDataset(features_train, targets_train)
-    dataset_test = TensorDataset(features_test, targets_test)
+    # # ipdb.set_trace()
+    # dataset_train = TensorDataset(features_train, targets_train)
+    # dataset_test = TensorDataset(features_test, targets_test)
 
     return nc_benchmark(
         train_dataset=dataset_train,
