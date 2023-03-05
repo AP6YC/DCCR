@@ -10,4 +10,5 @@ dataset_root = scratchdir("cifar100")
 benchmark = SplitCIFAR100(
     n_experiences=10,
     return_task_id=True,
+    dataset_root=dataset_root,
 )

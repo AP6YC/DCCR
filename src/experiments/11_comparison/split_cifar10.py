@@ -3,7 +3,14 @@ from src.ddvfa_foundry import DDVFAStrategy
 # THIS IS IMPORTED NEXT, AND I STILL DON'T KNOW WHY
 from src.datasets import SplitCIFAR10Preprocessed
 # Import all utilities and scenarios
-from src.utils import projectdir, print_allocated_memory, set_seed, create_default_args
+from src.utils import (
+    projectdir,
+    print_allocated_memory,
+    set_seed,
+    create_default_args,
+    scratchdir,
+)
+
 from src.scenarios import fast_condensed_scenario
 
 import torch
@@ -32,11 +39,15 @@ def ddvfa_splitcifar10(override_args=None):
         else "cpu"
     )
 
+    # Get the scratch directory
+    dataset_root = scratchdir("cifar10")
+
     # Create the benchmark dataset
     benchmark = SplitCIFAR10Preprocessed(
         n_experiences=5,
         # n_experiences=10,
         shuffle=False,
+        dataset_root=dataset_root,
         # replace_existing=True,
     )
 
