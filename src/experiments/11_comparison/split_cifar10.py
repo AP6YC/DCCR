@@ -44,9 +44,6 @@ def ddvfa_splitcifar10(
     args = create_default_args(
         {
             'cuda': 0,
-            # 'epochs': 30,
-            # 'learning_rate': 1e-3,
-            # 'train_mb_size': 200,
             'seed': None,
             'dataset_root': scratchdir("cifar10"),
             # 'runtime': "/home/sap625/julia",
@@ -64,13 +61,10 @@ def ddvfa_splitcifar10(
         else "cpu"
     )
 
-    # Get the scratch directory
-    # dataset_root = scratchdir("cifar10")
-
     # Create the benchmark dataset
     benchmark = SplitCIFAR10Preprocessed(
-        n_experiences=5,
-        # n_experiences=10,
+        # n_experiences=5,
+        n_experiences=10,
         shuffle=False,
         dataset_root=args.dataset_root,
         # replace_existing=True,

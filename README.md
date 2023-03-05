@@ -22,6 +22,7 @@ Interactive:
 
 ```shell
 sinteractive --time=03:00:00 --ntasks=16 --nodes=1
+sinteractive --time=12:00:00 --ntasks=32 --nodes=1 --mem-per-cpu=2000
 ```
 
 Interactive CUDA:

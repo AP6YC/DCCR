@@ -61,7 +61,12 @@ def SplitMNISTPreprocessed(
     replace_existing: bool = False,
 ):
     """
-    Creates a CL benchmark using the MNIST dataset.
+    Creates a preprocessed CL benchmark using the MNIST dataset.
+
+    This function preprocessed the MNIST dataset, extracting deep features,
+    normalizing them, and caching them to saved torch Tensor files.
+
+    ORIGINAL DOCUMENTATION:
 
     If the dataset is not present in the computer, this method will
     automatically download and store it.
@@ -148,6 +153,4 @@ def SplitMNISTPreprocessed(
         class_ids_from_zero_in_each_exp=class_ids_from_zero_in_each_exp,
         train_transform=None,
         eval_transform=None,
-        # train_transform=train_transform,
-        # eval_transform=eval_transform,
     )

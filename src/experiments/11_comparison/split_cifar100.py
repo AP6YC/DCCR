@@ -44,9 +44,6 @@ def ddvfa_splitcifar100(
     args = create_default_args(
         {
             'cuda': 0,
-            # 'epochs': 30,
-            # 'learning_rate': 1e-3,
-            # 'train_mb_size': 200,
             'seed': None,
             'dataset_root': scratchdir("cifar100"),
             # 'runtime': "/home/sap625/julia",

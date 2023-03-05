@@ -7,17 +7,34 @@ from src.utils import projectdir, print_allocated_memory, set_seed, create_defau
 from src.scenarios import fast_condensed_scenario
 
 import torch
+from typing import Optional, Tuple
 
-def ddvfa_splitmnist(override_args=None):
+def ddvfa_splitmnist(
+    override_args=Optional[dict]=None
+) -> Tuple[list, list, float]:
+    """DDVFA Avalanche strategy on the Split-MNIST benchmark in a fast
+    condensed scenario.
+
+    Parameters
+    ----------
+    override_args : Optional[dict], optional
+        Optional override arguments for the experiment, by default None
+
+    Returns
+    -------
+    Tuple[list, list, float]
+        The training performances by task, testing performances by task, and
+        final averaged top-1 performance after training.
+    """
+
     # Set the args using the continual-learning-baselines util
     args = create_default_args(
         {
             'cuda': 0,
-            'epochs': 30,
-            'learning_rate': 1e-3,
-            'train_mb_size': 200,
             'seed': None,
-            'dataset_root': None
+            'dataset_root': None,
+            'dataset_root': scratchdir("mnist"),
+            # 'runtime': "/home/sap625/julia",
         },
         override_args
     )
@@ -37,6 +54,7 @@ def ddvfa_splitmnist(override_args=None):
         # n_experiences=5,
         n_experiences=10,
         shuffle=False,
+        dataset_root=args.dataset_root,
         # replace_existing=True,
     )
 
