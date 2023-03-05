@@ -49,8 +49,11 @@ def process_dataset(raw_train, raw_test, name, replace_existing):
         torch.save(features_train, train_file)
         torch.save(features_test, test_file)
 
-        targets_train = raw_train.targets
-        targets_test = raw_test.targets
+        # targets_train = raw_train.targets
+        # targets_test = raw_test.targets
+        # Cast target to Tensors in case they are loaded as lists
+        targets_train = torch.IntTensor(raw_train.targets)
+        targets_test = torch.IntTensor(raw_test.targets)
         torch.save(targets_train, train_targets_file)
         torch.save(targets_test, test_targets_file)
 

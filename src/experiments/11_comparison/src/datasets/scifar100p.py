@@ -41,6 +41,9 @@ _default_cifar100_eval_transform = transforms.Compose(
     ]
 )
 
+# CIFAR100 SSl error, pointing instead to the http website
+import torchvision
+torchvision.datasets.CIFAR100.url="http://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
 
 def SplitCIFAR100Preprocessed(
     n_experiences: int,

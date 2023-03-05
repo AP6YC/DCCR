@@ -1,17 +1,30 @@
-import julia
+"""
 
+# Description:
+
+Definition of the DDVFA module for the linux cluster running these experiments.
+
+"""
+
+
+# Good ol' pyjulia problems:
+# https://pyjulia.readthedocs.io/en/latest/troubleshooting.html#your-python-interpreter-is-statically-linked-to-libpython
+# Pointing to the runtime and precompiling PyCall in this namespace because
+# it simply refuses to work when inside a function or class.
+
+# Import and setup the Julia runtime
+import julia
 runtime="/home/sap625/julia"
 julia.install(julia=runtime)
-
 jl_run = julia.Julia(
     runtime=runtime,
     compiled_modules=False,
 )
 
+# Point to the Main namespace for all eval calls
 from julia import Main
 
 import time
-
 
 from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score

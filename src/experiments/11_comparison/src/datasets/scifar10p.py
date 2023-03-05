@@ -1,6 +1,6 @@
 from .utils import process_dataset
 
-import ipdb
+# import ipdb
 
 from pathlib import Path
 from typing import Sequence, Optional, Union, Any
@@ -18,6 +18,9 @@ from avalanche.benchmarks.datasets.external_datasets.cifar import \
 
 from torchvision.transforms import Lambda
 
+# CIFAR10 SSl error, pointing instead to the http website
+import torchvision
+torchvision.datasets.CIFAR10.url="http://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
 
 
 _default_cifar10_train_transform = transforms.Compose(
