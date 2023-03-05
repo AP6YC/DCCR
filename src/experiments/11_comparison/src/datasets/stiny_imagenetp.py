@@ -13,6 +13,7 @@ from avalanche.benchmarks.classic.classic_benchmarks_utils import (
 from avalanche.benchmarks.datasets import TinyImagenet
 from avalanche.benchmarks.generators import nc_benchmark
 
+from torchvision.transforms import Lambda
 
 _default_train_transform = transforms.Compose(
     [
@@ -21,6 +22,7 @@ _default_train_transform = transforms.Compose(
         transforms.Normalize(
             (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
         ),
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
     ]
 )
 
@@ -30,6 +32,7 @@ _default_eval_transform = transforms.Compose(
         transforms.Normalize(
             (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
         ),
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
     ]
 )
 

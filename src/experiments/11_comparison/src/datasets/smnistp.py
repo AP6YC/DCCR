@@ -36,14 +36,14 @@ from torchvision.transforms import Lambda
 _default_mnist_train_transform = Compose(
     [
         Normalize((0.1307,), (0.3081,)),
-        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x)
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
     ]
 )
 
 _default_mnist_eval_transform = Compose(
     [
         Normalize((0.1307,), (0.3081,)),
-        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x)
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
     ]
 )
 
