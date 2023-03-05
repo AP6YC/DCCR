@@ -3,6 +3,8 @@ import torch
 import random
 import numpy as np
 
+from types import SimpleNamespace
+
 # # Point to the top of the project relative to this script
 def projectdir(*args):
     return str(Path.cwd().joinpath("..", "..", "..", *args).resolve())
