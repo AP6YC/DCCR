@@ -25,4 +25,5 @@ benchmark = CORe50(
     train_transform=transform,
     eval_transform=transform,
     dataset_root=dataset_root,
+    mini=True,
 )
