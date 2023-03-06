@@ -45,7 +45,7 @@ def ddvfa_splittinyimagenet(
         {
             'cuda': 0,
             'seed': None,
-            'dataset_root': scratchdir("tinyimagenet"),
+            'dataset_root': scratchdir("tiny_imagenet"),
             # 'runtime': "/home/sap625/julia",
         },
         override_args
