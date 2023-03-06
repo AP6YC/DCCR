@@ -1,11 +1,4 @@
-# # Import all of the names from the file that we want to extend
-# from avalanche.benchmarks.classic.cmnist import *
-# from .feature_extractor import FeatureExtractor
-# from torchvision.transforms import Lambda
-
-# import ipdb
-
-# from torch.utils.data import TensorDataset
+# Import the function implementing the feature extractor
 from .utils import process_dataset
 
 from pathlib import Path

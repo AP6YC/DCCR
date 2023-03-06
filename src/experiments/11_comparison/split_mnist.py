@@ -2,10 +2,10 @@
 from src.ddvfa_foundry import DDVFAStrategy
 # THIS IS IMPORTED NEXT, AND I STILL DON'T KNOW WHY
 from src.datasets.smnistp import SplitMNISTPreprocessed
+
 # Import all utilities and scenarios
 from src.utils import projectdir, print_allocated_memory, set_seed, create_default_args
 from src.scenarios import fast_condensed_scenario
-
 import torch
 from typing import Optional, Tuple
 

@@ -10,3 +10,13 @@ More specifically:
     1. The DCCR methodology requires an understanding of the *statistics of the deep-extracted feature spaces*.
     This is done on only the training dataset to not give an unfair advantage to the module during testing.
     2. The feature extraction stage is static between runs since the feature extractor weights are fixed, so these feature and preprocessing results are cached to speed up actual training.
+
+## File Structure
+
+```bash
+├── drafting        # Scripts used in the development and inspection of avalanche experiments
+├── inits           # Scripts that simply download (initialize) a dataset
+├── models          # Cache destination for the preprocessed features
+└── src             # Python driver files for all experiments
+    └── datasets    # Avalanche dataset definitions for preprocessed variants
+```
