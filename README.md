@@ -18,35 +18,27 @@ Deep Clustering Context Recognition (DCCR); materials for the upcoming ICML pape
 
 ## Usage
 
-Interactive:
+Experiments are enumerated in `src/experiments`.
+Each has a `README.md` that describes the experiment and how to run it.
+Most experiments only require instantiating the Julia project in this repo with
 
-```shell
-sinteractive --time=03:00:00 --ntasks=16 --nodes=1
-sinteractive --time=12:00:00 --ntasks=32 --nodes=1 --mem-per-cpu=2000
+```julia
+using Pkg; Pkg.activate("."); Pkg.instantiate()
 ```
 
-Interactive CUDA:
+and running the script in the experiment folder with either the shell command:
 
 ```shell
-sinteractive -p cuda --time=03:00:00 --gres=gpu:1
-sinteractive -p cuda --time=03:00:00 --gres=gpu:1 --ntasks=32 --nodes=1 --mem-per-cpu=2000
+julia src/experiments/1_accuracy/1_unshuffled.jl
 ```
 
-## Installation
+or in an existing REPL environment with the include command:
 
-Windows (with Conda):
-
-```shell
-conda install -y pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
-pip install avalanche-lib[all] jupyterlab ipywidgets julia scikit-learn pandas ipdb tqdm
+```julia
+include("src/experiments/1_accuracy/1_unshuffled.jl")
 ```
 
-Foundry:
-
-```shell
-pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
-pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116 avalanche-lib[all] jupyterlab ipywidgets julia scikit-learn pandas ipdb tqdm
-```
+Experiments with multiple stages or multiple interpreters (Julia, Python, and shell script) contain details for their reproducibilty.
 
 ## File Structure
 
@@ -74,11 +66,6 @@ DCCR
 
 Please raise an [issue][issues-url].
 
-## History
-
-- 6/25/2021 - Initialize the project.
-- 4/6/2022 - Create anonymous submission release.
-
 ## Credits
 
 ### Authors
@@ -98,3 +85,15 @@ This work is licensed under a
 [cc-by]: http://creativecommons.org/licenses/by/4.0/
 [cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
+
+### Useful Citation Links
+
+- [Avalanche docs](https://avalanche.continualai.org/)
+- [Avalanche continual-learning-baselines repo](https://github.com/ContinualAI/continual-learning-baselines)
+- Deep Streaming Linear Discriminant Analysis (DSLDA):
+  - [CVPR open access paper](https://openaccess.thecvf.com/content_CVPRW_2020/papers/w15/Hayes_Lifelong_Machine_Learning_With_Deep_Streaming_Linear_Discriminant_Analysis_CVPRW_2020_paper.pdf.)
+  - [GitHub repo](https://github.com/tyler-hayes/Deep_SLDA)
+- Continual Prototype Evolution (CoPE):
+  - [CVPR open access paper](https://openaccess.thecvf.com/content/ICCV2021/papers/De_Lange_Continual_Prototype_Evolution_Learning_Online_From_Non-Stationary_Data_Streams_ICCV_2021_paper.pdf)
+  - [GitHub repo](https://github.com/Mattdl/ContinualPrototypeEvolution)
+  - [arXiv](https://arxiv.org/abs/2009.00919)
