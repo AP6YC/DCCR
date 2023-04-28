@@ -9,12 +9,12 @@ Deep Clustering Context Recognition (DCCR); materials for the upcoming ICML pape
 - [DCCR](#dccr)
   - [Table of Contents](#table-of-contents)
   - [Usage](#usage)
-  - [Installation](#installation)
   - [File Structure](#file-structure)
   - [Contributing](#contributing)
-  - [History](#history)
   - [Credits](#credits)
     - [Authors](#authors)
+    - [License](#license)
+    - [Useful Citation Links](#useful-citation-links)
 
 ## Usage
 
