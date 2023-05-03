@@ -1,10 +1,11 @@
 """
     cluster_parallelize.jl
 
+# Description
 Adds a number of workers for parallel processing on the MST cluster.
 Currently, the number of workers is passed directly to addprocs from the first script argument.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
 """
 
