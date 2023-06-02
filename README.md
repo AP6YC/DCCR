@@ -1,6 +1,6 @@
 # DCCR
 
-Deep Clustering Context Recognition (DCCR); materials for the upcoming ICML paper "Lifelong Context Recognition via Online Deep Clustering."
+Deep Clustering Context Recognition (DCCR); materials for the upcoming TNNLS paper "Lifelong Context Recognition via Online Deep Feature Clustering."
 
 [issues-url]: https://github.com/AP6YC/DCCR/issues
 
