@@ -10,22 +10,26 @@ from .utils import process_dataset
 
 from pathlib import Path
 from typing import Optional, Sequence, Union, Any
-import torch
-from PIL.Image import Image
-from torch import Tensor
+# import torch
+# from PIL.Image import Image
+# from torch import Tensor
 from torchvision.transforms import (
-    ToTensor,
-    ToPILImage,
+    # ToTensor,
+    # ToPILImage,
     Compose,
     Normalize,
-    RandomRotation,
+    # RandomRotation,
 )
-import numpy as np
+# import numpy as np
 
-from avalanche.benchmarks import NCScenario, nc_benchmark
-from avalanche.benchmarks.classic.classic_benchmarks_utils import (
-    check_vision_benchmark,
+from avalanche.benchmarks import (
+    NCScenario,
+    nc_benchmark
 )
+# from avalanche.benchmarks.classic.classic_benchmarks_utils import (
+#     check_vision_benchmark,
+# )
+
 from avalanche.benchmarks.datasets.external_datasets.mnist import \
     get_mnist_dataset
 
@@ -35,14 +39,14 @@ from torchvision.transforms import Lambda
 _default_mnist_train_transform = Compose(
     [
         Normalize((0.1307,), (0.3081,)),
-        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x),
     ]
 )
 
 _default_mnist_eval_transform = Compose(
     [
         Normalize((0.1307,), (0.3081,)),
-        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x),
     ]
 )
 
@@ -59,7 +63,7 @@ def SplitMNISTPreprocessed(
     eval_transform: Optional[Any] = _default_mnist_eval_transform,
     dataset_root: Union[str, Path] = None,
     replace_existing: bool = False,
-):
+) -> NCScenario:
     """
     Creates a preprocessed CL benchmark using the MNIST dataset.
 

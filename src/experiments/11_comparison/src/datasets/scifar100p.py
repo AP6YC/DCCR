@@ -7,21 +7,33 @@ Defines a split and preprocessed CIFAR100 dataset.
 
 from .utils import process_dataset
 
-import random
+# import random
 from pathlib import Path
-from typing import Sequence, Optional, Union, Any
-
-from torchvision import transforms
-
-from avalanche.benchmarks.classic.classic_benchmarks_utils import (
-    check_vision_benchmark,
+from typing import (
+    Sequence,
+    Optional,
+    Union,
+    Any
 )
 
-from avalanche.benchmarks.datasets.external_datasets.cifar import \
-    get_cifar100_dataset, get_cifar10_dataset
-from avalanche.benchmarks.utils import concat_datasets_sequentially
+from torchvision import transforms
+import torchvision
 
-from avalanche.benchmarks import nc_benchmark, NCScenario
+# from avalanche.benchmarks.classic.classic_benchmarks_utils import (
+#     check_vision_benchmark,
+# )
+
+from avalanche.benchmarks.datasets.external_datasets.cifar import (
+    get_cifar100_dataset
+    # get_cifar10_dataset
+)
+
+# from avalanche.benchmarks.utils import concat_datasets_sequentially
+
+from avalanche.benchmarks import (
+    nc_benchmark,
+    NCScenario
+)
 
 from torchvision.transforms import Lambda
 
@@ -34,7 +46,7 @@ _default_cifar100_train_transform = transforms.Compose(
         transforms.Normalize(
             (0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)
         ),
-        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x),
     ]
 )
 
@@ -44,13 +56,13 @@ _default_cifar100_eval_transform = transforms.Compose(
         transforms.Normalize(
             (0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)
         ),
-        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x),
     ]
 )
 
 # CIFAR100 SSl error, pointing instead to the http website
-import torchvision
-torchvision.datasets.CIFAR100.url="http://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
+torchvision.datasets.CIFAR100.url = "http://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
+
 
 def SplitCIFAR100Preprocessed(
     n_experiences: int,
@@ -65,7 +77,7 @@ def SplitCIFAR100Preprocessed(
     eval_transform: Optional[Any] = _default_cifar100_eval_transform,
     dataset_root: Union[str, Path] = None,
     replace_existing: bool = False,
-):
+) -> NCScenario:
     """
     Creates a CL benchmark using the CIFAR100 dataset.
 
@@ -132,6 +144,7 @@ def SplitCIFAR100Preprocessed(
 
     :returns: A properly initialized :class:`NCScenario` instance.
     """
+
     cifar_train, cifar_test = get_cifar100_dataset(dataset_root)
 
     # Manually set the initial transforms

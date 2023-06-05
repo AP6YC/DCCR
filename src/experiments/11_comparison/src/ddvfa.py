@@ -18,17 +18,16 @@ import time
 from torch.utils.data import DataLoader
 from julia import Main as jl
 from sklearn.metrics import accuracy_score
-import ipdb
-import torch
+# import ipdb
+# import torch
 # from torchvision.transforms import Lambda
 from tqdm import tqdm
 
-from torchvision.models import resnet50, resnet18
-from torchvision.models import ResNet50_Weights, ResNet18_Weights
-from torchvision import models
-from torchvision.models.feature_extraction import create_feature_extractor
+# from torchvision.models import resnet50, resnet18
+# from torchvision.models import ResNet50_Weights, ResNet18_Weights
+# from torchvision import models
+# from torchvision.models.feature_extraction import create_feature_extractor
 
-from sklearn.metrics import accuracy_score
 from statistics import mean
 
 

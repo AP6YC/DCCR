@@ -15,9 +15,9 @@ from typing import Sequence, Optional, Union, Any
 from torchvision import transforms
 
 from avalanche.benchmarks import nc_benchmark, NCScenario
-from avalanche.benchmarks.classic.classic_benchmarks_utils import (
-    check_vision_benchmark,
-)
+# from avalanche.benchmarks.classic.classic_benchmarks_utils import (
+#     check_vision_benchmark,
+# )
 
 from avalanche.benchmarks.datasets.external_datasets.cifar import \
     get_cifar10_dataset
@@ -38,7 +38,7 @@ _default_cifar10_train_transform = transforms.Compose(
         transforms.Normalize(
             (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
         ),
-        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x),
     ]
 )
 
@@ -48,7 +48,7 @@ _default_cifar10_eval_transform = transforms.Compose(
         transforms.Normalize(
             (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
         ),
-        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x),
     ]
 )
 

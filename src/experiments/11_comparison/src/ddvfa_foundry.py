@@ -39,7 +39,7 @@ from tqdm import tqdm
 
 # from torchvision.models import resnet50, resnet18
 # from torchvision.models import ResNet50_Weights, ResNet18_Weights
-from torchvision import models
+# from torchvision import models
 # from torchvision.models.feature_extraction import create_feature_extractor
 
 from statistics import mean
