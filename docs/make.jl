@@ -11,6 +11,7 @@ using Documenter.jl and other tools.
 
 using
     Documenter,
+    DemoCards,
     Pkg
 
 # using DCCR
@@ -83,10 +84,18 @@ end
 # GENERATE DOCUMENTATION
 # -----------------------------------------------------------------------------
 
+# Generate the demo files
+# this is the relative path to docs/
+demopage, postprocess_cb, demo_assets = makedemos("examples")
+
 assets = [
     joinpath("assets", "favicon.ico"),
 ]
 
+# if there are generated css assets, pass it to Documenter.HTML
+isnothing(demo_assets) || (push!(assets, demo_assets))
+
+# Make the documentation
 makedocs(
     modules = [DCCR],
     sitename = "DCCR",
@@ -98,6 +107,7 @@ makedocs(
         "Home" => "index.md",
         "Manual" => [
             "Guide" => "man/guide.md",
+            demopage,
         ],
         "Internals" => [
             "Index" => "man/full-index.md",
@@ -108,6 +118,9 @@ makedocs(
     repo="https://github.com/AP6YC/DCCR/blob/{commit}{path}#L{line}",
     authors="Sasha Petrenko",
 )
+
+# 3. postprocess after makedocs
+postprocess_cb()
 
 # -----------------------------------------------------------------------------
 # DEPLOY

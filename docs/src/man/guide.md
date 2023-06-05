@@ -15,7 +15,7 @@ To set `Julia` component the project up, you must:
 
 ```julia-repl
 julia> ]
-(@v1.8) pkg> activate .
+(@v1.9) pkg> activate .
 (DCCR) pkg> instantiate
 ```
 

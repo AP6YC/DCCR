@@ -19,12 +19,15 @@ This documentation is split into the following sections:
 ```@contents
 Pages = [
     "man/guide.md",
+    "../examples/index.md",
     "man/contributing.md",
     "man/full-index.md",
     "man/dev-index.md",
 ]
 Depth = 1
 ```
+
+The [Package Guide](@ref) provides a tutorial to the full usage of the package, while [Examples](@ref examples) gives sample workflows with the various experiments of the project.
 
 The [Contributing](@ref) section outlines how to contribute to the project.
 The [Index](@ref main-index) enumerates all public types, functions, and other components with docstrings, whereas internals are listed in the [Developer's Index](@ref dev-main-index).
