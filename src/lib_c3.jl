@@ -8,6 +8,10 @@ This file contains the majority of common data structures, loading functions, an
 - Sasha Petrenko <sap625@mst.edu>
 """
 
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------------------------------
+
 using
     AdaptiveResonance,
     StatsBase,
@@ -26,6 +30,9 @@ using
 
 import Tar
 
+# -----------------------------------------------------------------------------
+# INCLUDES
+# -----------------------------------------------------------------------------
 
 # Include library code
 include("lib_c3/lib_c3.jl")

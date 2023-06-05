@@ -48,41 +48,41 @@ const Labels = Vector{String}
 # -----------------------------------------------------------------------------
 
 """
-A single dataset of features, targets, and human-readable string labels.
+A single dataset of [`Features`](@ref), [`Targets`](@ref), and human-readable string [`Labels`](@ref).
 """
 struct LabeledDataset
     """
-    Collection of features in the labeled dataset.
+    Collection of [`Features`](@ref) in the labeled dataset.
     """
     x::Features
 
     """
-    Targets corresponding to the features.
+    [`Targets`](@ref) corresponding to the [`Features`](@ref).
     """
     y::Targets
 
     """
-    Human-readable labels corresponding to the target values.
+    Human-readable [`Labels`](@ref) corresponding to the [`Targets`](@ref) values.
     """
     labels::Labels
 end
 
 """
-A single dataset of vectored labeled data with features, targets, and human-readable string labels.
+A single dataset of vectored labeled data with [`Features`](@ref), [`Targets`](@ref), and human-readable string [`Labels`](@ref).
 """
 struct VectorLabeledDataset
     """
-    A vector of features matrices.
+    A vector of [`Features`](@ref) matrices.
     """
     x::Vector{Features}
 
     """
-    A vector of targets corresponding to the features.
+    A vector of [`Targets`](@ref) corresponding to the [`Features`](@ref).
     """
     y::Vector{Targets}
 
     """
-    String labels corresponding to the targets.
+    String [`Labels`](@ref) corresponding to the [`Targets`](@ref).
     """
     labels::Labels
 end
@@ -92,17 +92,17 @@ A basic struct for encapsulating the components of supervised training.
 """
 struct DataSplit <: MatrixData
     """
-    Training dataset.
+    Training [`LabeledDataset`](@ref).
     """
     train::LabeledDataset
 
     """
-    Validation dataset.
+    Validation [`LabeledDataset`](@ref).
     """
     val::LabeledDataset
 
     """
-    Test dataset.
+    Test [`LabeledDataset`](@ref).
     """
     test::LabeledDataset
 end
@@ -112,17 +112,17 @@ A basic struct for encapsulating the components of supervised training.
 """
 struct DataSplitIndexed <: VectoredData
     """
-    Training vectorized dataset.
+    Training [`VectorLabeledDataset`](@ref).
     """
     train::VectorLabeledDataset
 
     """
-    Validation vectorized dataset.
+    Validation [`VectorLabeledDataset`](@ref).
     """
     val::VectorLabeledDataset
 
     """
-    Test vectorized dataset.
+    Test [`VectorLabeledDataset`](@ref).
     """
     test::VectorLabeledDataset
 end
@@ -132,12 +132,12 @@ A struct for combining training and validation data, containing only train and t
 """
 struct DataSplitCombined <: MatrixData
     """
-    Training dataset.
+    Training [`LabeledDataset`](@ref).
     """
     train::LabeledDataset
 
     """
-    Testing dataset.
+    Testing [`LabeledDataset`](@ref).
     """
     test::LabeledDataset
 end
@@ -147,11 +147,11 @@ end
 # -----------------------------------------------------------------------------
 
 """
-A constructor for LabeledDataset that merges two other LabeledDatasets.
+A constructor for a [`LabeledDataset`](@ref) that merges two other [`LabeledDataset`](@ref)s.
 
 # Arguments
-- `d1::LabeledDataset`: the first LabeledDataset to consolidate.
-- `d2::LabeledDataset`: the second LabeledDataset to consolidate.
+- `d1::LabeledDataset`: the first [`LabeledDataset`](@ref) to consolidate.
+- `d2::LabeledDataset`: the second [`LabeledDataset`](@ref) to consolidate.
 """
 function LabeledDataset(d1::LabeledDataset, d2::LabeledDataset)
     # Consolidate everything and construct in one step
@@ -166,7 +166,7 @@ end
 Constructs a DataSplitCombined from an existing DataSplit by consolidating the training and validation data.
 
 # Arguments
-- `data::DataSplit`: the DataSplit struct for consolidating validation features and labels into the training data.
+- `data::DataSplit`: the [`DataSplit`](@ref) struct for consolidating validation [`Features`](@ref) and [`Labels`](@ref) into the training data.
 """
 function DataSplitCombined(data::DataSplit)
     # Consolidate trainind and validation, and return the struct in one step

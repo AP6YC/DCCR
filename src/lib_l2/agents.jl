@@ -69,7 +69,7 @@ function DDVFAAgent(ddvfa_opts::opts_DDVFA)
 end
 
 """
-Constructor for a DDVFAAgent using the scenario dictionary and optional DDVFA keyword argument options.
+Constructor for a [`DDVFAAgent`](@ref) using the scenario dictionary and optional DDVFA keyword argument options.
 
 # Arguments
 - `opts::AbstractDict`: keyword arguments for DDVFA options.
@@ -110,7 +110,7 @@ end
 # -----------------------------------------------------------------------------
 
 """
-Checks if the agent is done with its scenario queue.
+Checks if the [`Agent`](@ref) is done with its scenario queue.
 
 # Arguments
 - `agent::Agent`: the agent to test scenario completion on.
@@ -125,7 +125,8 @@ end
 Gets an integer index of where a string name appears in a list of strings.
 
 # Arguments
-- `labels::`
+- `labels::Vector{T} where T <: AbstractString`: the list of strings to search.
+- `name::AbstractString`: the name to search for in the list of labels.
 """
 function get_index_from_name(labels::Vector{T}, name::AbstractString) where T <: AbstractString
     # Findall results in a list, even of only one entry
@@ -142,8 +143,8 @@ end
 Evaluates a single agent on a single experience, training or testing as needed.
 
 # Arguments
-- `agent::Agent`: the agent to evaluate.
-- `exp::Experience`: the experience to use for training/testing.
+- `agent::Agent`: the [`Agent`](@ref) to evaluate.
+- `exp::Experience`: the [`Experience`](@ref) to use for training/testing.
 """
 function evaluate_agent!(agent::Agent, experience::Experience, data::VectoredData)
     # Disect the experience
@@ -175,13 +176,13 @@ function evaluate_agent!(agent::Agent, experience::Experience, data::VectoredDat
 end
 
 """
-Logs data from an L2 experience.
+Logs data from an L2 [`Experience`](@ref).
 
 # Arguments
 - `data_logger::PyObject`: the l2logger DataLogger.
-- `exp::Experience`: the experience that the agent just processed.
-- `results::Dict`: the results from the agent's experience.
-- `status::AbstractString`: the if the experience was processed
+- `exp::Experience`: the [`Experience`](@ref) that the [`Agent`](@ref) just processed.
+- `results::Dict`: the results from the [`Agent`](@ref)'s [`Experience`](@ref).
+- `status::AbstractString`: string expressing if the experience was processed.
 """
 function log_data(data_logger::PyObject, experience::Experience, results::Dict, params::Dict ; status::AbstractString="complete")
     seq = experience.seq_nums
@@ -204,7 +205,7 @@ end
 Runs an agent's scenario.
 
 # Arguments
-- `agent::Agent`: a struct that contains an `agent` and `scenario`.
+- `agent::Agent`: a struct that contains an [`Agent`](@ref) and `scenario`.
 - `data_logger::PyObject`: a l2logger object.
 """
 function run_scenario(agent::Agent, data::VectoredData, data_logger::PyObject)

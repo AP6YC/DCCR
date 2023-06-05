@@ -1,17 +1,32 @@
+"""
+    common.jl
+
+# Description
+Common code for agents and L2 experiments.
+"""
+
 # -----------------------------------------------------------------------------
 # VARIABLES
 # -----------------------------------------------------------------------------
 
-# Pretty indentation in JSON files
+"""
+Constant for pretty indentation spacing in JSON files.
+"""
 const JSON_INDENT = 4
 
 # Valid types of certain options
-if !@isdefined BLOCK_TYPES
-    const BLOCK_TYPES = ["train", "test"]
-end
-if !@isdefined LOG_STATES
-    const LOG_STATES = ["complete", "incomplete"]
-end
+# if !@isdefined BLOCK_TYPES
+"""
+The names of the blocks that are encountered during L2 experiments.
+"""
+const BLOCK_TYPES = ["train", "test"]
+# end
+# if !@isdefined LOG_STATES
+"""
+The enumerated states that an L2 logger log can be in.
+"""
+const LOG_STATES = ["complete", "incomplete"]
+# end
 
 # -----------------------------------------------------------------------------
 # FUNCTIONS
@@ -22,7 +37,7 @@ Sanitizes a selection within a list of acceptable options.
 
 # Arguments
 - `selection_type::AbstractString`: a string describing the option in case it is misused.
-- `selection::Any`: a single selection from a list
+- `selection::Any`: a single selection from a list.
 """
 function sanitize_in_list(selection_type::AbstractString, selection::T, acceptable::Vector{T}) where T <: Any
     # Verify that we have a correct selection
@@ -34,7 +49,7 @@ function sanitize_in_list(selection_type::AbstractString, selection::T, acceptab
 end
 
 """
-Sanitize the selected block type against the BLOCK_TYPES constant.
+Sanitize the selected block type against the [`BLOCK_TYPES`](@ref) constant.
 
 # Arguments
 - `block_type::AbstractString`: the selected block type.
@@ -45,7 +60,7 @@ function sanitize_block_type(block_type::AbstractString)
 end
 
 """
-Sanitize the selected log state against the LOG_STATES constant.
+Sanitize the selected log state against the [`LOG_STATES`](@ref) constant.
 
 # Arguments
 - `log_state::AbstractString`: the selected log state.

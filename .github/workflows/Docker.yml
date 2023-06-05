@@ -30,4 +30,4 @@ jobs:
                     context: .
                     file: ./dockerfiles/Dockerfile
                     push: true
-                    tags: ap6yc/oar:latest
+                    tags: ap6yc/dccr:latest
