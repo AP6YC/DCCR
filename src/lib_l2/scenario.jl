@@ -13,7 +13,7 @@ Definitions of collections of experiences and how they are created from scenario
 # -----------------------------------------------------------------------------
 
 """
-Alias for a queue of Experiences.
+Alias for a queue of [`Experience`](@ref)s.
 """
 const ExperienceQueue = Deque{Experience}
 
@@ -27,11 +27,11 @@ const StatsDict = Dict{String, Any}
 # -----------------------------------------------------------------------------
 
 """
-Container for the ExperienceQueue and some statistics about it.
+Container for the [`ExperienceQueue`](@ref) and some statistics about it.
 """
 struct ExperienceQueueContainer
     """
-    The ExperienceQueue itself.
+    The [`ExperienceQueue`](@ref) itself.
     """
     queue::ExperienceQueue
 
@@ -47,7 +47,7 @@ end
 # -----------------------------------------------------------------------------
 
 """
-Initializes an ExperienceQueueContainer from the provided scenario dictionary.
+Initializes an [`ExperienceQueueContainer`](@ref) from the provided scenario dictionary.
 
 # Arguments
 - `eqc::ExperienceQueueContainer`: the container with the queue and stats to initialize.
@@ -105,7 +105,7 @@ function initialize_exp_queue!(eqc::ExperienceQueueContainer, scenario_dict::Abs
 end
 
 """
-Creates an empty ExperienceQueueContainer with an empty queue and zeroed stats.
+Creates an empty [`ExperienceQueueContainer`](@ref) with an empty queue and zeroed stats.
 """
 function ExperienceQueueContainer()
     # Create an empty statistics container
@@ -127,7 +127,7 @@ function ExperienceQueueContainer()
 end
 
 """
-Creates a queue of Experiences from the scenario dictionary.
+Creates a queue of [`Experience`](@ref)s from the scenario dictionary.
 
 # Arguments
 - `scenario_dict::AbstractDict`: the scenario dictionary.
@@ -148,11 +148,11 @@ end
 # -----------------------------------------------------------------------------
 
 """
-Overload of the show function for ExperienceQueue.
+Overload of the show function for [`ExperienceQueue`](@ref).
 
 # Arguments
 - `io::IO`: the current IO stream.
-- `cont::ExperienceQueueContainer`: the ExperienceQueueContainer to print/display.
+- `cont::ExperienceQueueContainer`: the [`ExperienceQueueContainer`](@ref) to print/display.
 """
 function Base.show(io::IO, queue::ExperienceQueue)
     # compact = get(io, :compact, false)
@@ -166,11 +166,11 @@ function Base.show(io::IO, queue::ExperienceQueue)
 end
 
 """
-Overload of the show function for ExperienceQueueContainer.
+Overload of the show function for [`ExperienceQueueContainer`](@ref).
 
 # Arguments
 - `io::IO`: the current IO stream.
-- `cont::ExperienceQueueContainer`: the ExperienceQueueContainer to print/display.
+- `cont::ExperienceQueueContainer`: the [`ExperienceQueueContainer`](@ref) to print/display.
 """
 function Base.show(io::IO, cont::ExperienceQueueContainer)
     # compact = get(io, :compact, false)
@@ -196,10 +196,10 @@ end
 """
 Adds entry to a dictionary from a struct with fields.
 
-Meant to be used with StatsDict.
+Meant to be used with [`StatsDict`](@ref).
 
 # Arguments
-- `dict::AbstractDict`: the dictionary to add entries to.
+- `dict::AbstractDict`: the [`StatsDict`](@ref) dictionary to add entries to.
 - `opts::Any`: a struct containing fields, presumably of options, to add as key-value entries to the dict.
 """
 function fields_to_dict!(dict::AbstractDict, opts::Any)

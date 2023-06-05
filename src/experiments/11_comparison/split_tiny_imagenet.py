@@ -23,8 +23,9 @@ from src.scenarios import fast_condensed_scenario
 from typing import Optional, Tuple
 import torch
 
+
 def ddvfa_splittinyimagenet(
-    override_args: Optional[dict]=None
+    override_args: Optional[dict] = None
 ) -> Tuple[list, list, float]:
     """DDVFA Avalanche strategy on the Split-Tiny-Imagenet benchmark in a fast
     condensed scenario.

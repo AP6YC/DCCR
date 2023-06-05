@@ -9,8 +9,9 @@ from src.scenarios import fast_condensed_scenario
 import torch
 from typing import Optional, Tuple
 
+
 def ddvfa_splitmnist(
-    override_args=Optional[dict]=None
+    override_args=Optional[dict] = None
 ) -> Tuple[list, list, float]:
     """DDVFA Avalanche strategy on the Split-MNIST benchmark in a fast
     condensed scenario.

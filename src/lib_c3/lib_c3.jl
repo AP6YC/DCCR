@@ -5,7 +5,9 @@
 Collects all of the C3 library code.
 """
 
-# Add the custom colors definitions
-include("colors.jl")
+# -----------------------------------------------------------------------------
+# INCLUDES
+# -----------------------------------------------------------------------------
 
-include("data.jl")
+include("colors.jl")        # Custom colors definitions
+include("data.jl")          # Data structures definitions

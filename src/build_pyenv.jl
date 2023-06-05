@@ -1,3 +1,10 @@
+"""
+    build_pyenv.jl
+
+# Description
+Sets and builds the PyCall environment for Julia experiments requiring Python modules.
+"""
+
 # using PyCall
 using Pkg
 

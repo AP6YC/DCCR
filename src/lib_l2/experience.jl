@@ -2,18 +2,18 @@
     experience.jl
 
 # Description
-Definitions of what individual l2 experiences are.
+Definitions of what L2 experiences are.
 
 # Authors
 - Sasha Petrenko <sap625@mst.edu>
 """
 
 # -----------------------------------------------------------------------------
-# STRUCTS
+# TYPES
 # -----------------------------------------------------------------------------
 
 """
-Sequence numbers for a block and experience.
+Sequence numbers for a block and [`Experience`](@ref).
 
 Taken from l2logger_template.
 """
@@ -46,7 +46,7 @@ struct Experience
     task_name::String
 
     """
-    The sequence numbers (block and experience count).
+    The [sequence numbers](@ref SequenceNums) (block and experience count).
     """
     seq_nums::SequenceNums
 
@@ -66,12 +66,12 @@ end
 # -----------------------------------------------------------------------------
 
 """
-Constructs an Experience, setting the update_model field based upon the block type.
+Constructs an [`Experience`](@ref), setting the update_model field based upon the block type.
 
 # Arguments
 - `task_name::AbstractString`: the name of the current task.
-- `seq_nums::SequenceNums`: the block and experience number of the experience.
-- `block_type::AbstractString`: the block type ∈ ["train", "test"]. Using "train" sets update_model to true, "test" to false.
+- `seq_nums::SequenceNums`: the block and experience number of the [`Experience`](@ref).
+- `block_type::AbstractString`: the block type ∈ ["train", "test"]. Using "train" sets `update_model` to true, "test" to false.
 """
 function Experience(task_name::AbstractString, seq_nums::SequenceNums, block_type::AbstractString)
     # Verify the block type

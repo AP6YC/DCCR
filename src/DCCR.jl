@@ -1,4 +1,11 @@
 """
+    DCCR.jl
+
+# Description
+Definition of the `DCCR` module, which encapsulates experiment driver code.
+"""
+
+"""
 A module encapsulating the experimental driver code for the DCCR project.
 
 # Imports

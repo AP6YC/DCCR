@@ -182,7 +182,7 @@ Logs data from an L2 [`Experience`](@ref).
 - `data_logger::PyObject`: the l2logger DataLogger.
 - `exp::Experience`: the [`Experience`](@ref) that the [`Agent`](@ref) just processed.
 - `results::Dict`: the results from the [`Agent`](@ref)'s [`Experience`](@ref).
-- `status::AbstractString`: string expressing if the experience was processed.
+- `status::AbstractString`: string expressing if the [`Experience`](@ref) was processed.
 """
 function log_data(data_logger::PyObject, experience::Experience, results::Dict, params::Dict ; status::AbstractString="complete")
     seq = experience.seq_nums

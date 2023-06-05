@@ -108,7 +108,7 @@ struct DataSplit <: MatrixData
 end
 
 """
-A basic struct for encapsulating the components of supervised training.
+A struct for encapsulating the components of supervised training in vectorized form.
 """
 struct DataSplitIndexed <: VectoredData
     """
