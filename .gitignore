@@ -3,6 +3,7 @@ src/experiments/9_l2metrics/l2logger_template/logs_simple/
 
 # Development folder
 dev/
+_dev/
 
 # Project results ignores
 
