@@ -33,7 +33,7 @@ struct DDVFAAgent <: Agent
     params::Dict
 
     """
-    Container for the Experience Queue
+    Container for the Experience Queue.
     """
     scenario::ExperienceQueueContainer
 end
@@ -89,11 +89,11 @@ end
 # -----------------------------------------------------------------------------
 
 """
-Overload of the show function for DDVFAAgent.
+Overload of the show function for [`DDVFAAgent`](@ref).
 
 # Arguments
 - `io::IO`: the current IO stream.
-- `cont::DDVFAAgent`: the DDVFAAgent to print/display.
+- `cont::DDVFAAgent`: the [`DDVFAAgent`](@ref) to print/display.
 """
 function Base.show(io::IO, agent::DDVFAAgent)
 # function Base.show(io::IO, ::MIME"text/plain", agent::DDVFAAgent)

@@ -43,5 +43,5 @@ pubu_9_raw = [
 n_colors = size(ylgn_9_raw)[1]
 
 # Define the colorschemes from the RGB values
-ylgn_9 = ColorScheme([RGB{Float64}(ylgn_9_raw[i, :]...) for i = 1:n_colors])
-pubu_9 = ColorScheme([RGB{Float64}(pubu_9_raw[i, :]...) for i = 1:n_colors])
+ylgn_9 = ColorScheme([ColorSchemes.RGB{Float64}(ylgn_9_raw[i, :]...) for i = 1:n_colors])
+pubu_9 = ColorScheme([ColorSchemes.RGB{Float64}(pubu_9_raw[i, :]...) for i = 1:n_colors])
