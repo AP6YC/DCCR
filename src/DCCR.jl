@@ -1,3 +1,16 @@
+"""
+A module encapsulating the experimental driver code for the DCCR project.
+
+# Imports
+
+The following names are imported by the package as dependencies:
+$(IMPORTS)
+
+# Exports
+
+The following names are exported and available when `using` the package:
+$(EXPORTS)
+"""
 module DCCR
 
 # -----------------------------------------------------------------------------
