@@ -1,5 +1,7 @@
 # DCCR
 
+[![dccr-header](docs/src/assets/logo.png)][docs-url]
+
 Deep Clustering Context Recognition (DCCR); materials for the upcoming TNNLS paper "Lifelong Context Recognition via Online Deep Feature Clustering."
 
 [issues-url]: https://github.com/AP6YC/DCCR/issues
@@ -11,10 +13,11 @@ Deep Clustering Context Recognition (DCCR); materials for the upcoming TNNLS pap
   - [Usage](#usage)
   - [File Structure](#file-structure)
   - [Contributing](#contributing)
-  - [Credits](#credits)
+  - [Attribution](#attribution)
     - [Authors](#authors)
     - [License](#license)
     - [Useful Citation Links](#useful-citation-links)
+    - [Assets](#assets)
 
 ## Usage
 
@@ -66,7 +69,7 @@ DCCR
 
 Please raise an [issue][issues-url].
 
-## Credits
+## Attribution
 
 ### Authors
 
@@ -97,3 +100,9 @@ This work is licensed under a
   - [CVPR open access paper](https://openaccess.thecvf.com/content/ICCV2021/papers/De_Lange_Continual_Prototype_Evolution_Learning_Online_From_Non-Stationary_Data_Streams_ICCV_2021_paper.pdf)
   - [GitHub repo](https://github.com/Mattdl/ContinualPrototypeEvolution)
   - [arXiv](https://arxiv.org/abs/2009.00919)
+
+### Assets
+
+The following external assets are used in this project by attribution:
+
+- [Drone-case icons created by Smashicons](https://www.flaticon.com/free-icons/drone-case) ([drone_2738988](https://www.flaticon.com/free-icon/drone_2738988))

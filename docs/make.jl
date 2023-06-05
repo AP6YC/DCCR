@@ -2,7 +2,7 @@
     make.jl
 
 # Description
-This file builds the documentation for the OAR.jl package
+This file builds the documentation for the DCCR project
 using Documenter.jl and other tools.
 """
 # -----------------------------------------------------------------------------
@@ -12,6 +12,7 @@ using Documenter.jl and other tools.
 using
     Documenter,
     Pkg
+
 # using DCCR
 
 # -----------------------------------------------------------------------------
