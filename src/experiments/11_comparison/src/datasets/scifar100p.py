@@ -1,3 +1,10 @@
+"""
+    scifar100p.py
+
+# Description
+Defines a split and preprocessed CIFAR100 dataset.
+"""
+
 from .utils import process_dataset
 
 import random

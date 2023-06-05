@@ -1,3 +1,10 @@
+"""
+    smnistp.py
+
+# Description
+Defines a split and preprocessed MNIST handwritten digits dataset.
+"""
+
 # Import the function implementing the feature extractor
 from .utils import process_dataset
 

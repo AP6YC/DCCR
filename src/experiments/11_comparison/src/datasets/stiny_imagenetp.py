@@ -1,3 +1,10 @@
+"""
+    stiny_imagenetp.py
+
+# Description
+Defines a split and preprocessed Tiny ImageNet dataset.
+"""
+
 from .utils import process_dataset
 
 # import pdb
@@ -7,9 +14,9 @@ from typing import Union, Any, Optional
 
 from torchvision import transforms
 
-from avalanche.benchmarks.classic.classic_benchmarks_utils import (
-    check_vision_benchmark,
-)
+# from avalanche.benchmarks.classic.classic_benchmarks_utils import (
+#     check_vision_benchmark,
+# )
 from avalanche.benchmarks.datasets import TinyImagenet
 from avalanche.benchmarks.generators import nc_benchmark
 
@@ -22,7 +29,7 @@ _default_train_transform = transforms.Compose(
         transforms.Normalize(
             (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
         ),
-        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x),
     ]
 )
 
@@ -32,9 +39,10 @@ _default_eval_transform = transforms.Compose(
         transforms.Normalize(
             (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
         ),
-        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0)==1 else x),
+        Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x),
     ]
 )
+
 
 def _get_tiny_imagenet_dataset(dataset_root):
     train_set = TinyImagenet(root=dataset_root, train=True)
@@ -42,6 +50,7 @@ def _get_tiny_imagenet_dataset(dataset_root):
     test_set = TinyImagenet(root=dataset_root, train=False)
 
     return train_set, test_set
+
 
 def SplitTinyImageNetPreprocessed(
     n_experiences=10,

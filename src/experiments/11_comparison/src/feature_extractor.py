@@ -1,9 +1,24 @@
+"""
+    feature_extractor.py
+
+# Description
+This file implements the feature extractor used in the DDVFAStrategy.
+"""
+
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------------------------------
+
 # mnist_train.data.shape
 import torch
 
-from torchvision.transforms import Normalize
-from torchvision.models import resnet50, resnet18
-from torchvision.models import ResNet50_Weights, ResNet18_Weights
+# from torchvision.transforms import Normalize
+from torchvision.models import (
+    # resnet50,
+    # ResNet50_Weights,
+    resnet18,
+    ResNet18_Weights
+)
 # from torchvision import models
 from torchvision.models.feature_extraction import create_feature_extractor
 from torch.utils.data import DataLoader
@@ -12,9 +27,15 @@ from tqdm import tqdm
 # import ipdb
 # import pdb
 
+# -----------------------------------------------------------------------------
+# CLASSES
+# -----------------------------------------------------------------------------
+
+
 class FeatureExtractor():
 
-    def __init__(self,
+    def __init__(
+        self,
         layer: str = 'layer4',
         sigmoid_scaling: float = 3.0,
     ):

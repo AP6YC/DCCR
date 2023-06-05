@@ -31,6 +31,7 @@ from torchvision.models.feature_extraction import create_feature_extractor
 from sklearn.metrics import accuracy_score
 from statistics import mean
 
+
 class DDVFAStrategy():
     """DDVFA Strategy"""
 

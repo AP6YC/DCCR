@@ -1,14 +1,23 @@
+"""
+    utils.py
+
+# Description
+This file defines utilities relevant to preprocessing split dataset for
+avalanche experiments.
+"""
+
 from ..feature_extractor import FeatureExtractor
 
 # from .feature_extractor import FeatureExtractor
 # import ipdb
 # import pdb
 
-from torchvision.transforms import Lambda
+# from torchvision.transforms import Lambda
 from torch.utils.data import TensorDataset
 
 from pathlib import Path
 import torch
+
 
 def process_dataset(raw_train, raw_test, name, replace_existing):
     # Create the custom feature extractor

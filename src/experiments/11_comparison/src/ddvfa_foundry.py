@@ -19,7 +19,7 @@ done in due time.
 
 # Import and setup the Julia runtime
 import julia
-runtime="/home/sap625/julia"
+runtime = "/home/sap625/julia"
 julia.install(julia=runtime)
 jl_run = julia.Julia(
     runtime=runtime,
@@ -33,24 +33,22 @@ import time
 
 from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score
-import ipdb
-import torch
+# import ipdb
+# import torch
 from tqdm import tqdm
 
-from torchvision.models import resnet50, resnet18
-from torchvision.models import ResNet50_Weights, ResNet18_Weights
+# from torchvision.models import resnet50, resnet18
+# from torchvision.models import ResNet50_Weights, ResNet18_Weights
 from torchvision import models
-from torchvision.models.feature_extraction import create_feature_extractor
+# from torchvision.models.feature_extraction import create_feature_extractor
 
-from sklearn.metrics import accuracy_score
 from statistics import mean
 
 from typing import Union
 from pathlib import Path
 
+# from utils import print_allocated_memory
 
-def print_allocated_memory():
-   print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
 
 class DDVFAStrategy():
     """DDVFAStrategy : a DDVFA module implemented as an Avalanche strategy.
@@ -60,7 +58,8 @@ class DDVFAStrategy():
     """
 
     # def __init__(self, preprocessed=False):
-    def __init__(self,
+    def __init__(
+        self,
         projectdir: Union[str, Path],
         # runtime="julia",
     ):

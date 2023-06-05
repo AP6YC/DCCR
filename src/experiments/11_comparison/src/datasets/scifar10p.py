@@ -1,3 +1,10 @@
+"""
+    scifar10p.py
+
+# Description
+Defines a split and preprocessed CIFAR10 dataset.
+"""
+
 from .utils import process_dataset
 
 # import ipdb
@@ -20,7 +27,7 @@ from torchvision.transforms import Lambda
 
 # CIFAR10 SSl error, pointing instead to the http website
 import torchvision
-torchvision.datasets.CIFAR10.url="http://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
+torchvision.datasets.CIFAR10.url = "http://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
 
 
 _default_cifar10_train_transform = transforms.Compose(
