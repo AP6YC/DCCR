@@ -1,3 +1,14 @@
+"""
+    utils.py
+
+# Description
+Utilities for the l2logger/l2metrics component of the DCCR project.
+"""
+
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------------------------------
+
 from pathlib import Path
 import torch
 import random
@@ -5,17 +16,25 @@ import numpy as np
 
 from types import SimpleNamespace
 
+# -----------------------------------------------------------------------------
+# FUNCTIONS
+# -----------------------------------------------------------------------------
+
+
 # # Point to the top of the project relative to this script
 def projectdir(*args):
     return str(Path.cwd().joinpath("..", "..", "..", *args).resolve())
 
+
 def print_allocated_memory():
-   print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
+    print("{:.2f} GB".format(torch.cuda.memory_allocated() / 1024 ** 3))
+
 
 def scratchdir(name):
     dataset_root = Path("/lustre", "scratch", "sap625", "data", name)
     dataset_root.mkdir(parents=True, exist_ok=True)
     return dataset_root
+
 
 def set_seed(seed):
     if seed is None:
@@ -28,6 +47,7 @@ def set_seed(seed):
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.enabled = True
         torch.backends.cudnn.benchmark = False
+
 
 def create_default_args(args_dict, additional_args=None):
     args = SimpleNamespace()

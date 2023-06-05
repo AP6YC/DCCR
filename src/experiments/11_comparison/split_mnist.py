@@ -4,14 +4,21 @@ from src.ddvfa_foundry import DDVFAStrategy
 from src.datasets.smnistp import SplitMNISTPreprocessed
 
 # Import all utilities and scenarios
-from src.utils import projectdir, print_allocated_memory, set_seed, create_default_args
+from src.utils import (
+    projectdir,
+    # print_allocated_memory,
+    set_seed,
+    create_default_args,
+    scratchdir
+)
+
 from src.scenarios import fast_condensed_scenario
 import torch
 from typing import Optional, Tuple
 
 
 def ddvfa_splitmnist(
-    override_args=Optional[dict] = None
+    override_args: Optional[dict] = None
 ) -> Tuple[list, list, float]:
     """DDVFA Avalanche strategy on the Split-MNIST benchmark in a fast
     condensed scenario.
@@ -33,7 +40,7 @@ def ddvfa_splitmnist(
         {
             'cuda': 0,
             'seed': None,
-            'dataset_root': None,
+            # 'dataset_root': None,
             'dataset_root': scratchdir("mnist"),
             # 'runtime': "/home/sap625/julia",
         },
@@ -69,7 +76,10 @@ def ddvfa_splitmnist(
     print('Starting experiment...')
 
     # Run the condensed scenario and get the final training and testing results
-    train_results, test_results = fast_condensed_scenario(benchmark, cl_strategy)
+    train_results, test_results = fast_condensed_scenario(
+        benchmark,
+        cl_strategy
+    )
 
     print("--- INDIVIDUAL RESULTS ---")
     print(test_results)
@@ -79,6 +89,7 @@ def ddvfa_splitmnist(
     print("--- END OF SCENARIO ---")
 
     return train_results, test_results, avg_perf
+
 
 if __name__ == "__main__":
     train_results, test_results, avg_perf = ddvfa_splitmnist()

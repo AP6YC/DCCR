@@ -1,4 +1,20 @@
+"""
+    scenarios.py
+
+# Description
+Definitions of l2logger scenarios for a DDVFAStrategy.
+"""
+
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------------------------------
+
 from avalanche.benchmarks import NCScenario
+
+# -----------------------------------------------------------------------------
+# FUNCTIONS
+# -----------------------------------------------------------------------------
+
 
 def iterative_scenario(benchmark: NCScenario, cl_strategy) -> tuple[list, list]:
     """Iteratively trains and tests on one experience at a time.
@@ -28,6 +44,7 @@ def iterative_scenario(benchmark: NCScenario, cl_strategy) -> tuple[list, list]:
         print(test_results)
 
     return train_results, test_results
+
 
 def fast_condensed_scenario(benchmark: NCScenario, cl_strategy) -> tuple[list, list]:
     """This is a condensed scenario that only tests the performance on all classes after training.

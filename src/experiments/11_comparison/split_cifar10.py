@@ -81,7 +81,10 @@ def ddvfa_splitcifar10(
     print('Starting experiment...')
 
     # Run the condensed scenario and get the final training and testing results
-    train_results, test_results = fast_condensed_scenario(benchmark, cl_strategy)
+    train_results, test_results = fast_condensed_scenario(
+        benchmark,
+        cl_strategy
+    )
 
     print("--- INDIVIDUAL RESULTS ---")
     print(test_results)
@@ -91,6 +94,7 @@ def ddvfa_splitcifar10(
     print("--- END OF SCENARIO ---")
 
     return train_results, test_results, avg_perf
+
 
 if __name__ == "__main__":
     train_results, test_results, avg_perf = ddvfa_splitcifar10()

@@ -28,11 +28,11 @@ module DCCR
 
 # Full usings (which supports comma-separated import notation)
 using
-    AdaptiveResonance,
+    AdaptiveResonance,      # ART algorithms, DDVFA, FuzzyART, etc.
     DocStringExtensions,    # Docstring utilities
-    DrWatson,
-    NumericalTypeAliases,
-    Reexport
+    DrWatson,               # Scientific project commands
+    NumericalTypeAliases,   # RealMatrix, IntegerVector, etc.
+    Reexport                # Reexport submodule exports
 
 # Precompile concrete type methods
 using PrecompileSignatures: @precompile_signatures
