@@ -83,10 +83,27 @@ end
 # GENERATE DOCUMENTATION
 # -----------------------------------------------------------------------------
 
+assets = [
+    joinpath("assets", "favicon.ico"),
+]
+
 makedocs(
+    modules = [DCCR],
     sitename = "DCCR",
-    format = Documenter.HTML(),
-    modules = [DCCR]
+    format = Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true",
+        assets = assets,
+    ),
+    pages=[
+        "Home" => "index.md",
+        "Internals" => [
+            "Index" => "man/full-index.md",
+            "Dev Index" => "man/dev-index.md",
+            "Contributing" => "man/contributing.md",
+        ],
+    ],
+    repo="https://github.com/AP6YC/DCCR/blob/{commit}{path}#L{line}",
+    authors="Sasha Petrenko",
 )
 
 # -----------------------------------------------------------------------------

@@ -16,6 +16,15 @@ These pages serve as the official documentation for the `DCCR` (*Deep Clustering
 
 This documentation is split into the following sections:
 
+```@contents
+Pages = [
+    "man/contributing.md",
+    "man/full-index.md",
+    "man/dev-index.md",
+]
+Depth = 1
+```
+
 TODO
 
 ## About These Docs
