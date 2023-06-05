@@ -18,6 +18,7 @@ This documentation is split into the following sections:
 
 ```@contents
 Pages = [
+    "man/guide.md",
     "man/contributing.md",
     "man/full-index.md",
     "man/dev-index.md",
@@ -25,7 +26,8 @@ Pages = [
 Depth = 1
 ```
 
-TODO
+The [Contributing](@ref) section outlines how to contribute to the project.
+The [Index](@ref main-index) enumerates all public types, functions, and other components with docstrings, whereas internals are listed in the [Developer's Index](@ref dev-main-index).
 
 ## About These Docs
 

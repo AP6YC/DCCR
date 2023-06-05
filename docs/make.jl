@@ -96,6 +96,9 @@ makedocs(
     ),
     pages=[
         "Home" => "index.md",
+        "Manual" => [
+            "Guide" => "man/guide.md",
+        ],
         "Internals" => [
             "Index" => "man/full-index.md",
             "Dev Index" => "man/dev-index.md",
