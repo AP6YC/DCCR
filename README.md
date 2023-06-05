@@ -72,7 +72,6 @@ DCCR
 │   ├── experiments         //      Experiment scripts
 │   ├── lib                 //      Common experimental code
 │   └── utils               //      Utility scripts (data inspection, etc.)
-├── opts                    // Options: files for each experiment, learner, etc.
 ├── test                    // Test: Pytest unit, integration, and environment tests
 ├── work                    // Work: Temporary file location (weights, datasets)
 │   ├── data                //      Datasets
