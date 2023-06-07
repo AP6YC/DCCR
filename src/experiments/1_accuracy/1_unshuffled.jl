@@ -17,12 +17,16 @@ Timeline:
 """
 
 # -----------------------------------------------------------------------------
-# FILE SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-# Load Revise for speed and DrWatson for folder pointing
-using Revise            # Editing this file
-using DrWatson          # Project directory functions, etc.
+using Revise
+using DrWatson
+@quickactivate :DCCR
+
+# -----------------------------------------------------------------------------
+# FILE SETUP
+# -----------------------------------------------------------------------------
 
 # Experiment save directory name
 experiment_top = "1_accuracy"
@@ -33,6 +37,8 @@ include(projectdir("src", "setup.jl"))
 # -----------------------------------------------------------------------------
 # OPTIONS
 # -----------------------------------------------------------------------------
+
+SAVE_TO_PAPER_DIR = false
 
 # Saving names
 plot_name = "1_accuracy.png"
@@ -108,7 +114,7 @@ display(p)
 
 # Save the plot
 savefig(p, results_dir(plot_name))
-savefig(p, paper_results_dir(plot_name))
+SAVE_TO_PAPER_DIR && savefig(p, paper_results_dir(plot_name))
 
 # -----------------------------------------------------------------------------
 # CATEGORY ANALYSIS
@@ -127,10 +133,12 @@ table = latexify(df, env=:table)
 open(results_dir(n_cat_name), "w") do io
     write(io, table)
 end
-open(paper_results_dir(n_cat_name), "w") do io
-    write(io, table)
-end
 
+if SAVE_TO_PAPER_DIR
+    open(paper_results_dir(n_cat_name), "w") do io
+        write(io, table)
+    end
+end
 # -----------------------------------------------------------------------------
 # CONFUSION HEATMAP
 # -----------------------------------------------------------------------------
@@ -142,4 +150,4 @@ display(h)
 
 # Save the heatmap to both the local and paper results directories
 savefig(h, results_dir(heatmap_name))
-savefig(h, paper_results_dir(heatmap_name))
+SAVE_TO_PAPER_DIR && savefig(h, paper_results_dir(heatmap_name))
