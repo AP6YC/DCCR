@@ -118,18 +118,20 @@ DISPLAY && display(p)
 # SAVE_TO_PAPER_DIR && savefig(p, paper_results_dir(plot_name))
 DCCR.save_dccr("figure", p, experiment_top, plot_name)
 
-# # -----------------------------------------------------------------------------
-# # CATEGORY ANALYSIS
-# # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# CATEGORY ANALYSIS
+# -----------------------------------------------------------------------------
 
-# # Save the number of F2 nodes and total categories per class
-# n_F2, n_categories = get_n_categories(ddvfa)
-# @info "F2 nodes:" n_F2
-# @info "Total categories:" n_categories
+# Save the number of F2 nodes and total categories per class
+n_F2, n_categories = get_n_categories(ddvfa)
+@info "F2 nodes:" n_F2
+@info "Total categories:" n_categories
 
-# # Create a LaTeX table from the categories
-# df = DataFrame(F2 = n_F2, Total = n_categories)
-# table = latexify(df, env=:table)
+# Create a LaTeX table from the categories
+df = DataFrame(F2 = n_F2, Total = n_categories)
+table = latexify(df, env=:table)
+
+# DCCR.save_dccr("table", table, )
 
 # # Save the categories table to both the local and paper results directories
 # open(results_dir(n_cat_name), "w") do io

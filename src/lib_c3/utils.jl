@@ -11,10 +11,34 @@ paper_results_dir(args...) = joinpath("C:\\", "Users", "Sasha", "Dropbox", "Apps
 # paper_results_dir(args...) = joinpath("C:\\", "Users", "sap62", "Dropbox", "Apps", "Overleaf", "Paper-MST-TDY-C3-V3-Resubmission", "images", "results", experiment_top, args...)
 
 """
-Wrapper for how figures are saved in the project.
+Common doc: directory string to save to.
+"""
+const DOC_ARG_SAVE_DIR = """
+- `dir::AbstractString`: the directory to save to.
+"""
+
+"""
+Wrapper for how figures are saved in the DCCR project.
+
+# Arguments
+- `fig`: the figure object to save.
+$DOC_ARG_SAVE_DIR
 """
 function _save_dccr_fig(fig, dir::AbstractString)
     savefig(fig, dir)
+end
+
+"""
+Wrapper for how tables are saved in the DCCR project.
+
+# Arguments
+- `table`: the table object to save.
+$DOC_ARG_SAVE_DIR
+"""
+function _save_dccr_table(table, dir::AbstractString)
+    open(dir, "w") do io
+        write(io, table)
+    end
 end
 
 const SAVE_MAP = Dict(

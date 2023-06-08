@@ -1,9 +1,27 @@
+title: "AP6YC/DCCR"
+abstract: "This software is a Julia project for Deep Clustering Context Recognition."
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
+keywords:
+  - "ART"
+  - "Adaptive Resonance Theory"
+  - "Adaptive Resonance"
+  - "Clustering"
+  - "Lifelong Learning"
+  - "Lifelong Machine Learning"
 authors:
-  - family-names: Petrenko
-    given-names: Sasha
+  - family-names: "Petrenko"
+    given-names: "Sasha"
     orcid: https://orcid.org/0000-0003-2442-8901
-title: AP6YC/DCCR
+    website: "https://ap6yc.github.io/"
+    email: "sap625@mst.edu"
+    alias: "AP6YC"
+    affiliation: "Missouri University of Science and Technology"
 doi: 10.5281/zenodo.8017806
 date-released: 2023-06-08
+url: "https://doi.org/10.5281/zenodo.8017806"
+repository-code: "https://github.com/AP6YC/DCCR"
+identifiers:
+  - description: "The DOI of the latest DCCR Zenodo archive."
+    type: "doi"
+    value: "10.5281/zenodo.8017806"
