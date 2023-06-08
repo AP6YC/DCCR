@@ -1,14 +1,9 @@
+"""
+    constants.jl
 
-using
-    # DrWatson,
-    Dates,
-    Logging,           # Printing diagnostics
-    Random,            # Random subsequence
-    Plots
-    # AdaptiveResonance, # ART modules
-    # Printf,            # Formatted number printing
-    # Latexify,
-    # DataFrames
+# Description
+This file contains a collection of contants used in the DCCR project, such as those used for plotting configurations.
+"""
 
 # using PlotThemes
 # Plotting style
@@ -22,11 +17,7 @@ Random.seed!(0)
 # Get the simulation datetime for the destination directory
 sim_datetime = Dates.format(now(), "yyyy-mm-dd_HH-MM-SS")
 
-# Load source files
-# include(projectdir("src", "lib_c3.jl"))
-
 # Top data directory
-# const data_dir = projectdir("work", "data", "activations_yolov3_cell=1")
 const data_dir = unpacked_dir("activations_yolov3_cell=1")
 
 # Plotting DPI

@@ -25,19 +25,34 @@ module DCCR
 # -----------------------------------------------------------------------------
 
 # Usings/imports for the whole package declared once
-
 using Reexport              # Reexport submodule exports
-@reexport using AdaptiveResonance
-@reexport using Printf      # Formatted number printing
+
+@reexport using AdaptiveResonance   # ART algorithms, DDVFA, FuzzyART, etc.
+@reexport using Printf              # Formatted number printing
 @reexport using DataFrames
 @reexport using Latexify
+
 # Full usings (which supports comma-separated import notation)
 using
-    # AdaptiveResonance,      # ART algorithms, DDVFA, FuzzyART, etc.
+    DataStructures,         # Dequeue
+    DelimitedFiles,
     DocStringExtensions,    # Docstring utilities
     DrWatson,               # Scientific project commands
-    NumericalTypeAliases    # RealMatrix, IntegerVector, etc.
-    # Reexport                # Reexport submodule exports
+    JSON                    # JSON file load/save
+    Logging,                # Printing diagnostics
+    MLBase,                 # confusmat
+    MLDataUtils,            # stratifiedobs
+    NumericalTypeAliases,   # RealMatrix, IntegerVector, etc.
+    Plots,                  # Plotting
+    ProgressMeter,          # Progress bars
+    PyCall,                 # PyObject
+    Random,                 # Random subsequence
+    StatsBase,
+    StatsPlots              # groupedbar
+
+# using HDF5              # Loading .h5 activation files
+
+import Tar
 
 # Precompile concrete type methods
 using PrecompileSignatures: @precompile_signatures

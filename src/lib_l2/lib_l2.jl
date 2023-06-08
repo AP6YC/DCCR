@@ -9,17 +9,6 @@ Includes all of the lib_l2 source files.
 """
 
 # -----------------------------------------------------------------------------
-# DEPENDENCIES
-# -----------------------------------------------------------------------------
-
-using
-    AdaptiveResonance,  # train!, classify, DDVFA, opts_DDVFA
-    DataStructures,     # Dequeue
-    ProgressMeter,      # Progress bars
-    PyCall,             # PyObject
-    JSON                # JSON file load/save
-
-# -----------------------------------------------------------------------------
 # INCLUDES
 # -----------------------------------------------------------------------------
 

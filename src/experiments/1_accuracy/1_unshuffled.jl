@@ -10,7 +10,6 @@ containing the Overleaf document for the paper.
 
 # Authors
 - Sasha Petrenko <sap625@mst.edu>
-
 """
 
 # -----------------------------------------------------------------------------

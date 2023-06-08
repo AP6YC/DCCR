@@ -1,44 +1,15 @@
 """
-    lib_c3.jl
+    functions.jl
 
 # Description
-This file contains the majority of common data structures, loading functions, and experiments for the DCCR project.
+This file contains the majority of experiment functions for the DCCR project.
 
 # Authors
 - Sasha Petrenko <sap625@mst.edu>
 """
 
 # -----------------------------------------------------------------------------
-# DEPENDENCIES
-# -----------------------------------------------------------------------------
-
-using
-    AdaptiveResonance,
-    StatsBase,
-    Logging,
-    DelimitedFiles,
-    MLBase,             # confusmat
-    MLDataUtils,        # stratifiedobs
-    StatsPlots,         # groupedbar
-    # DataFrames,
-    # Printf,
-    NumericalTypeAliases
-
-# # using Statistics
-# # using DrWatson
-# # using HDF5              # Loading .h5 activation files
-
-import Tar
-
-# -----------------------------------------------------------------------------
-# INCLUDES
-# -----------------------------------------------------------------------------
-
-# Include library code
-# include("lib_c3/lib_c3.jl")
-
-# -----------------------------------------------------------------------------
-# METHODS
+# FUNCTIONS
 # -----------------------------------------------------------------------------
 
 """
