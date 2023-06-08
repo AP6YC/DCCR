@@ -29,6 +29,8 @@ module DCCR
 using Reexport              # Reexport submodule exports
 @reexport using AdaptiveResonance
 @reexport using Printf      # Formatted number printing
+@reexport using DataFrames
+@reexport using Latexify
 # Full usings (which supports comma-separated import notation)
 using
     # AdaptiveResonance,      # ART algorithms, DDVFA, FuzzyART, etc.

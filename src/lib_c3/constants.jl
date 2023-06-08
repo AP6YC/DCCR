@@ -4,11 +4,11 @@ using
     Dates,
     Logging,           # Printing diagnostics
     Random,            # Random subsequence
-    Plots,
-    AdaptiveResonance, # ART modules
-    Printf,            # Formatted number printing
-    Latexify,
-    DataFrames
+    Plots
+    # AdaptiveResonance, # ART modules
+    # Printf,            # Formatted number printing
+    # Latexify,
+    # DataFrames
 
 # using PlotThemes
 # Plotting style

@@ -20,7 +20,7 @@ using
     MLBase,             # confusmat
     MLDataUtils,        # stratifiedobs
     StatsPlots,         # groupedbar
-    DataFrames,
+    # DataFrames,
     # Printf,
     NumericalTypeAliases
 
@@ -442,8 +442,9 @@ Returns both the number of F2 categories and total number of weights per class a
 
 # Arguments
 - `ddvfa::DDVFA`: the DDVFA module to calculate the statistics for.
+- `n_classes::Int`: the number of target classes that the model was trained upon.
 """
-function get_n_categories(ddvfa::DDVFA)
+function get_n_categories(ddvfa::DDVFA, n_classes::Int)
     # Save the number of F2 nodes and total categories per class
     n_F2 = Int[]
     n_categories = Int[]

@@ -1,19 +1,16 @@
 """
     1_unshuffled.jl
 
-Description:
-    This file runs a single condensed scenario without experience blocks,
+# Description
+This file runs a single condensed scenario without experience blocks,
 getting the final accuracies per category and saving them to a combined bar chart.
 This script also counts the number of categories, saving to a LaTeX table.
 Both of these results are saved to a local results directory and Dropbox directory
 containing the Overleaf document for the paper.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
 
-Timeline:
-- 1/17/2022: Created.
-- 2/17/2022: Documented.
 """
 
 # -----------------------------------------------------------------------------
@@ -30,9 +27,6 @@ using DrWatson
 
 # Experiment save directory name
 experiment_top = "1_accuracy"
-
-# Run the common setup methods (data paths, etc.)
-# include(projectdir("src", "setup.jl"))
 
 # -----------------------------------------------------------------------------
 # OPTIONS
@@ -114,16 +108,14 @@ p = DCCR.create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels, perc
 DISPLAY && display(p)
 
 # Save the plot
-# savefig(p, results_dir(plot_name))
-# SAVE_TO_PAPER_DIR && savefig(p, paper_results_dir(plot_name))
-DCCR.save_dccr("figure", p, experiment_top, plot_name)
+DCCR.save_dccr("figure", p, experiment_top, plot_name, to_paper=SAVE_TO_PAPER_DIR)
 
 # -----------------------------------------------------------------------------
 # CATEGORY ANALYSIS
 # -----------------------------------------------------------------------------
 
 # Save the number of F2 nodes and total categories per class
-n_F2, n_categories = get_n_categories(ddvfa)
+n_F2, n_categories = DCCR.get_n_categories(ddvfa, n_classes)
 @info "F2 nodes:" n_F2
 @info "Total categories:" n_categories
 
@@ -131,27 +123,18 @@ n_F2, n_categories = get_n_categories(ddvfa)
 df = DataFrame(F2 = n_F2, Total = n_categories)
 table = latexify(df, env=:table)
 
-# DCCR.save_dccr("table", table, )
+# Save the categories table to both the local and paper results directories
+DCCR.save_dccr("table", table, experiment_top, n_cat_name, to_paper=SAVE_TO_PAPER_DIR)
 
-# # Save the categories table to both the local and paper results directories
-# open(results_dir(n_cat_name), "w") do io
-#     write(io, table)
-# end
+# -----------------------------------------------------------------------------
+# CONFUSION HEATMAP
+# -----------------------------------------------------------------------------
 
-# if SAVE_TO_PAPER_DIR
-#     open(paper_results_dir(n_cat_name), "w") do io
-#         write(io, table)
-#     end
-# end
-# # -----------------------------------------------------------------------------
-# # CONFUSION HEATMAP
-# # -----------------------------------------------------------------------------
+# Normalized confusion heatmap
+# norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
+h = DCCR.create_confusion_heatmap(class_labels, data.test.y, y_hat)
+DISPLAY && display(h)
 
-# # Normalized confusion heatmap
-# # norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
-# h = create_confusion_heatmap(class_labels, data.test_y, y_hat)
-# display(h)
+# Save the heatmap to both the local and paper results directories
+DCCR.save_dccr("figure", h, experiment_top, heatmap_name, to_paper=SAVE_TO_PAPER_DIR)
 
-# # Save the heatmap to both the local and paper results directories
-# savefig(h, results_dir(heatmap_name))
-# SAVE_TO_PAPER_DIR && savefig(h, paper_results_dir(heatmap_name))
