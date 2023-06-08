@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Petrenko
+    given-names: Sasha
+    orcid: https://orcid.org/0000-0003-2442-8901
+title: AP6YC/DCCR
+doi: 10.5281/zenodo.8017806
+date-released: 2023-06-08
