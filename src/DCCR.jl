@@ -26,13 +26,16 @@ module DCCR
 
 # Usings/imports for the whole package declared once
 
+using Reexport              # Reexport submodule exports
+@reexport using AdaptiveResonance
+@reexport using Printf      # Formatted number printing
 # Full usings (which supports comma-separated import notation)
 using
-    AdaptiveResonance,      # ART algorithms, DDVFA, FuzzyART, etc.
+    # AdaptiveResonance,      # ART algorithms, DDVFA, FuzzyART, etc.
     DocStringExtensions,    # Docstring utilities
     DrWatson,               # Scientific project commands
-    NumericalTypeAliases,   # RealMatrix, IntegerVector, etc.
-    Reexport                # Reexport submodule exports
+    NumericalTypeAliases    # RealMatrix, IntegerVector, etc.
+    # Reexport                # Reexport submodule exports
 
 # Precompile concrete type methods
 using PrecompileSignatures: @precompile_signatures

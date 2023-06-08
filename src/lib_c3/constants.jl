@@ -1,18 +1,12 @@
-"""
-    setup.jl
-
-# Description
-Run common setup tasks for Julia experiments, such as setting loading source files and setting data paths.
-"""
 
 using
-    DrWatson,
+    # DrWatson,
     Dates,
     Logging,           # Printing diagnostics
     Random,            # Random subsequence
     Plots,
     AdaptiveResonance, # ART modules
-    # Printf,            # Formatted number printing
+    Printf,            # Formatted number printing
     Latexify,
     DataFrames
 
@@ -29,26 +23,7 @@ Random.seed!(0)
 sim_datetime = Dates.format(now(), "yyyy-mm-dd_HH-MM-SS")
 
 # Load source files
-include(projectdir("src", "lib_c3.jl"))
-
-# Results directories (local and paper)
-results_dir(args...) = projectdir("work", "results", experiment_top, args...)
-paper_results_dir(args...) = joinpath("C:\\", "Users", "Sasha", "Dropbox", "Apps", "Overleaf", "Paper-MST-TDY-C3-V3-Resubmission", "images", "results", experiment_top, args...)
-# paper_results_dir(args...) = joinpath("C:\\", "Users", "sap62", "Dropbox", "Apps", "Overleaf", "Paper-MST-TDY-C3-V3-Resubmission", "images", "results", experiment_top, args...)
-
-# results_dir(args...) = projectdir("work", "results", args...)
-# paper_results_dir(args...) = joinpath("C:\\", "Users", "Sasha", "Dropbox", "Apps", "Overleaf", "Paper-MST-TDY-C3-V3-Resubmission", "images", "results", args...)
-# # paper_results_dir(args...) = joinpath("C:\\", "Users", "sap62", "Dropbox", "Apps", "Overleaf", "Paper-MST-TDY-C3-V3-Resubmission", "images", "results", experiment_top, args...)
-
-# function s
-
-# function save_dccr_fig(args... ; to_paper::Bool=false)
-
-# end
-
-# Make the results directories if they do not exist
-mkpath(results_dir())
-mkpath(paper_results_dir())
+# include(projectdir("src", "lib_c3.jl"))
 
 # Top data directory
 # const data_dir = projectdir("work", "data", "activations_yolov3_cell=1")
