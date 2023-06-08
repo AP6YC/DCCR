@@ -21,17 +21,14 @@ using DrWatson
 @quickactivate :DCCR
 
 # -----------------------------------------------------------------------------
-# FILE SETUP
+# OPTIONS
 # -----------------------------------------------------------------------------
 
 # Experiment save directory name
 experiment_top = "1_accuracy"
-
-# -----------------------------------------------------------------------------
-# OPTIONS
-# -----------------------------------------------------------------------------
-
+# Flag for saving to paper results directory
 SAVE_TO_PAPER_DIR = false
+# Flag for displaying plots
 DISPLAY = false
 
 # Saving names
@@ -136,4 +133,3 @@ DISPLAY && display(h)
 
 # Save the heatmap to both the local and paper results directories
 DCCR.save_dccr("figure", h, experiment_top, heatmap_name, to_paper=SAVE_TO_PAPER_DIR)
-

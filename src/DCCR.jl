@@ -6,7 +6,7 @@ Definition of the `DCCR` module, which encapsulates experiment driver code.
 """
 
 """
-A module encapsulating the experimental driver code for the DCCR project.
+A module encapsulating the experiment driver code for the `DCCR` project.
 
 # Imports
 
@@ -27,10 +27,12 @@ module DCCR
 # Usings/imports for the whole package declared once
 using Reexport              # Reexport submodule exports
 
+# Reexport tools used in experiment scripts
 @reexport using AdaptiveResonance   # ART algorithms, DDVFA, FuzzyART, etc.
 @reexport using Printf              # Formatted number printing
-@reexport using DataFrames
-@reexport using Latexify
+@reexport using DataFrames          # DataFrame
+@reexport using Latexify            # latexify
+@reexport using Random              # Random subsequence
 
 # Full usings (which supports comma-separated import notation)
 using
@@ -46,7 +48,6 @@ using
     Plots,                  # Plotting
     ProgressMeter,          # Progress bars
     PyCall,                 # PyObject
-    Random,                 # Random subsequence
     StatsBase,
     StatsPlots              # groupedbar
 

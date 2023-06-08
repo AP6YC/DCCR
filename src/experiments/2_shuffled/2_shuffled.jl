@@ -1,36 +1,33 @@
 """
     2_shuffled.jl
 
-Description:
-    This script does the same experiment as 1_unshuffled.jl but with shuffling
+# Description
+This script does the same experiment as 1_unshuffled.jl but with shuffling
 the individual samples. The same training, testing, plots, and category tables
 are generated and saved.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
-
-Timeline:
-- 1/17/2022: Created.
-- 2/17/2022: Documented.
 """
 
 # -----------------------------------------------------------------------------
-# FILE SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-# Load Revise for speed and DrWatson for folder pointing
-using Revise            # Editing this file
-using DrWatson          # Project directory functions, etc.
-
-# Experiment save directory name
-experiment_top = "2_shuffled"
-
-# Run the common setup methods (data paths, etc.)
-include(projectdir("src", "setup.jl"))
+using Revise
+using DrWatson
+@quickactivate :DCCR
 
 # -----------------------------------------------------------------------------
 # OPTIONS
 # -----------------------------------------------------------------------------
+
+# Experiment save directory name
+experiment_top = "2_shuffled"
+# Flag for saving to paper results directory
+SAVE_TO_PAPER_DIR = false
+# Flag for displaying plots
+DISPLAY = false
 
 # Saving names
 plot_name = "2_accuracy_shuffled.png"
@@ -68,17 +65,17 @@ scaling = 2.0
 # -----------------------------------------------------------------------------
 
 # Load the data names and class labels from the selection
-data_dirs, class_labels = get_orbit_names(data_selection)
+data_dirs, class_labels = DCCR.get_orbit_names(data_selection)
 
 # Number of classes
 n_classes = length(data_dirs)
 
 # Load the orbit data
-data = load_orbits(data_dir, data_dirs, scaling)
+data = DCCR.load_orbits(DCCR.data_dir, data_dirs, scaling)
 
 i_train = randperm(length(data.train.y))
-data.train.x = data.train.x[:, i_train]
-data.train.y = data.train.y[i_train]
+local_x = data.train.x[:, i_train]
+local_y = data.train.y[i_train]
 
 # (X_train, y_train), (X_test, y_test) = stratifiedobs((data, targets))
 
@@ -90,12 +87,12 @@ ddvfa.config = DataConfig(0, 1, 128)
 # -----------------------------------------------------------------------------
 
 # Train in batch
-y_hat_train = train!(ddvfa, data.train.x, y=data.train.y)
-y_hat = AdaptiveResonance.classify(ddvfa, data.test_x, get_bmu=true)
+y_hat_train = train!(ddvfa, local_x, y=local_y)
+y_hat = AdaptiveResonance.classify(ddvfa, data.test.x, get_bmu=true)
 
 # Calculate performance on training data, testing data, and with get_bmu
-perf_train = performance(y_hat_train, data.train.y)
-perf_test = performance(y_hat, data.test_y)
+perf_train = performance(y_hat_train, local_y)
+perf_test = performance(y_hat, data.test.y)
 
 # Format each performance number for comparison
 @printf "Batch training performance: %.4f\n" perf_train
@@ -106,19 +103,18 @@ perf_test = performance(y_hat, data.test_y)
 # -----------------------------------------------------------------------------
 
 # Create an accuracy grouped bar chart
-p = create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels, percentages=true)
-display(p)
+p = DCCR.create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels, percentages=true)
+DISPLAY && display(p)
 
 # Save the plot
-savefig(p, results_dir(plot_name))
-savefig(p, paper_results_dir(plot_name))
+DCCR.save_dccr("figure", p, experiment_top, plot_name, to_paper=SAVE_TO_PAPER_DIR)
 
 # -----------------------------------------------------------------------------
 # CATEGORY ANALYSIS
 # -----------------------------------------------------------------------------
 
 # Save the number of F2 nodes and total categories per class
-n_F2, n_categories = get_n_categories(ddvfa)
+n_F2, n_categories = DCCR.get_n_categories(ddvfa, n_classes)
 @info "F2 nodes:" n_F2
 @info "Total categories:" n_categories
 
@@ -126,13 +122,8 @@ n_F2, n_categories = get_n_categories(ddvfa)
 df = DataFrame(F2 = n_F2, Total = n_categories)
 table = latexify(df, env=:table)
 
-open(results_dir(n_cat_name), "w") do io
-    write(io, table)
-end
-
-open(paper_results_dir(n_cat_name), "w") do io
-    write(io, table)
-end
+# Save the categories table to both the local and paper results directories
+DCCR.save_dccr("table", table, experiment_top, n_cat_name, to_paper=SAVE_TO_PAPER_DIR)
 
 # -----------------------------------------------------------------------------
 # CONFUSION HEATMAP
@@ -140,9 +131,8 @@ end
 
 # Normalized confusion heatmap
 # norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
-h = create_confusion_heatmap(class_labels, data.test_y, y_hat)
-display(h)
+h = DCCR.create_confusion_heatmap(class_labels, data.test.y, y_hat)
+DISPLAY && display(h)
 
 # Save the heatmap to both the local and paper results directories
-savefig(h, results_dir(heatmap_name))
-savefig(h, paper_results_dir(heatmap_name))
+DCCR.save_dccr("figure", h, experiment_top, heatmap_name, to_paper=SAVE_TO_PAPER_DIR)
