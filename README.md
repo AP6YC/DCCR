@@ -5,9 +5,12 @@
 Deep Clustering Context Recognition (DCCR); materials for the upcoming TNNLS paper "Lifelong Context Recognition via Online Deep Feature Clustering."
 Please see the [documentation][docs-url].
 
-| **Documentation** | **Docs Build Status**|  **Testing Status** | **Coveralls** | **Codecov** |
-|:-----------------:|:--------------------:|:-------------------:|:-------------:|:-----------:|
-| [![Docs][docs-img]][docs-url] | [![Docs Status][doc-status-img]][doc-status-url] | [![CI Status][ci-img]][ci-url] | [![Coveralls][coveralls-img]][coveralls-url] | [![Codecov][codecov-img]][codecov-url] |
+| **Documentation** | **Docs Build Status**|  **Testing Status** |
+|:-----------------:|:--------------------:|:-------------------:|
+| [![Docs][docs-img]][docs-url] | [![Docs Status][doc-status-img]][doc-status-url] | [![CI Status][ci-img]][ci-url] |
+| **Coveralls** | **Codecov** | **Zenodo DOI** |
+ [![Coveralls][coveralls-img]][coveralls-url] | [![Codecov][codecov-img]][codecov-url] | [![Zenodo DOI][doi-img]][doi-url] |
+
 
 [doc-status-img]: https://github.com/AP6YC/DCCR/actions/workflows/Documentation.yml/badge.svg
 [doc-status-url]: https://github.com/AP6YC/DCCR/actions/workflows/Documentation.yml
@@ -26,6 +29,9 @@ Please see the [documentation][docs-url].
 
 [issues-url]: https://github.com/AP6YC/DCCR/issues
 
+[doi-img]: https://zenodo.org/badge/DOI/10.5281/zenodo.8017807.svg
+[doi-url]: https://doi.org/10.5281/zenodo.8017807
+
 ## Table of Contents
 
 - [DCCR](#dccr)
@@ -36,8 +42,9 @@ Please see the [documentation][docs-url].
   - [Attribution](#attribution)
     - [Authors](#authors)
     - [License](#license)
-    - [Useful Citation Links](#useful-citation-links)
+    - [Useful Links](#useful-links)
     - [Assets](#assets)
+    - [Citation](#citation)
 
 ## Usage
 
@@ -65,28 +72,16 @@ Experiments with multiple stages or multiple interpreters (Julia, Python, and sh
 
 ## File Structure
 
-```
-DCCR
-├── dockerfiles             // Dockerfiles: for deployment
-├── src                     // Source: julia scripts and modules
-│   ├── experiments         //      Experiment scripts
-│   ├── lib                 //      Common experimental code
-│   └── utils               //      Utility scripts (data inspection, etc.)
-├── test                    // Test: Pytest unit, integration, and environment tests
-├── work                    // Work: Temporary file location (weights, datasets)
-│   ├── data                //      Datasets
-│   ├── models              //      Model weights
-│   └── results             //      Generated results
-├── .gitattributes          // Git: definitions for LFS patterns
-├── .gitignore              // Git: .gitignore for the whole project
-├── LICENSE                 // Git: license for the project
-├── Project.toml            // Julia: project dependencies
-└── README.md               // Doc: this document
-```
+An explanation of the `DCCR` project file structure can be found [in the hosted documentation][package-structure].
+
+[package-structure]: https://ap6yc.github.io/DCCR/dev/man/contributing/#Package-Structure
 
 ## Contributing
 
-Please raise an [issue][issues-url].
+If you have an issue with the project, please raise an [issue][issues-url].
+If you would instead like to contribute to the package, please see the [contributing guide][contributing-guide].
+
+[contributing-guide]: https://ap6yc.github.io/DCCR/dev/man/contributing/
 
 ## Attribution
 
@@ -108,7 +103,9 @@ This work is licensed under a
 [cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
 
-### Useful Citation Links
+### Useful Links
+
+The following resources are referenced in this project or are useful resources for reference:
 
 - [Avalanche docs](https://avalanche.continualai.org/)
 - [Avalanche continual-learning-baselines repo](https://github.com/ContinualAI/continual-learning-baselines)
@@ -125,3 +122,19 @@ This work is licensed under a
 The following external assets are used in this project by attribution:
 
 - [Drone-case icons created by Smashicons](https://www.flaticon.com/free-icons/drone-case) ([drone_2738988](https://www.flaticon.com/free-icon/drone_2738988))
+
+### Citation
+
+This project has a [citation file](CITATION.cff) file that generates citation information for the package and corresponding JOSS paper, which can be accessed at the "Cite this repository button" under the "About" section of the GitHub page.
+
+You may also cite this repository with the following BibTeX entry:
+
+```bibtex
+@software{Petrenko_AP6YC_DCCR_2023,
+  author = {Petrenko, Sasha},
+  doi = {10.5281/zenodo.8017806},
+  month = jun,
+  title = {{AP6YC/DCCR}},
+  year = {2023}
+}
+```

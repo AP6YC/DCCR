@@ -82,7 +82,7 @@ They are setup to be built and served in a separate branch called `gh-pages` fro
 
 ### Package Structure
 
-The `DCCR` package has the following file structure:
+The `DCCR` project has the following file structure:
 
 ```console
 DCCR
