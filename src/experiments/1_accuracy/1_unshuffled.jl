@@ -26,24 +26,27 @@ using DrWatson
 
 # Experiment save directory name
 experiment_top = "1_accuracy"
+
 # Flag for saving to paper results directory
 SAVE_TO_PAPER_DIR = false
+
 # Flag for displaying plots
 DISPLAY = false
+
+# Simulation options
+opts_file = "default.yml"
 
 # Saving names
 plot_name = "1_accuracy.png"
 heatmap_name = "1_heatmap.png"
-
-# n_F2_name = "1_n_F2.tex"
 n_cat_name = "1_n_cat.tex"
-
-# Load the default simulation options
-opts = DCCR.load_sim_opts()
 
 # -----------------------------------------------------------------------------
 # EXPERIMENT SETUP
 # -----------------------------------------------------------------------------
+
+# Load the default simulation options
+opts = DCCR.load_sim_opts(opts_file)
 
 # Load the data names and class labels from the selection
 data_dirs, class_labels = DCCR.get_orbit_names(opts["data_selection"])
