@@ -108,6 +108,43 @@ function dist_exp_parse()
     return parse_args(s)
 end
 
-function load_ddvfa_opts()
-    return
+"""
+Loads the provided options YAML file.
+
+# Arguments
+- `file::AbstractString`: the YAML file to load.
+"""
+function load_opts(file::AbstractString)
+    # Point to the default location of the file
+    full_path = projectdir("opts", file)
+    # Load the YAML options file as a string-keyed dictionary
+    file_opts = YAML.load_file(full_path, dicttype=Dict{String, Any})
+    # Return the dictionary
+    return file_opts
+end
+
+"""
+Loads and returns the simulation options from the provided YAML file.
+
+# Arguments
+- `file::AbstractString="default.yml"`: options the file to load from the options directory.
+"""
+function load_sim_opts(file::AbstractString="default.yml")
+    # Load the options dict
+    opts_dict = load_opts(file)
+
+    # Parse the DDVFA options
+    dd = opts_dict["opts_DDVFA"]
+    opts = opts_DDVFA(
+        gamma = dd["gamma"],
+        gamma_ref = dd["gamma_ref"],
+        rho_lb = dd["rho_lb"],
+        rho_ub = dd["rho_ub"],
+        similarity = Symbol(dd["similarity"]),
+    )
+
+    # Overwrite the dictionary entry with the actual options
+    opts_dict["opts_DDVFA"] = opts
+
+    return opts_dict
 end

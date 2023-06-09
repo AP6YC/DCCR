@@ -70,45 +70,21 @@ sim_params = Dict{String, Any}(
     sweep_results_dir(args...) = DCCR.unpacked_dir(experiment_top, "sweep", args...)
     mkpath(sweep_results_dir())
 
-    # Select which data entries to use for the experiment
-    data_selection = [
-        "dot_dusk",
-        "dot_morning",
-        # "emahigh_dusk",
-        # "emahigh_morning",
-        "emalow_dusk",
-        "emalow_morning",
-        "pr_dusk",
-        "pr_morning",
-    ]
-
-    # Create the DDVFA options
-    opts = opts_DDVFA(
-        gamma = 5.0,
-        gamma_ref = 1.0,
-        rho_lb = 0.45,
-        rho_ub = 0.7,
-        similarity = :single,
-    )
-
-    # Sigmoid input scaling
-    scaling = 2.0
-
-    # Plotting DPI
-    # dpi = 350
+    # Load the default simulation options
+    opts = DCCR.load_sim_opts()
 
     # Load the data names and class labels from the selection
-    data_dirs, class_labels = DCCR.get_orbit_names(data_selection)
+    data_dirs, class_labels = DCCR.get_orbit_names(opts["data_selection"])
 
     # Number of classes
     n_classes = length(data_dirs)
 
     # Load the orbits
     @info "Worker $(myid()): loading data"
-    data = DCCR.load_orbits(data_dir, data_dirs, scaling)
+    data = DCCR.load_orbits(data_dir, data_dirs, opts["scaling"])
 
     # Define a single-parameter function for pmap
-    local_sim(dict) = DCCR.shuffled_mc(dict, data, opts)
+    local_sim(dict) = DCCR.shuffled_mc(dict, data, opts["opts_DDVFA"])
 
 end
 

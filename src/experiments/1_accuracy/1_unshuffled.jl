@@ -38,45 +38,24 @@ heatmap_name = "1_heatmap.png"
 # n_F2_name = "1_n_F2.tex"
 n_cat_name = "1_n_cat.tex"
 
-# Select which data entries to use for the experiment
-data_selection = [
-    "dot_dusk",
-    "dot_morning",
-    # "emahigh_dusk",
-    # "emahigh_morning",
-    "emalow_dusk",
-    "emalow_morning",
-    "pr_dusk",
-    "pr_morning",
-]
-
-# Create the DDVFA options
-opts = opts_DDVFA(
-    gamma = 5.0,
-    gamma_ref = 1.0,
-    rho_lb = 0.45,
-    rho_ub = 0.7,
-    similarity = :single,
-)
-
-# Sigmoid input scaling
-scaling = 2.0
+# Load the default simulation options
+opts = DCCR.load_sim_opts()
 
 # -----------------------------------------------------------------------------
 # EXPERIMENT SETUP
 # -----------------------------------------------------------------------------
 
 # Load the data names and class labels from the selection
-data_dirs, class_labels = DCCR.get_orbit_names(data_selection)
+data_dirs, class_labels = DCCR.get_orbit_names(opts["data_selection"])
 
 # Number of classes
 n_classes = length(data_dirs)
 
 # Load the data
-data = DCCR.load_orbits(DCCR.data_dir, data_dirs, scaling)
+data = DCCR.load_orbits(DCCR.data_dir, data_dirs, opts["scaling"])
 
 # Create the DDVFA module and set the data config
-ddvfa = DDVFA(opts)
+ddvfa = DDVFA(opts["opts_DDVFA"])
 ddvfa.config = DataConfig(0, 1, 128)
 
 # -----------------------------------------------------------------------------

@@ -51,12 +51,13 @@ using
     ProgressMeter,          # Progress bars
     PyCall,                 # PyObject
     StatsBase,
-    StatsPlots,              # groupedbar
-    YAML
+    StatsPlots              # groupedbar
 
 # using HDF5              # Loading .h5 activation files
 
-import Tar
+import
+    Tar,
+    YAML
 
 # Precompile concrete type methods
 using PrecompileSignatures: @precompile_signatures
