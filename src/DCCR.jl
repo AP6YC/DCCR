@@ -33,6 +33,8 @@ using Reexport              # Reexport submodule exports
 @reexport using DataFrames          # DataFrame
 @reexport using Latexify            # latexify
 @reexport using Random              # Random subsequence
+@reexport using StatsBase           # mean
+@reexport using Plots               # Plotting
 
 # Full usings (which supports comma-separated import notation)
 using
@@ -47,10 +49,8 @@ using
     MLBase,                 # confusmat
     MLDataUtils,            # stratifiedobs
     NumericalTypeAliases,   # RealMatrix, IntegerVector, etc.
-    Plots,                  # Plotting
     ProgressMeter,          # Progress bars
     PyCall,                 # PyObject
-    StatsBase,
     StatsPlots              # groupedbar
 
 # using HDF5              # Loading .h5 activation files

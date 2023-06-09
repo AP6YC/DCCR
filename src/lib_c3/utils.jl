@@ -5,17 +5,9 @@
 This file contains utilities for file handling and results saving.
 """
 
-# Results directories (local and paper)
-"""
-`DrWatson`-style local results directory.
-"""
-results_dir(args...) = projectdir("work", "results", args...)
-
-"""
-`DrWatson`-style paper results directory.
-"""
-paper_results_dir(args...) = joinpath("C:\\", "Users", "Sasha", "Dropbox", "Apps", "Overleaf", "Paper-MST-TDY-C3-V3-Resubmission", "images", "results", args...)
-# paper_results_dir(args...) = joinpath("C:\\", "Users", "sap62", "Dropbox", "Apps", "Overleaf", "Paper-MST-TDY-C3-V3-Resubmission", "images", "results", experiment_top, args...)
+# -----------------------------------------------------------------------------
+# CONSTANTS
+# -----------------------------------------------------------------------------
 
 """
 Common doc: directory string to save to.
@@ -56,6 +48,22 @@ const SAVE_MAP = Dict(
     "table" => :_save_dccr_table,
 )
 
+# -----------------------------------------------------------------------------
+# FUNCTIONS
+# -----------------------------------------------------------------------------
+
+# Results directories (local and paper)
+"""
+`DrWatson`-style local results directory.
+"""
+results_dir(args...) = projectdir("work", "results", args...)
+
+"""
+`DrWatson`-style paper results directory.
+"""
+paper_results_dir(args...) = joinpath("C:\\", "Users", "Sasha", "Dropbox", "Apps", "Overleaf", "Paper-MST-TDY-C3-V3-Resubmission", "images", "results", args...)
+# paper_results_dir(args...) = joinpath("C:\\", "Users", "sap62", "Dropbox", "Apps", "Overleaf", "Paper-MST-TDY-C3-V3-Resubmission", "images", "results", experiment_top, args...)
+
 """
 Saving function for results in the DCCR project.
 
@@ -84,6 +92,7 @@ end
 Parses the command line for common options in distributed experiments.
 """
 function dist_exp_parse()
+    # Set up the parse settings
     s = ArgParseSettings(
         description = "A distributed experiment script",
         commands_are_required = false,
@@ -91,6 +100,7 @@ function dist_exp_parse()
         add_version = true
     )
 
+    # Set up the arguments table
     @add_arg_table! s begin
         "--procs", "-p"
             help = "number of parallel processes"

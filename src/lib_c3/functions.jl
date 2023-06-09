@@ -255,11 +255,11 @@ function get_deindexed_data(data::DataSplitIndexed, order::IntegerVector)
     train_y = Array{Int}(undef, 0)
     train_labels = Vector{String}()
 
-    val_x = Array{Float64}(undef, 128, 0)
+    val_x = Array{Float64}(undef, dim, 0)
     val_y = Array{Int}(undef, 0)
     val_labels = Vector{String}()
 
-    test_x = Array{Float64}(undef, 128, 0)
+    test_x = Array{Float64}(undef, dim, 0)
     test_y = Array{Int}(undef, 0)
     test_labels = Vector{String}()
 

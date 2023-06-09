@@ -14,21 +14,23 @@ Timeline:
 """
 
 # -----------------------------------------------------------------------------
-# FILE SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
 using Revise
 using DrWatson
-
-# Experiment save directory name
-experiment_top = "3_shuffled_mc"
-
-# Run the common setup methods (data paths, etc.)
-include(projectdir("src", "setup.jl"))
+@quickactivate :DCCR
 
 # -----------------------------------------------------------------------------
 # OPTIONS
 # -----------------------------------------------------------------------------
+
+# Experiment save directory name
+experiment_top = "3_shuffled_mc"
+# Flag for saving to paper results directory
+SAVE_TO_PAPER_DIR = false
+# Flag for displaying plots
+DISPLAY = false
 
 # Plot file names
 n_w_plot_name = "3_n_w.png"
@@ -38,8 +40,11 @@ heatmap_plot_name = "3_heatmap.png"
 
 # Point to the local sweep data directory
 # sweep_dir = projectdir("work", "results", "3_shuffled_mc", "sweep")
-safe_unpack(experiment_top)
-sweep_dir = unpacked_dir(experiment_top, "sweep")
+DCCR.safe_unpack(experiment_top)
+sweep_dir = DCCR.unpacked_dir(experiment_top, "sweep")
+
+# Load the default simulation options
+opts = DCCR.load_sim_opts()
 
 # -----------------------------------------------------------------------------
 # LOAD RESULTS
@@ -49,20 +54,8 @@ sweep_dir = unpacked_dir(experiment_top, "sweep")
 df = collect_results!(sweep_dir)
 # df = collect_results(sweep_dir)
 
-# Select which data entries to use for the experiment
-data_selection = [
-    "dot_dusk",
-    "dot_morning",
-    # "emahigh_dusk",
-    # "emahigh_morning",
-    "emalow_dusk",
-    "emalow_morning",
-    "pr_dusk",
-    "pr_morning",
-]
-
 # Load the data names and class labels from the selection
-data_dirs, class_labels = get_orbit_names(data_selection)
+data_dirs, class_labels = DCCR.get_orbit_names(opts["data_selection"])
 
 # df_high = filter(row -> row[:test_perf] > 0.97, df)
 # df_high[:, Not([:method, :arch, :path])]
@@ -72,39 +65,35 @@ data_dirs, class_labels = get_orbit_names(data_selection)
 # -----------------------------------------------------------------------------
 
 # Total number of weights
-n_w_matrix = df_column_to_matrix(df, :n_w)
-p_w = create_boxplot(n_w_matrix, class_labels)
+n_w_matrix = DCCR.df_column_to_matrix(df, :n_w)
+p_w = DCCR.create_boxplot(n_w_matrix, class_labels)
 ylabel!("# Weights")
-display(p_w)
+DISPLAY && display(p_w)
 # Save the plot
-savefig(p_w, results_dir(n_w_plot_name))
-savefig(p_w, paper_results_dir(n_w_plot_name))
+DCCR.save_dccr("figure", p_w, experiment_top, n_w_plot_name, to_paper=SAVE_TO_PAPER_DIR)
+
 
 # Number of F2 nodes
-n_F2_matrix = df_column_to_matrix(df, :n_F2)
-p_F2 = create_boxplot(n_F2_matrix, class_labels)
+n_F2_matrix = DCCR.df_column_to_matrix(df, :n_F2)
+p_F2 = DCCR.create_boxplot(n_F2_matrix, class_labels)
 ylabel!("# F2 Nodes")
-display(p_F2)
+DISPLAY && display(p_F2)
 # Save the plot
-savefig(p_F2, results_dir(n_F2_plot_name))
-savefig(p_F2, paper_results_dir(n_F2_plot_name))
+DCCR.save_dccr("figure", p_F2, experiment_top, n_F2_plot_name, to_paper=SAVE_TO_PAPER_DIR)
 
 # Testing performance
-perf_matrix = df_column_to_matrix(df, :a_te)
-p_perf = create_boxplot(perf_matrix, class_labels, percentages=true)
+perf_matrix = DCCR.df_column_to_matrix(df, :a_te)
+p_perf = DCCR.create_boxplot(perf_matrix, class_labels, percentages=true)
 ylabel!("Context Testing Accuracy")
-display(p_perf)
+DISPLAY && display(p_perf)
 # Save the plot
-savefig(p_perf, results_dir(perf_plot_name))
-savefig(p_perf, paper_results_dir(perf_plot_name))
+DCCR.save_dccr("figure", p_perf, experiment_top, perf_plot_name, to_paper=SAVE_TO_PAPER_DIR)
 
 # Normalized confusion heatmap
 # norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
 norm_cm_df = df[:, :norm_cm]
 norm_cm = mean(norm_cm_df)
-h = create_custom_confusion_heatmap(class_labels, norm_cm)
-display(h)
-
+h = DCCR.create_custom_confusion_heatmap(class_labels, norm_cm)
+DISPLAY && display(h)
 # Save the heatmap to both the local and paper results directories
-savefig(h, results_dir(heatmap_plot_name))
-savefig(h, paper_results_dir(heatmap_plot_name))
+DCCR.save_dccr("figure", h, experiment_top, heatmap_plot_name, to_paper=SAVE_TO_PAPER_DIR)
