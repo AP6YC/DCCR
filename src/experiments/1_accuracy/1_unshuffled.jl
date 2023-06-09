@@ -27,12 +27,6 @@ using DrWatson
 # Experiment save directory name
 experiment_top = "1_accuracy"
 
-# Flag for saving to paper results directory
-SAVE_TO_PAPER_DIR = false
-
-# Flag for displaying plots
-DISPLAY = false
-
 # Simulation options
 opts_file = "default.yml"
 
@@ -40,6 +34,15 @@ opts_file = "default.yml"
 plot_name = "1_accuracy.png"
 heatmap_name = "1_heatmap.png"
 n_cat_name = "1_n_cat.tex"
+
+# -----------------------------------------------------------------------------
+# PARSE ARGS
+# -----------------------------------------------------------------------------
+
+# Parse the arguments provided to this script
+pargs = DCCR.exp_parse(
+    "1_accuracy: unshuffled condensed scenario"
+)
 
 # -----------------------------------------------------------------------------
 # EXPERIMENT SETUP
@@ -83,10 +86,10 @@ perf_test = performance(y_hat, data.test.y)
 
 # Create an accuracy grouped bar chart
 p = DCCR.create_accuracy_groupedbar(data, y_hat_train, y_hat, class_labels, percentages=true)
-DISPLAY && display(p)
+pargs["display"] && display(p)
 
 # Save the plot
-DCCR.save_dccr("figure", p, experiment_top, plot_name, to_paper=SAVE_TO_PAPER_DIR)
+DCCR.save_dccr("figure", p, experiment_top, plot_name, to_paper=pargs["paper"])
 
 # -----------------------------------------------------------------------------
 # CATEGORY ANALYSIS
@@ -102,7 +105,7 @@ df = DataFrame(F2 = n_F2, Total = n_categories)
 table = latexify(df, env=:table)
 
 # Save the categories table to both the local and paper results directories
-DCCR.save_dccr("table", table, experiment_top, n_cat_name, to_paper=SAVE_TO_PAPER_DIR)
+DCCR.save_dccr("table", table, experiment_top, n_cat_name, to_paper=pargs["paper"])
 
 # -----------------------------------------------------------------------------
 # CONFUSION HEATMAP
@@ -111,7 +114,7 @@ DCCR.save_dccr("table", table, experiment_top, n_cat_name, to_paper=SAVE_TO_PAPE
 # Normalized confusion heatmap
 # norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
 h = DCCR.create_confusion_heatmap(class_labels, data.test.y, y_hat)
-DISPLAY && display(h)
+pargs["display"] && display(h)
 
 # Save the heatmap to both the local and paper results directories
-DCCR.save_dccr("figure", h, experiment_top, heatmap_name, to_paper=SAVE_TO_PAPER_DIR)
+DCCR.save_dccr("figure", h, experiment_top, heatmap_name, to_paper=pargs["paper"])

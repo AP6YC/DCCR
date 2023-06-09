@@ -32,7 +32,6 @@ using Distributed
 
 pargs = DCCR.dist_exp_parse()
 
-
 if pargs[PROCS] > 0
     # Start several processes
     addprocs(pargs[PROCS], exeflags="--project=.")
