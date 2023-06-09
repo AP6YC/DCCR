@@ -1,8 +1,8 @@
 """
     3_shuffled_mc.jl
 
-Description:
-    This script runs a Monte Carlo simulation of the simple shuffled train/test
+# Description
+This script runs a Monte Carlo simulation of the simple shuffled train/test
 scenario in parallel. Because each process does a lot of work, `pmap`` is used,
 requiring every process to be spawned ahead of time and passed the necessary
 function definitions to run each simulation.
@@ -11,25 +11,43 @@ function definitions to run each simulation.
 them down after. This is done to reduce precompilation in each process during
 development.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
-
-Timeline:
-- 1/17/2022: Created.
-- 2/17/2022: Documented.
 """
 
+# -----------------------------------------------------------------------------
+# PREAMBLE
+# -----------------------------------------------------------------------------
+
 # Start several processes
-using Distributed
+# using Distributed
 # addprocs(3, exeflags="--project=.")
 # Close the workers after simulation
 # rmprocs(workers())
 
+using Revise
+using DrWatson
+using Distributed
+@quickactivate :DCCR
+
+pargs = DCCR.dist_exp_parse()
+
+
+if pargs[PROCS] > 0
+    # Start several processes
+    addprocs(pargs[PROCS], exeflags="--project=.")
+end
+
 # Set the simulation parameters
 sim_params = Dict{String, Any}(
     "m" => "ddvfa",
-    "seed" => collect(1:1000)
+    "seed" => collect(1:pargs[N_SIMS]),
+    # "seed" => collect(1:1000)
 )
+
+# -----------------------------------------------------------------------------
+# PARALLEL DEFINITIONS
+# -----------------------------------------------------------------------------
 
 @everywhere begin
     # Activate the project in case
@@ -44,12 +62,12 @@ sim_params = Dict{String, Any}(
     experiment_top = "3_shuffled_mc"
 
     # Run the common setup methods (data paths, etc.)
-    include(projectdir("src", "setup.jl"))
+    # include(projectdir("src", "setup.jl"))
 
     # Make a path locally just for the sweep results
     # sweep_results_dir(args...) = results_dir("sweep", args...)
     # sweep_results_dir(args...) = projectdir("work", "data", experiment_top, "sweep", args...)
-    sweep_results_dir(args...) = unpacked_dir(experiment_top, "sweep", args...)
+    sweep_results_dir(args...) = DCCR.unpacked_dir(experiment_top, "sweep", args...)
     mkpath(sweep_results_dir())
 
     # Select which data entries to use for the experiment
@@ -77,20 +95,20 @@ sim_params = Dict{String, Any}(
     scaling = 2.0
 
     # Plotting DPI
-    dpi = 350
+    # dpi = 350
 
     # Load the data names and class labels from the selection
-    data_dirs, class_labels = get_orbit_names(data_selection)
+    data_dirs, class_labels = DCCR.get_orbit_names(data_selection)
 
     # Number of classes
     n_classes = length(data_dirs)
 
     # Load the orbits
     @info "Worker $(myid()): loading data"
-    data = load_orbits(data_dir, data_dirs, scaling)
+    data = DCCR.load_orbits(data_dir, data_dirs, scaling)
 
     # Define a single-parameter function for pmap
-    local_sim(dict) = shuffled_mc(dict, data, opts)
+    local_sim(dict) = DCCR.shuffled_mc(dict, data, opts)
 
 end
 

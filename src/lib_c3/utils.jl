@@ -79,3 +79,35 @@ function save_dccr(type::AbstractString, object, exp_name::AbstractString, save_
         eval(SAVE_MAP[type])(object, paper_results_dir(exp_name, save_name))
     end
 end
+
+"""
+Parses the command line for common options in distributed experiments.
+"""
+function dist_exp_parse()
+    s = ArgParseSettings(
+        description = "A distributed experiment script",
+        commands_are_required = false,
+        version = string(DCCR_VERSION),
+        add_version = true
+    )
+
+    @add_arg_table! s begin
+        "--procs", "-p"
+            help = "number of parallel processes"
+            arg_type = Int
+            default = 0
+        "--n_sims", "-n"
+            help = "the number of simulations to run"
+            arg_type = Int
+            default = 1
+        "--verbose", "-v"
+            help = "verbose output"
+            action = :store_true
+    end
+
+    return parse_args(s)
+end
+
+function load_ddvfa_opts()
+    return
+end

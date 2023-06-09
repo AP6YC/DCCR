@@ -36,11 +36,13 @@ using Reexport              # Reexport submodule exports
 
 # Full usings (which supports comma-separated import notation)
 using
+    ArgParse,               # ArgParseSettings
     DataStructures,         # Dequeue
+    Dates,                  # Dates.format
     DelimitedFiles,
     DocStringExtensions,    # Docstring utilities
     DrWatson,               # Scientific project commands
-    JSON                    # JSON file load/save
+    JSON,                   # JSON file load/save
     Logging,                # Printing diagnostics
     MLBase,                 # confusmat
     MLDataUtils,            # stratifiedobs
@@ -49,7 +51,8 @@ using
     ProgressMeter,          # Progress bars
     PyCall,                 # PyObject
     StatsBase,
-    StatsPlots              # groupedbar
+    StatsPlots,              # groupedbar
+    YAML
 
 # using HDF5              # Loading .h5 activation files
 
