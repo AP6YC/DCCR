@@ -1,57 +1,64 @@
 """
     4_analyze_complex_alt.jl
 
-Description:
-    This script analyzes a complex single condensed scenario iteration.
+# Description
+This script analyzes a complex single condensed scenario iteration.
 This script is updated to use the updated full condensed scenario plot.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
-
-Timeline:
-- 1/26/2022: Created.
-- 2/17/2022: Documented.
 """
 
 # -----------------------------------------------------------------------------
-# FILE SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-using Revise            # Editing this file
-using DrWatson          # Project directory functions, etc.
+using Revise
+using DrWatson
+@quickactivate :DCCR
+
+# -----------------------------------------------------------------------------
+# ADDITIONAL DEPENDENCIES
+# -----------------------------------------------------------------------------
 
 using JLD2
-
-# Experiment save directory name
-experiment_top = "4_condensed"
-
-# Run the common setup methods (data paths, etc.)
-include(projectdir("src", "setup.jl"))
 
 # -----------------------------------------------------------------------------
 # OPTIONS
 # -----------------------------------------------------------------------------
 
+# Experiment save directory name
+experiment_top = "4_condensed"
+
 # Saving names
 plot_name = "4_condensed_complex_alt.png"
 
 # Load name
-data_file = results_dir("condensed_complex_data.jld2")
+data_file = DCCR.results_dir(experiment_top, "condensed_complex_data.jld2")
+
+# -----------------------------------------------------------------------------
+# PARSE ARGS
+# -----------------------------------------------------------------------------
+
+# Parse the arguments provided to this script
+pargs = DCCR.exp_parse(
+    "4_analyze_complex_alt: full condensed scenario plot."
+)
 
 # -----------------------------------------------------------------------------
 # LOAD DATA
 # -----------------------------------------------------------------------------
 
-perfs, vals, class_labels = load(data_file, "perfs", "vals", "class_labels")
+# Load the data used for generating the condensed scenario plot
+perfs, vals, class_labels = JLD2.load(data_file, "perfs", "vals", "class_labels")
 
 # -----------------------------------------------------------------------------
 # PLOTTING
 # -----------------------------------------------------------------------------
 
 # p = create_condensed_plot(perfs, class_labels)
-p, training_vals, x_training_vals = create_complex_condensed_plot_alt(perfs, vals, class_labels)
-display(p)
+p, training_vals, x_training_vals = DCCR.create_complex_condensed_plot_alt(perfs, vals, class_labels)
+pargs["display"] && display(p)
 
 # Save the plot
-savefig(p, results_dir(plot_name))
-savefig(p, paper_results_dir(plot_name))
+DCCR.save_dccr("figure", p, experiment_top, plot_name, to_paper=pargs["paper"])

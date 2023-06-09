@@ -94,7 +94,7 @@ const ARG_ARG_DESCRIPTION = """
 """
 
 """
-Common function for how ArgParseSettings are generated in the project.
+Common function for how `ArgParseSettings` are generated in the project.
 
 $ARG_ARG_DESCRIPTION
 """
