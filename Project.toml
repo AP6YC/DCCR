@@ -45,6 +45,7 @@ YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
 [compat]
 AdaptiveResonance = "0.8"
+ArgParse = "1"
 Arrow = "2"
 CSV = "0.10"
 ColorSchemes = "3"
