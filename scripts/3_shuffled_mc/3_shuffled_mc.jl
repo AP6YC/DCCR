@@ -36,8 +36,12 @@ pargs = DCCR.dist_exp_parse(
     "3_shuffled_mc: simple shuffled train/test Monte Carlo."
 )
 
+# -----------------------------------------------------------------------------
+# SETUP
+# -----------------------------------------------------------------------------
+
+# Start several processes
 if pargs["procs"] > 0
-    # Start several processes
     addprocs(pargs["procs"], exeflags="--project=.")
 end
 

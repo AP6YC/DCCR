@@ -17,12 +17,6 @@ using Revise
 using DCCR
 
 # -----------------------------------------------------------------------------
-# ADDITIONAL DEPENDENCIES
-# -----------------------------------------------------------------------------
-
-using JLD2
-
-# -----------------------------------------------------------------------------
 # OPTIONS
 # -----------------------------------------------------------------------------
 
@@ -52,7 +46,7 @@ pargs = DCCR.exp_parse(
 # -----------------------------------------------------------------------------
 
 # Load the data used for generating the condensed scenario plot
-perfs, vals, class_labels = JLD2.load(data_file, "perfs", "vals", "class_labels")
+perfs, vals, class_labels = DCCR.load_sim_results(data_file, "perfs", "vals", "class_labels")
 
 # -----------------------------------------------------------------------------
 # PLOTTING
@@ -61,7 +55,7 @@ perfs, vals, class_labels = JLD2.load(data_file, "perfs", "vals", "class_labels"
 # Alternative simplified condensed scenario plot
 # p = create_condensed_plot(perfs, class_labels)
 p, training_vals, x_training_vals = DCCR.create_complex_condensed_plot_alt(perfs, vals, class_labels)
-pargs["display"] && display(p)
+DCCR.handle_display(p, pargs)
 
 # Save the plot
 DCCR.save_dccr("figure", p, experiment_top, plot_name, to_paper=pargs["paper"])

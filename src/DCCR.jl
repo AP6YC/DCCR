@@ -44,6 +44,7 @@ using
     DelimitedFiles,
     DocStringExtensions,    # Docstring utilities
     DrWatson,               # Scientific project commands
+    JLD2,                   # JLD2.load
     JSON,                   # JSON file load/save
     Logging,                # Printing diagnostics
     MLBase,                 # confusmat

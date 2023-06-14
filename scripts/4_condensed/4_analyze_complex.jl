@@ -13,14 +13,7 @@ This script analyzes a complex single condensed scenario iteration.
 # -----------------------------------------------------------------------------
 
 using Revise
-using DrWatson
-@quickactivate :DCCR
-
-# -----------------------------------------------------------------------------
-# ADDITIONAL DEPENDENCIES
-# -----------------------------------------------------------------------------
-
-using JLD2
+using DCCR
 
 # -----------------------------------------------------------------------------
 # OPTIONS
@@ -49,7 +42,7 @@ pargs = DCCR.exp_parse(
 # -----------------------------------------------------------------------------
 
 # Load the data used for generating the condensed scenario plot
-perfs, vals, class_labels = JLD2.load(data_file, "perfs", "vals", "class_labels")
+perfs, vals, class_labels = DCCR.load_sim_results(data_file, "perfs", "vals", "class_labels")
 
 # -----------------------------------------------------------------------------
 # PLOTTING
@@ -58,7 +51,7 @@ perfs, vals, class_labels = JLD2.load(data_file, "perfs", "vals", "class_labels"
 # Simplified condensed scenario plot
 # p = create_condensed_plot(perfs, class_labels)
 p, plot_data = DCCR.create_complex_condensed_plot(perfs, vals, class_labels)
-pargs["display"] && display(p)
+DCCR.handle_display(p, pargs)
 
 # Save the plot
 DCCR.save_dccr("figure", p, experiment_top, plot_name, to_paper=pargs["paper"])
