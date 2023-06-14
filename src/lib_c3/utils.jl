@@ -233,3 +233,15 @@ function load_sim_results(data_file::AbstractString, args...)
     # Load and return the tuple of entries from the data file
     return JLD2.load(data_file, args...)
 end
+
+# """
+# Wrapper for saving simulation results with arbitrarily many fields.
+
+# # Arguments
+# - `data_file::AbstractString`: the location of the datafile for saving.
+# - `args...`: the variables to save.
+# """
+# function save_sim_results(data_file::AbstractString, args...)
+#     # Save the data
+#     jldsave(data_file; args...)
+# end

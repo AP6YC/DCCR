@@ -1,82 +1,61 @@
 """
     4_condensed.jl
 
-Description:
-    This script runs a single condensed scenario iteration.
+# Description
+This script runs a single condensed scenario iteration.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
-
-Timeline:
-- 1/18/2022: Created.
-- 2/17/2022: Documented.
 """
 
 # -----------------------------------------------------------------------------
-# FILE SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-using Revise            # Editing this file
-using DrWatson          # Project directory functions, etc.
-
-# Experiment save directory name
-experiment_top = "4_condensed"
-
-# Run the common setup methods (data paths, etc.)
-include(projectdir("src", "setup.jl"))
+using Revise
+using DCCR
 
 # -----------------------------------------------------------------------------
 # OPTIONS
 # -----------------------------------------------------------------------------
 
+# Experiment save directory name
+experiment_top = "4_condensed"
+
 # Saving names
 plot_name = "4_condensed.png"
 # plot_name_2 = "4_condensed_2.png"
 
-# Select which data entries to use for the experiment
-data_selection = [
-    "dot_dusk",
-    "dot_morning",
-    # "emahigh_dusk",
-    # "emahigh_morning",
-    "emalow_dusk",
-    "emalow_morning",
-    "pr_dusk",
-    "pr_morning",
-]
+# -----------------------------------------------------------------------------
+# PARSE ARGS
+# -----------------------------------------------------------------------------
 
-
-# Create the DDVFA options
-opts = opts_DDVFA(
-    gamma = 5.0,
-    gamma_ref = 1.0,
-    # rho=0.45,
-    rho_lb = 0.45,
-    rho_ub = 0.7,
-    similarity = :single,
+# Parse the arguments provided to this script
+pargs = DCCR.exp_parse(
+    "4_condensed: a single condensed scenario iteration."
 )
-
-# Sigmoid input scaling
-scaling = 2.0
 
 # -----------------------------------------------------------------------------
 # EXPERIMENT SETUP
 # -----------------------------------------------------------------------------
 
+# Load the default simulation options
+opts = DCCR.load_sim_opts(opts_file)
+
 # Load the data names and class labels from the selection
-data_dirs, class_labels = get_orbit_names(data_selection)
+data_dirs, class_labels = DCCR.get_orbit_names(opts["data_selection"])
 
 # Number of classes
 n_classes = length(data_dirs)
 
 # Load the data
-data = load_orbits(data_dir, data_dirs, scaling)
+data = DCCR.load_orbits(DCCR.data_dir, data_dirs, opts["scaling"])
 
 # Sort/reload the data as indexed components
-data_indexed = get_indexed_data(data)
+data_indexed = DCCR.get_indexed_data(data)
 
 # Create the DDVFA module and set the data config
-ddvfa = DDVFA(opts)
+ddvfa = DDVFA(opts["opts_DDVFA"])
 ddvfa.config = DataConfig(0, 1, 128)
 
 # -----------------------------------------------------------------------------
@@ -85,7 +64,7 @@ ddvfa.config = DataConfig(0, 1, 128)
 
 # Get the data dimensions
 dim, n_train = size(data.train.x)
-_, n_test = size(data.test_x)
+_, n_test = size(data.test.x)
 
 # Create the estimate containers
 perfs = [[] for i = 1:n_classes]
@@ -98,12 +77,12 @@ end
 # Iterate over each class
 for i = 1:n_classes
     # _, n_samples_local = size(data_indexed.train_x[i])
-    train!(ddvfa, data_indexed.train_x[i], y=data_indexed.train_y[i])
+    train!(ddvfa, data_indexed.train.x[i], y=data_indexed.train.y[i])
 
     # Test over each class
     for j = 1:n_classes
-        local_y_hat = AdaptiveResonance.classify(ddvfa, data_indexed.test_x[j], get_bmu=true)
-        push!(perfs[j], performance(local_y_hat, data_indexed.test_y[j]))
+        local_y_hat = AdaptiveResonance.classify(ddvfa, data_indexed.test.x[j], get_bmu=true)
+        push!(perfs[j], performance(local_y_hat, data_indexed.test.y[j]))
     end
 end
 
@@ -112,9 +91,8 @@ end
 # -----------------------------------------------------------------------------
 
 # Simplified condensed scenario plot
-p = create_condensed_plot(perfs, class_labels)
-display(p)
+p = DCCR.create_condensed_plot(perfs, class_labels)
+DCCR.handle_display(p, pargs)
 
 # Save the plot
-savefig(p, results_dir(plot_name))
-savefig(p, paper_results_dir(plot_name))
+DCCR.save_dccr("figure", p, experiment_top, plot_name, to_paper=pargs["paper"])
