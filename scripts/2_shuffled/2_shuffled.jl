@@ -56,13 +56,10 @@ n_classes = length(data_dirs)
 
 # Load the orbit data
 data = DCCR.load_orbits(DCCR.data_dir, data_dirs, opts["scaling"])
+# Shuffle the training data
+data = DCCR.shuffle_orbits(data)
 
-i_train = randperm(length(data.train.y))
-local_x = data.train.x[:, i_train]
-local_y = data.train.y[i_train]
-
-# (X_train, y_train), (X_test, y_test) = stratifiedobs((data, targets))
-
+# Instantiate and setup the DDVFA module
 ddvfa = DDVFA(opts["opts_DDVFA"])
 ddvfa.config = DataConfig(0, 1, 128)
 
@@ -71,11 +68,13 @@ ddvfa.config = DataConfig(0, 1, 128)
 # -----------------------------------------------------------------------------
 
 # Train in batch
-y_hat_train = train!(ddvfa, local_x, y=local_y)
+# y_hat_train = train!(ddvfa, local_x, y=local_y)
+y_hat_train = train!(ddvfa, data.train.x, y=data.train.y)
 y_hat = AdaptiveResonance.classify(ddvfa, data.test.x, get_bmu=true)
 
 # Calculate performance on training data, testing data, and with get_bmu
-perf_train = performance(y_hat_train, local_y)
+# perf_train = performance(y_hat_train, local_y)
+perf_train = performance(y_hat_train, data.train.y)
 perf_test = performance(y_hat, data.test.y)
 
 # Format each performance number for comparison
