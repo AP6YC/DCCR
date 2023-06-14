@@ -1,5 +1,5 @@
 # Logging ignores
-src/experiments/9_l2metrics/l2logger_template/logs_simple/
+scripts/9_l2metrics/l2logger_template/logs_simple/
 
 # Development folder
 dev/
