@@ -1,16 +1,12 @@
 """
     3_analyze.jl
 
-Description:
-    This script takes the results of the Monte Carlo of shuffled simulations
+# Description
+This script takes the results of the Monte Carlo of shuffled simulations
 and generates plots of their statistics.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
-
-Timeline:
-- 1/17/2022: Created.
-- 2/17/2022: Documented.
 """
 
 # -----------------------------------------------------------------------------
@@ -18,6 +14,7 @@ Timeline:
 # -----------------------------------------------------------------------------
 
 using Revise
+using DrWatson
 using DCCR
 
 # -----------------------------------------------------------------------------
@@ -26,12 +23,6 @@ using DCCR
 
 # Experiment save directory name
 experiment_top = "3_shuffled_mc"
-
-# Flag for saving to paper results directory
-pargs["paper"] = false
-
-# Flag for displaying plots
-pargs["display"] = false
 
 # Simulation options
 opts_file = "default.yml"
@@ -86,17 +77,16 @@ n_w_matrix = DCCR.df_column_to_matrix(df, :n_w)
 p_w = DCCR.create_boxplot(n_w_matrix, class_labels)
 ylabel!("# Weights")
 # Display if the option is set
-pargs["display"] && display(p_w)
+DCCR.handle_display(p_w, pargs)
 # Save the plot
 DCCR.save_dccr("figure", p_w, experiment_top, n_w_plot_name, to_paper=pargs["paper"])
-
 
 # Number of F2 nodes
 n_F2_matrix = DCCR.df_column_to_matrix(df, :n_F2)
 p_F2 = DCCR.create_boxplot(n_F2_matrix, class_labels)
 ylabel!("# F2 Nodes")
 # Display if the option is set
-pargs["display"] && display(p_F2)
+DCCR.handle_display(p_F2, pargs)
 # Save the plot
 DCCR.save_dccr("figure", p_F2, experiment_top, n_F2_plot_name, to_paper=pargs["paper"])
 
@@ -105,7 +95,7 @@ perf_matrix = DCCR.df_column_to_matrix(df, :a_te)
 p_perf = DCCR.create_boxplot(perf_matrix, class_labels, percentages=true)
 ylabel!("Context Testing Accuracy")
 # Display if the option is set
-pargs["display"] && display(p_perf)
+DCCR.handle_display(p_perf, pargs)
 # Save the plot
 DCCR.save_dccr("figure", p_perf, experiment_top, perf_plot_name, to_paper=pargs["paper"])
 
@@ -115,6 +105,6 @@ norm_cm_df = df[:, :norm_cm]
 norm_cm = mean(norm_cm_df)
 h = DCCR.create_custom_confusion_heatmap(class_labels, norm_cm)
 # Display if the option is set
-pargs["display"] && display(h)
+DCCR.handle_display(h, pargs)
 # Save the heatmap to both the local and paper results directories
 DCCR.save_dccr("figure", h, experiment_top, heatmap_plot_name, to_paper=pargs["paper"])

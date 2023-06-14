@@ -48,6 +48,11 @@ const SAVE_MAP = Dict(
     "table" => :_save_dccr_table,
 )
 
+"""
+Type alias for how parsed arguments are treated.
+"""
+const ParsedArgs = Dict{String, Any}
+
 # -----------------------------------------------------------------------------
 # FUNCTIONS
 # -----------------------------------------------------------------------------
@@ -123,14 +128,15 @@ function exp_parse(description::AbstractString="A DCCR experiment script.")
         "--paper", "-p"
             help = "flag for saving results to the paper directory"
             action = :store_true
-        "--display", "-d"
-            help = "flag for displaying generated figures"
+        "--no-display", "-d"
+            help = "flag for running headless, suppressing the display of generated figures"
             action = :store_true
         "--verbose", "-v"
             help = "flag for verbose output"
             action = :store_true
     end
 
+    # Parse and return the arguments
     return parse_args(s)
 end
 
@@ -158,6 +164,7 @@ function dist_exp_parse(description::AbstractString="A distributed DCCR experime
             action = :store_true
     end
 
+    # Parse and return the arguments
     return parse_args(s)
 end
 
@@ -199,5 +206,18 @@ function load_sim_opts(file::AbstractString="default.yml")
     # Overwrite the dictionary entry with the actual options
     opts_dict["opts_DDVFA"] = opts
 
+    # Return the simulation options dictionary
     return opts_dict
+end
+
+"""
+Handles the display of plots according to arguments parsed by the script.
+
+# Arguments
+- `p::Plots.Plot`: the plot handle to display if necessary.
+- `pargs::ParsedArgs`: the parsed arguments provided by the script.
+"""
+function handle_display(p::Plots.Plot, pargs::ParsedArgs)
+    # Display if the flag is low
+    !pargs["no-display"] && display(p)
 end

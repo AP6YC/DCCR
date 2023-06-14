@@ -915,7 +915,7 @@ end
 """
 Create and return a simplified condensed scenario plot.
 """
-function create_condensed_plot(perfs, class_labels, percentages=true)
+function create_condensed_plot(perfs, class_labels, percentages::Bool=true)
     # Add initial testing block to labels
     local_labels = cat("", class_labels, dims=1)
     println(local_labels)
@@ -952,7 +952,7 @@ end
 """
 Create and return a complex condensed scenario plot.
 """
-function create_complex_condensed_plot(perfs, vals, class_labels, percentages=true)
+function create_complex_condensed_plot(perfs, vals, class_labels, percentages::Bool=true)
     # Add initial testing block to labels
     local_labels = cat("", class_labels, dims=1)
     println(local_labels)
@@ -1019,7 +1019,7 @@ end
 """
 Create and return an alternate complex condensed scenario plot.
 """
-function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentages=true)
+function create_complex_condensed_plot_alt(perfs, vals, class_labels, percentages::Bool=true)
     # Reshape the labels string vector for plotting
     local_labels = reshape(class_labels, 1, length(class_labels))
     # Determine if plotting percentages or [0, 1]

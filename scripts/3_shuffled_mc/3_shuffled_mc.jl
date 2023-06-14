@@ -19,13 +19,6 @@ development.
 # PREAMBLE
 # -----------------------------------------------------------------------------
 
-# Start several processes
-# using Distributed
-# addprocs(3, exeflags="--project=.")
-# Close the workers after simulation
-# rmprocs(workers())
-
-
 using Revise
 using DCCR
 
@@ -35,19 +28,23 @@ using DCCR
 
 using Distributed
 
+# -----------------------------------------------------------------------------
+# PARSE ARGS
+# -----------------------------------------------------------------------------
 
-pargs = DCCR.dist_exp_parse()
+pargs = DCCR.dist_exp_parse(
+    "3_shuffled_mc: simple shuffled train/test Monte Carlo."
+)
 
-if pargs[PROCS] > 0
+if pargs["procs"] > 0
     # Start several processes
-    addprocs(pargs[PROCS], exeflags="--project=.")
+    addprocs(pargs["procs"], exeflags="--project=.")
 end
 
 # Set the simulation parameters
 sim_params = Dict{String, Any}(
     "m" => "ddvfa",
-    "seed" => collect(1:pargs[N_SIMS]),
-    # "seed" => collect(1:1000)
+    "seed" => collect(1:pargs["n_sims"]),
 )
 
 # -----------------------------------------------------------------------------
@@ -61,7 +58,7 @@ sim_params = Dict{String, Any}(
 
     # Modules
     using Revise            # Editing this file
-    using DrWatson          # Project directory functions, etc.
+    using DCCR
 
     # Experiment save directory name
     experiment_top = "3_shuffled_mc"
@@ -90,7 +87,6 @@ sim_params = Dict{String, Any}(
 
     # Define a single-parameter function for pmap
     local_sim(dict) = DCCR.shuffled_mc(dict, data, opts["opts_DDVFA"])
-
 end
 
 # Log the simulation scale
@@ -107,4 +103,6 @@ dicts = dict_list(sim_params)
 pmap(local_sim, dicts)
 
 # Close the workers after simulation
-# rmprocs(workers())
+if pargs["procs"] > 0
+    rmprocs(workers())
+end
