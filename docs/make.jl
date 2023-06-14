@@ -2,8 +2,10 @@
     make.jl
 
 # Description
-This file builds the documentation for the DCCR project
-using Documenter.jl and other tools.
+This file builds the documentation for the `DCCR` project using Documenter.jl and other tools.
+
+# Authors
+- Sasha Petrenko <sap625@mst.edu>
 """
 # -----------------------------------------------------------------------------
 # DEPENDENCIES

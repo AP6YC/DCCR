@@ -42,7 +42,7 @@ data_file = DCCR.results_dir(experiment_top, "condensed_complex_data.jld2")
 
 # Parse the arguments provided to this script
 pargs = DCCR.exp_parse(
-    "4_analyze_complex_alt: full condensed scenario plot."
+    "4_analyze_complex_alt: alternative full condensed scenario plot."
 )
 
 # -----------------------------------------------------------------------------

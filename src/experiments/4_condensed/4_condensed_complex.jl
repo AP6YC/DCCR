@@ -1,40 +1,39 @@
 """
     4_condensed_complex.jl
 
-Description:
-    This script runs a complex single condensed scenario iteration.
+# Description
+This script runs a complex single condensed scenario iteration.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
-
-Timeline:
-- 1/18/2022: Created.
-- 2/17/2022: Documented.
 """
 
 # -----------------------------------------------------------------------------
-# FILE SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-using Revise            # Editing this file
-using DrWatson          # Project directory functions, etc.
+using Revise
+using DrWatson
+@quickactivate :DCCR
 
-using ProgressMeter
-using JLD2
+# -----------------------------------------------------------------------------
+# ADDITIONAL DEPENDENCIES
+# -----------------------------------------------------------------------------
 
-# Experiment save directory name
-experiment_top = "4_condensed"
-
-# Run the common setup methods (data paths, etc.)
-include(projectdir("src", "setup.jl"))
+using
+    ProgressMeter,
+    JLD2
 
 # -----------------------------------------------------------------------------
 # OPTIONS
 # -----------------------------------------------------------------------------
 
+# Experiment save directory name
+experiment_top = "4_condensed"
+
 # Saving names
 # plot_name = "4_condensed_complex.png"
-data_file = results_dir("condensed_complex_data.jld2")
+data_file = DCCR.results_dir("condensed_complex_data.jld2")
 
 # Select which data entries to use for the experiment
 data_selection = [
