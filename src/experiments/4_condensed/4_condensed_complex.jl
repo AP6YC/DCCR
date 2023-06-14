@@ -13,8 +13,7 @@ This script runs a complex single condensed scenario iteration.
 # -----------------------------------------------------------------------------
 
 using Revise
-using DrWatson
-@quickactivate :DCCR
+using DCCR
 
 # -----------------------------------------------------------------------------
 # ADDITIONAL DEPENDENCIES

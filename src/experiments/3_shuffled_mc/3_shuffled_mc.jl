@@ -25,10 +25,16 @@ development.
 # Close the workers after simulation
 # rmprocs(workers())
 
+
 using Revise
-using DrWatson
+using DCCR
+
+# -----------------------------------------------------------------------------
+# ADDITIONAL DEPENDENCIES
+# -----------------------------------------------------------------------------
+
 using Distributed
-@quickactivate :DCCR
+
 
 pargs = DCCR.dist_exp_parse()
 

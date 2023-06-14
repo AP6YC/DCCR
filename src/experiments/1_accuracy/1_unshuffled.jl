@@ -17,8 +17,7 @@ containing the Overleaf document for the paper.
 # -----------------------------------------------------------------------------
 
 using Revise
-using DrWatson
-@quickactivate :DCCR
+using DCCR
 
 # -----------------------------------------------------------------------------
 # OPTIONS

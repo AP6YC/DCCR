@@ -14,8 +14,7 @@ This script is updated to use the updated full condensed scenario plot.
 # -----------------------------------------------------------------------------
 
 using Revise
-using DrWatson
-@quickactivate :DCCR
+using DCCR
 
 # -----------------------------------------------------------------------------
 # ADDITIONAL DEPENDENCIES
@@ -35,6 +34,9 @@ plot_name = "4_condensed_complex_alt.png"
 
 # Load name
 data_file = DCCR.results_dir(experiment_top, "condensed_complex_data.jld2")
+
+# Plot override
+PLOT_OVERRIDE = false
 
 # -----------------------------------------------------------------------------
 # PARSE ARGS
@@ -56,6 +58,7 @@ perfs, vals, class_labels = JLD2.load(data_file, "perfs", "vals", "class_labels"
 # PLOTTING
 # -----------------------------------------------------------------------------
 
+# Alternative simplified condensed scenario plot
 # p = create_condensed_plot(perfs, class_labels)
 p, training_vals, x_training_vals = DCCR.create_complex_condensed_plot_alt(perfs, vals, class_labels)
 pargs["display"] && display(p)

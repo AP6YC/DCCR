@@ -68,6 +68,8 @@ using PrecompileSignatures: @precompile_signatures
 
 # Necessary to download data without prompts to custom folders
 ENV["DATADEPS_ALWAYS_ACCEPT"] = true
+# Suppress display on headless systems
+ENV["GKSwstype"] = 100
 
 # -----------------------------------------------------------------------------
 # INCLUDES
