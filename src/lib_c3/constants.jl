@@ -17,8 +17,8 @@ Random.seed!(0)
 # Get the simulation datetime for the destination directory
 sim_datetime = Dates.format(now(), "yyyy-mm-dd_HH-MM-SS")
 
-# Top data directory
-const data_dir = unpacked_dir("activations_yolov3_cell=1")
+# # Top data directory
+# const data_dir = unpacked_dir("activations_yolov3_cell=1")
 
 # Plotting DPI
 const DPI = 350
@@ -55,4 +55,5 @@ const CONDENSED_LINEWIDTH = 2.5
 const percentage_formatter = j -> @sprintf("%0.0f%%", 100*j)
 # end
 
-const PERCENTAGES_BOUNDS = (0.45, 1)
+const PERCENTAGES_BOUNDS = (0.45, 1.0)
+# const PERCENTAGES_BOUNDS = [0.45, 1.0]
