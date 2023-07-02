@@ -16,6 +16,7 @@ before and after.
 
 using Revise
 using DCCR
+using DataFrames
 
 # -----------------------------------------------------------------------------
 # OPTIONS
@@ -40,9 +41,6 @@ n_cat_name = "5_n_cat.tex"
 
 # Simulation options
 opts_file = "default.yml"
-
-# Plot override
-PLOT_OVERRIDE = false
 
 # -----------------------------------------------------------------------------
 # PARSE ARGS
@@ -71,12 +69,8 @@ n_classes = length(data_dirs)
 data = DCCR.load_orbits(DCCR.data_dir, data_dirs, opts["scaling"])
 
 # Create the DDVFA module and set the data config
-# ddvfa = DDVFA(opts)
-# ddvfa.config = DataConfig(0, 1, 128)
-
 ddvfa = DDVFA(opts["opts_DDVFA"])
 ddvfa.config = DataConfig(0, 1, 128)
-
 
 # -----------------------------------------------------------------------------
 # TRAIN/TEST
@@ -113,48 +107,43 @@ perf_test_val = performance(y_hat, data.test.y)
 @printf "Unsupervised training performance: %.4f\n" perf_train_val
 @printf "Unsupervised testing performance: %.4f\n" perf_test_val
 
-# # -----------------------------------------------------------------------------
-# # ACCURACY PLOTTING
-# # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# ACCURACY PLOTTING
+# -----------------------------------------------------------------------------
 
-# # Create an accuracy grouped bar chart
-# p = create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels, percentages=true, extended=true)
-# display(p)
+# Create an accuracy grouped bar chart
+p = DCCR.create_comparison_groupedbar(data, y_hat_val, y_hat, class_labels, percentages=true, extended=true)
+DCCR.handle_display(p, pargs)
 
-# # Save the plot
-# savefig(p, results_dir(plot_name))
-# savefig(p, paper_results_dir(plot_name))
+# Save the plot
+DCCR.save_dccr("figure", p, experiment_top, plot_name, to_paper=pargs["paper"])
 
-# # -----------------------------------------------------------------------------
-# # CATEGORY ANALYSIS
-# # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# CATEGORY ANALYSIS
+# -----------------------------------------------------------------------------
 
-# # Save the number of F2 nodes and total categories per class
-# n_F2, n_categories = get_n_categories(ddvfa)
-# @info "F2 nodes:" n_F2
-# @info "Total categories:" n_categories
+# Save the number of F2 nodes and total categories per class
+n_F2, n_categories = DCCR.get_n_categories(ddvfa, n_classes)
+@info "F2 nodes:" n_F2
+@info "Total categories:" n_categories
 
-# # Create a LaTeX table from the categories
-# df = DataFrame(F2 = n_F2, Total = n_categories)
-# table = latexify(df, env=:table)
+# Create a LaTeX table from the categories
+df = DataFrame(F2 = n_F2, Total = n_categories)
+table = latexify(df, env=:table)
 
-# # Save the categories table to both the local and paper results directories
-# open(results_dir(n_cat_name), "w") do io
-#     write(io, table)
-# end
-# open(paper_results_dir(n_cat_name), "w") do io
-#     write(io, table)
-# end
+# Save the categories table to both the local and paper results directories
+DCCR.save_dccr("table", table, experiment_top, n_cat_name, to_paper=pargs["paper"])
 
-# # -----------------------------------------------------------------------------
-# # CONFUSION HEATMAP
-# # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# CONFUSION HEATMAP
+# -----------------------------------------------------------------------------
 
-# # Normalized confusion heatmap
-# # norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
-# h = create_confusion_heatmap(class_labels, data.test_y, y_hat)
-# display(h)
+# Normalized confusion heatmap
+# norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
+h = DCCR.create_confusion_heatmap(class_labels, data.test.y, y_hat)
+# Display if the option is set
+DCCR.handle_display(h, pargs)
 
-# # Save the heatmap to both the local and paper results directories
-# savefig(h, results_dir(heatmap_name))
-# savefig(h, paper_results_dir(heatmap_name))
+# Save the heatmap to both the local and paper results directories
+DCCR.save_dccr("figure", h, experiment_top, heatmap_name, to_paper=pargs["paper"])
+
