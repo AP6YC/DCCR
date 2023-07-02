@@ -6,6 +6,10 @@ The main collection of tests for the DCCR.jl package.
 This file loads common utilities and aggregates all other unit tests files.
 """
 
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------------------------------
+
 using
     Logging,
     DCCR,
@@ -21,9 +25,13 @@ end
         "1_test: unit test."
     )
 
-    # # Simulation options
-    # opts_file = "default.yml"
-
+    # Simulation options
+    opts_file = "default.yml"
+    # @info DCCR.opts_file(opts_file)
+    @info DCCR.projectdir("opts", opts_file)
+    @info isfile(DCCR.projectdir("opts", opts_file))
+    @info readdir(DCCR.projectdir())
+    @info readdir(pwd())
     # # Load the default simulation options
     # opts = DCCR.load_sim_opts(opts_file)
 
