@@ -7,10 +7,6 @@ scenario in parallel. Because each process does a lot of work, `pmap`` is used,
 requiring every process to be spawned ahead of time and passed the necessary
 function definitions to run each simulation.
 
-**NOTE**: You must manually add the processes (run parallelize.jl) and shut
-them down after. This is done to reduce precompilation in each process during
-development.
-
 # Authors
 - Sasha Petrenko <sap625@mst.edu>
 """
@@ -33,7 +29,7 @@ using Distributed
 # -----------------------------------------------------------------------------
 
 pargs = DCCR.dist_exp_parse(
-    "3_shuffled_mc: simple shuffled train/test Monte Carlo."
+    "3_shuffled_mc: distributed simple shuffled train/test Monte Carlo."
 )
 
 # -----------------------------------------------------------------------------
@@ -67,12 +63,7 @@ sim_params = Dict{String, Any}(
     # Experiment save directory name
     experiment_top = "3_shuffled_mc"
 
-    # Run the common setup methods (data paths, etc.)
-    # include(projectdir("src", "setup.jl"))
-
     # Make a path locally just for the sweep results
-    # sweep_results_dir(args...) = results_dir("sweep", args...)
-    # sweep_results_dir(args...) = projectdir("work", "data", experiment_top, "sweep", args...)
     sweep_results_dir(args...) = DCCR.unpacked_dir(experiment_top, "sweep", args...)
     mkpath(sweep_results_dir())
 

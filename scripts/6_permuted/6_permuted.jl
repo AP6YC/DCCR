@@ -6,29 +6,52 @@ Because each process does a lot of work, `pmap` is used,
 requiring every process to be spawned ahead of time and passed the necessary
 function definitions to run each simulation.
 
-**NOTE**: You must manually add the processes (run parallelize.jl) and shut
-them down after. This is done to reduce precompilation in each process during
-development.
-
 # Authors
 - Sasha Petrenko <sap625@mst.edu>
 """
 
-# Start several processes
+# -----------------------------------------------------------------------------
+# PREAMBLE
+# -----------------------------------------------------------------------------
+
+using Revise
+using DCCR
+
+# -----------------------------------------------------------------------------
+# ADDITIONAL DEPENDENCIES
+# -----------------------------------------------------------------------------
+
 using Distributed
 using Combinatorics     # permutations
-# addprocs(3, exeflags="--project=.")
-# Close the workers after simulation
-# rmprocs(workers())
 
-orders = collect(1:6)
+# -----------------------------------------------------------------------------
+# PARSE ARGS
+# -----------------------------------------------------------------------------
+
+pargs = DCCR.dist_exp_parse(
+    "6_permuted: distributed permuted condensed scenarios."
+)
+
+# -----------------------------------------------------------------------------
+# SETUP
+# -----------------------------------------------------------------------------
+
+# Start several processes
+if pargs["procs"] > 0
+    addprocs(pargs["procs"], exeflags="--project=.")
+end
 
 # Set the simulation parameters
+orders = collect(1:6)
 sim_params = Dict{String, Any}(
     "m" => "ddvfa",
     "order" => collect(permutations(orders))
     # "seed" => collect(1:1000)
 )
+
+# -----------------------------------------------------------------------------
+# PARALLEL DEFINITIONS
+# -----------------------------------------------------------------------------
 
 @everywhere begin
     # Activate the project in case
@@ -37,63 +60,33 @@ sim_params = Dict{String, Any}(
 
     # Modules
     using Revise            # Editing this file
-    using DrWatson          # Project directory functions, etc.
+    using DCCR
 
     # Experiment save directory name
     experiment_top = "6_permuted"
 
-    # Run the common setup methods (data paths, etc.)
-    include(projectdir("src", "setup.jl"))
-
     # Make a path locally just for the sweep results
-    # sweep_results_dir(args...) = results_dir("sweep", args...)
-    # sweep_results_dir(args...) = projectdir("work", "data", experiment_top, "sweep", args...)
-    sweep_results_dir(args...) = unpacked_dir(experiment_top, "sweep", args...)
+    sweep_results_dir(args...) = DCCR.unpacked_dir(experiment_top, "sweep", args...)
     mkpath(sweep_results_dir())
 
-    # Select which data entries to use for the experiment
-    data_selection = [
-        "dot_dusk",
-        "dot_morning",
-        # "emahigh_dusk",
-        # "emahigh_morning",
-        "emalow_dusk",
-        "emalow_morning",
-        "pr_dusk",
-        "pr_morning",
-    ]
-
-    # Create the DDVFA options
-    opts = opts_DDVFA(
-        gamma = 5.0,
-        gamma_ref = 1.0,
-        rho_lb = 0.45,
-        rho_ub = 0.7,
-        similarity = :single,
-    )
-
-    # Sigmoid input scaling
-    scaling = 2.0
-
-    # Plotting DPI
-    dpi = 350
+    # Load the default simulation options
+    opts = DCCR.load_sim_opts()
 
     # Load the data names and class labels from the selection
-    data_dirs, class_labels = get_orbit_names(data_selection)
+    data_dirs, class_labels = DCCR.get_orbit_names(opts["data_selection"])
 
     # Number of classes
     n_classes = length(data_dirs)
 
     # Load the orbits
     @info "Worker $(myid()): loading data"
-    data = load_orbits(data_dir, data_dirs, scaling)
+    data = DCCR.load_orbits(data_dir, data_dirs, opts["opts_DDVFA"])
 
     # Sort/reload the data as indexed components
-    data_indexed = get_indexed_data(data)
+    data_indexed = DCCR.get_indexed_data(data)
 
     # Define a single-parameter function for pmap
-    local_sim(dict) = permuted(dict, data_indexed, opts)
-
+    local_sim(dict) = DCCR.permuted(dict, data_indexed, opts["opts_DDVFA"])
 end
 
 # Log the simulation scale
@@ -110,4 +103,6 @@ dicts = dict_list(sim_params)
 pmap(local_sim, dicts)
 
 # Close the workers after simulation
-# rmprocs(workers())
+if pargs["procs"] > 0
+    rmprocs(workers())
+end
