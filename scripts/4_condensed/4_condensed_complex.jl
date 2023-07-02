@@ -34,6 +34,9 @@ experiment_top = "4_condensed"
 # plot_name = "4_condensed_complex.png"
 data_file = DCCR.results_dir(experiment_top, "condensed_complex_data.jld2")
 
+# Simulation options
+opts_file = "default.yml"
+
 # -----------------------------------------------------------------------------
 # EXPERIMENT SETUP
 # -----------------------------------------------------------------------------

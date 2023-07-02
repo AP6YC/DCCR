@@ -29,9 +29,6 @@ plot_name = "4_condensed_complex_alt.png"
 # Load name
 data_file = DCCR.results_dir(experiment_top, "condensed_complex_data.jld2")
 
-# Plot override
-PLOT_OVERRIDE = false
-
 # -----------------------------------------------------------------------------
 # PARSE ARGS
 # -----------------------------------------------------------------------------

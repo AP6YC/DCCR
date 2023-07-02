@@ -9,21 +9,24 @@ Analyze/plot the permuted condensed scenario runs from 6_permuted.jl.
 """
 
 # -----------------------------------------------------------------------------
-# FILE SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
 using Revise
+using DCCR
+
+# -----------------------------------------------------------------------------
+# ADDITIONAL DEPENDENCIES
+# -----------------------------------------------------------------------------
+
 using DrWatson
-
-# Experiment save directory name
-experiment_top = "6_permuted"
-
-# Run the common setup methods (data paths, etc.)
-include(projectdir("src", "setup.jl"))
 
 # -----------------------------------------------------------------------------
 # OPTIONS
 # -----------------------------------------------------------------------------
+
+# Experiment save directory name
+experiment_top = "6_permuted"
 
 # Plot file names
 n_w_plot_name = "6_n_w.png"
@@ -33,8 +36,8 @@ heatmap_plot_name = "6_heatmap.png"
 
 # Point to the local sweep data directory
 # sweep_dir = projectdir("work", "results", "6_permuted", "sweep")
-safe_unpack(experiment_top)
-sweep_dir = unpacked_dir(experiment_top, "sweep")
+DCCR.safe_unpack(experiment_top)
+sweep_dir = DCCR.unpacked_dir(experiment_top, "sweep")
 
 # -----------------------------------------------------------------------------
 # LOAD RESULTS
