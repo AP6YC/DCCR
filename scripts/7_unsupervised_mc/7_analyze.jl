@@ -1,17 +1,13 @@
 """
     7_analyze.jl
 
-Description:
-    This script takes the results of the Monte Carlo of shuffled simulations
+# Description
+This script takes the results of the Monte Carlo of shuffled simulations
 and generates plots of their statistics.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
-
-Timeline:
-- 6/24/2022: Created and documented.
 """
-
 
 # -----------------------------------------------------------------------------
 # PREAMBLE

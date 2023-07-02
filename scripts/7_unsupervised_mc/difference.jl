@@ -9,23 +9,25 @@ Same as 7_analyze.jl, with just the difference plot generation section
 """
 
 # -----------------------------------------------------------------------------
-# FILE SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-using
-    Revise,
-    DrWatson,
-    StatsPlots
+using Revise
+using DCCR
 
-# Experiment save directory name
-experiment_top = "7_unsupervised_mc"
+# -----------------------------------------------------------------------------
+# ADDITIONAL DEPENDENCIES
+# -----------------------------------------------------------------------------
 
-# Run the common setup methods (data paths, etc.)
-include(projectdir("src", "setup.jl"))
+using DrWatson      # collect_results!
+using StatsPlots
 
 # -----------------------------------------------------------------------------
 # OPTIONS
 # -----------------------------------------------------------------------------
+
+# Experiment save directory name
+experiment_top = "7_unsupervised_mc"
 
 # Plot file names
 n_w_plot_name = "7_n_w.png"
@@ -34,10 +36,29 @@ perf_plot_name = "7_perf.png"
 heatmap_plot_name = "7_heatmap.png"
 diff_perf_plot_name = "7_diff_perf.png"
 
+# Simulation options
+opts_file = "default.yml"
+
+# -----------------------------------------------------------------------------
+# PARSE ARGS
+# -----------------------------------------------------------------------------
+
+# Parse the arguments provided to this script
+pargs = DCCR.exp_parse(
+    "7_analyze: analyze the permuted unsupervised Monte Carlo."
+)
+
+# -----------------------------------------------------------------------------
+# EXPERIMENT SETUP
+# -----------------------------------------------------------------------------
+
+# Load the default simulation options
+opts = DCCR.load_sim_opts(opts_file)
+
 # Point to the local sweep data directory
 # sweep_dir = projectdir("work", "results", experiment_top, "sweep")
-safe_unpack(experiment_top)
-sweep_dir = unpacked_dir(experiment_top, "sweep")
+DCCR.safe_unpack(experiment_top)
+sweep_dir = DCCR.unpacked_dir(experiment_top, "sweep")
 
 # -----------------------------------------------------------------------------
 # LOAD RESULTS
@@ -47,20 +68,8 @@ sweep_dir = unpacked_dir(experiment_top, "sweep")
 df = collect_results!(sweep_dir)
 # df = collect_results(sweep_dir)
 
-# Select which data entries to use for the experiment
-data_selection = [
-    "dot_dusk",
-    "dot_morning",
-    # "emahigh_dusk",
-    # "emahigh_morning",
-    "emalow_dusk",
-    "emalow_morning",
-    "pr_dusk",
-    "pr_morning",
-]
-
 # Load the data names and class labels from the selection
-data_dirs, class_labels = get_orbit_names(data_selection)
+data_dirs, class_labels = DCCR.get_orbit_names(opts["data_selection"])
 
 # df_high = filter(row -> row[:test_perf] > 0.97, df)
 # df_high[:, Not([:method, :arch, :path])]
@@ -70,18 +79,22 @@ data_dirs, class_labels = get_orbit_names(data_selection)
 # -----------------------------------------------------------------------------
 
 # Training to testing difference performance
-diff_perf_matrix = df_column_to_matrix(df, :a_te) .- df_column_to_matrix(df, :a_tev)[:, 1:6]
+diff_perf_matrix = DCCR.df_column_to_matrix(df, :a_te) .- DCCR.df_column_to_matrix(df, :a_tev)[:, 1:6]
 # diff_perf_matrix = df_column_to_matrix(df, :a_te)
 # diff_perf_matrix = df_column_to_matrix(df, :a_tev)[:, 1:6] .- df_column_to_matrix(df, :a_te)
 # diff_perf_matrix = df_column_to_matrix(df, :a_te) - df_column_to_matrix(df, :a_tev)[:, 1:6]
-p_diff_perf = create_boxplot(diff_perf_matrix, class_labels, percentages=true, bounds_override=(-0.1, 0.1), violin_bandwidth=0.005)
+p_diff_perf = DCCR.create_boxplot(
+    diff_perf_matrix,
+    class_labels,
+    percentages=true,
+    bounds=(-0.1, 0.1),
+    violin_bandwidth=0.005
+)
 # p_diff_perf = create_inverted_boxplot(diff_perf_matrix, class_labels, percentages=true)
-ylabel!("Context Testing Accuracy Difference")
+ylabel!(p_diff_perf, "Context Testing Accuracy Difference")
+DCCR.handle_display(p_diff_perf, pargs)
 # Save the plot
-savefig(p_diff_perf, results_dir(diff_perf_plot_name))
-savefig(p_diff_perf, paper_results_dir(diff_perf_plot_name))
-# Display the plot
-display(p_diff_perf)
+DCCR.save_dccr("figure", p_diff_perf, experiment_top, diff_perf_plot_name, to_paper=pargs["paper"])
 
 # # Normalized confusion heatmap
 # # norm_cm = get_normalized_confusion(n_classes, data.test_y, y_hat)
