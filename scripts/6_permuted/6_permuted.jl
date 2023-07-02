@@ -1,9 +1,8 @@
 """
     6_permuted.jl
 
-Description:
-
-Because each process does a lot of work, `pmap`` is used,
+# Description
+Because each process does a lot of work, `pmap` is used,
 requiring every process to be spawned ahead of time and passed the necessary
 function definitions to run each simulation.
 
@@ -11,12 +10,8 @@ function definitions to run each simulation.
 them down after. This is done to reduce precompilation in each process during
 development.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
-
-Timeline:
-- 1/25/2022: Created.
-- 2/17/2022: Documented.
 """
 
 # Start several processes

@@ -26,6 +26,9 @@ experiment_top = "4_condensed"
 plot_name = "4_condensed.png"
 # plot_name_2 = "4_condensed_2.png"
 
+# Simulation options
+opts_file = "default.yml"
+
 # -----------------------------------------------------------------------------
 # PARSE ARGS
 # -----------------------------------------------------------------------------

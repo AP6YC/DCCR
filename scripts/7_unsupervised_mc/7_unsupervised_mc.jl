@@ -1,16 +1,13 @@
 """
     7_unsupervised_mc.jl
 
-Description:
-    This script runs an unsupervised learning scenario. After supervised pretraining,
+# Description
+This script runs an unsupervised learning scenario. After supervised pretraining,
 the module learns upon additional data unsupervised and is tested for performance
 before and after. This is done as a monte carlo of many simulations.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
-
-Timeline:
-- 6/17/2022: Created and documented.
 """
 
 # Start several processes
