@@ -1315,7 +1315,8 @@ function shuffled_mc(d::Dict, data::DataSplit, opts::opts_DDVFA)
     test_perf = performance(y_hat, data.test.y)
 
     # Save the number of F2 nodes and total categories per class
-    n_F2, n_categories = get_n_categories(ddvfa)
+    # n_F2, n_categories = get_n_categories(ddvfa)
+    n_F2, n_categories = get_n_categories(ddvfa, n_classes)
     n_F2_sum = sum(n_F2)
     n_categories_sum = sum(n_categories)
 
@@ -1373,7 +1374,8 @@ function permuted(d::Dict, data_indexed::DataSplitIndexed, opts::opts_DDVFA)
     test_perf = performance(y_hat, local_data.test.y)
 
     # Save the number of F2 nodes and total categories per class
-    n_F2, n_categories = get_n_categories(ddvfa)
+    # n_F2, n_categories = get_n_categories(ddvfa)
+    n_F2, n_categories = get_n_categories(ddvfa, 6)
     n_F2_sum = sum(n_F2)
     n_categories_sum = sum(n_categories)
 
@@ -1468,7 +1470,8 @@ function unsupervised_mc(d::Dict, data::DataSplitCombined, opts::opts_DDVFA)
     test_perf_val = performance(y_hat_val, data.test.y)
 
     # Save the number of F2 nodes and total categories per class
-    n_F2, n_categories = get_n_categories(ddvfa)
+    # n_F2, n_categories = get_n_categories(ddvfa)
+    n_F2, n_categories = get_n_categories(ddvfa, n_classes)
     n_F2_sum = sum(n_F2)
     n_categories_sum = sum(n_categories)
 
