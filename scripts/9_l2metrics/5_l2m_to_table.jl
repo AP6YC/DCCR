@@ -1,3 +1,14 @@
+"""
+    5_l2m_to_table.jl
+
+# Description
+Generates a LaTeX table from the l2 metrics from previous experiments.
+
+# Authors
+- Sasha Petrenko <sap625@mst.edu>
+"""
+
+
 using
     DrWatson,
     DataFrames,

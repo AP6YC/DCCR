@@ -26,9 +26,12 @@ ENV["PYTHON"] = raw"C:\Users\Sasha\Anaconda3\envs\l2mmetrics\python.exe"
 
 # Setup the Python l2packages (i.e., l2logger and l2metrics)
 include("1_setup_l2_packages.jl")
+
 # Reverse-generate the scenario from the existing data
 include("2_gen_scenario.jl")
+
 # Run the l2 experiment and generate logs
 include("3_driver.jl")
+
 # Generate the metrics
 include("4_l2metrics_julia.jl")

@@ -9,25 +9,37 @@ Runs the l2metrics batch script from within Julia.
 """
 
 # -----------------------------------------------------------------------------
-# SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-using
-    PyCall,
-    Revise,
-    DrWatson
+using Revise
+using DCCR
+
+# -----------------------------------------------------------------------------
+# ADDITIONAL DEPENDENCIES
+# -----------------------------------------------------------------------------
+
+using PyCall
+
+# -----------------------------------------------------------------------------
+# OPTIONS
+# -----------------------------------------------------------------------------
 
 # Experiment save directory name
 experiment_top = "9_l2metrics"
 
+# -----------------------------------------------------------------------------
+# EXPERIMENT
+# -----------------------------------------------------------------------------
+
 # DCCR project files
-include(projectdir("src", "setup.jl"))
+# include(projectdir("src", "setup.jl"))
 
 # Get the location of the last log
-last_log = readdir(results_dir("logs"))[end]
+last_log = readdir(DCCR.results_dir(experiment_top, "logs"))[end]
 
 # Get the batch script location
-exp_dir(args...) = projectdir("src", "experiments", experiment_top, args...)
+exp_dir(args...) = DCCR.projectdir("scripts", experiment_top, args...)
 l2m_script = "4_l2metrics.bat"
 full_l2m_script = exp_dir(l2m_script)
 
