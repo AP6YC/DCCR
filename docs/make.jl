@@ -7,9 +7,12 @@ This file builds the documentation for the `DCCR` project using Documenter.jl an
 # Authors
 - Sasha Petrenko <sap625@mst.edu>
 """
+
 # -----------------------------------------------------------------------------
 # DEPENDENCIES
 # -----------------------------------------------------------------------------
+
+using Revise
 
 using
     Documenter,

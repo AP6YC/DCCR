@@ -11,7 +11,6 @@ Please see the [documentation][docs-url].
 | **Coveralls** | **Codecov** | **Zenodo DOI** |
  [![Coveralls][coveralls-img]][coveralls-url] | [![Codecov][codecov-img]][codecov-url] | [![Zenodo DOI][doi-img]][doi-url] |
 
-
 [doc-status-img]: https://github.com/AP6YC/DCCR/actions/workflows/Documentation.yml/badge.svg
 [doc-status-url]: https://github.com/AP6YC/DCCR/actions/workflows/Documentation.yml
 
@@ -59,13 +58,13 @@ using Pkg; Pkg.activate("."); Pkg.instantiate()
 and running the script in the experiment folder with either the shell command:
 
 ```shell
-julia src/experiments/1_accuracy/1_unshuffled.jl
+julia scripts/1_accuracy/1_unshuffled.jl
 ```
 
 or in an existing REPL environment with the include command:
 
 ```julia
-include("src/experiments/1_accuracy/1_unshuffled.jl")
+include("scripts/1_accuracy/1_unshuffled.jl")
 ```
 
 Experiments with multiple stages or multiple interpreters (Julia, Python, and shell script) contain details for their reproducibilty.
