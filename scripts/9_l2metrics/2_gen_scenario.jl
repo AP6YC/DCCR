@@ -10,21 +10,28 @@ Generates the scenario and config files for l2logger and l2metrics experiments.
 """
 
 # -----------------------------------------------------------------------------
-# SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-using
-    Revise,
-    DrWatson
+using Revise
+using DCCR
+
+# -----------------------------------------------------------------------------
+# OPTIONS
+# -----------------------------------------------------------------------------
 
 # Experiment save directory name
 experiment_top = "9_l2metrics"
 
+# -----------------------------------------------------------------------------
+# OPTIONS
+# -----------------------------------------------------------------------------
+
 # DCCR project files
-include(projectdir("src", "setup.jl"))
+# include(projectdir("src", "setup.jl"))
 
 # Special folders for this experiment
-include(projectdir("src", "setup_l2.jl"))
+include(DCCR.projectdir("src", "setup_l2.jl"))
 
 # Point to config and scenario files
 config_file = configs_dir("config.json")
@@ -34,7 +41,7 @@ scenario_file = configs_dir("scenario.json")
 # CONFIG FILE
 # -----------------------------------------------------------------------------
 
-DIR = results_dir("logs")
+DIR = DCCR.results_dir(experiment_top, "logs")
 NAME = "9_l2metrics_logger"
 COLS = Dict(
     # "metrics_columns" => "reward",
@@ -61,14 +68,14 @@ config_dict = Dict(
 )
 
 # Write the config file
-json_save(config_file, config_dict)
+DCCR.json_save(config_file, config_dict)
 
 # -----------------------------------------------------------------------------
 # SCENARIO FILE
 # -----------------------------------------------------------------------------
 
 # Load the default data configuration
-data, data_indexed, class_labels, data_selection, n_classes = load_default_orbit_data(data_dir)
+data, data_indexed, class_labels, data_selection, n_classes = DCCR.load_default_orbit_data(data_dir)
 
 # Build the scenario vector
 SCENARIO = []
@@ -121,4 +128,4 @@ scenario_dict = Dict(
 )
 
 # Save the scenario
-json_save(scenario_file, scenario_dict)
+DCCR.json_save(scenario_file, scenario_dict)
