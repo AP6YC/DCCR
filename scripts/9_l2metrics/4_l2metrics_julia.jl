@@ -9,13 +9,21 @@ Runs the l2metrics on the latest logs from within Julia.
 """
 
 # -----------------------------------------------------------------------------
-# SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-using
-    PyCall,
-    Revise,
-    DrWatson
+using Revise
+using DCCR
+
+# -----------------------------------------------------------------------------
+# ADDITIONAL DEPENDENCIES
+# -----------------------------------------------------------------------------
+
+using PyCall
+
+# -----------------------------------------------------------------------------
+# OPTIONS
+# -----------------------------------------------------------------------------
 
 # Experiment save directory name
 experiment_top = "9_l2metrics"
@@ -30,19 +38,16 @@ metrics = [
     "art_activation",
 ]
 
-# DCCR project files
-include(projectdir("src", "setup.jl"))
-
 # -----------------------------------------------------------------------------
 # GENERATE METRICS
 # -----------------------------------------------------------------------------
 
 # Get the most recent log directory name
-last_log = readdir(results_dir(log_dir_name))[end]
+last_log = readdir(DCCR.results_dir(experiment_top, log_dir_name))[end]
 
 # Set the full source and output directories
-src_dir(args...) = results_dir(log_dir_name, last_log, args...)
-out_dir(args...) = results_dir(metrics_dir_name, last_log, args...)
+src_dir(args...) = DCCR.results_dir(experiment_top, log_dir_name, last_log, args...)
+out_dir(args...) = DCCR.results_dir(experiment_top, metrics_dir_name, last_log, args...)
 
 # Iterate over every metric
 for metric in metrics
