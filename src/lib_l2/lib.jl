@@ -1,8 +1,8 @@
 """
-    lib_l2.jl
+    lib.jl
 
 # Description
-Includes all of the lib_l2 source files.
+Aggregates all of the lib_l2 source files.
 
 # Authors
 - Sasha Petrenko <sap625@mst.edu>
@@ -14,9 +14,12 @@ Includes all of the lib_l2 source files.
 
 # Common definitions and variables
 include("common.jl")
+
 # Experience definitions
 include("experience.jl")
+
 # Scenario and experience definitions
 include("scenario.jl")
+
 # Agent definitions that depend on scenario definitions
 include("agents.jl")

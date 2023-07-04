@@ -1,16 +1,25 @@
 """
-    lib_c3.jl
+    lib.jl
 
 # Description
-Collects all of the C3 library code.
+Aggregates all of the C3 library code.
 """
 
 # -----------------------------------------------------------------------------
 # INCLUDES
 # -----------------------------------------------------------------------------
 
-include("colors.jl")        # Custom colors definitions
-include("data.jl")          # Data structures definitions
-include("utils.jl")         # Data and experiment utilities
-include("constants.jl")     # Constants used throughout experiments
-include("functions.jl")     # Myriad of experiment and plotting functions
+# Custom colors definitions
+include("colors.jl")
+
+# Data structures definitions
+include("data.jl")
+
+# Data and experiment utilities
+include("utils.jl")
+
+# Constants used throughout experiments
+include("constants.jl")
+
+# Myriad of experiment and plotting functions
+include("functions.jl")
