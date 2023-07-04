@@ -1,34 +1,36 @@
 """
     8_balance.jl
 
-Description:
-    This script produces the Shannon entropy of the dataset to quantify the
+# Description
+This script produces the Shannon entropy of the dataset to quantify the
 dataset balance/imbalance.
 
-Authors:
+# Authors
 - Sasha Petrenko <sap625@mst.edu>
-
-Timeline:
-- 7/29/2022: Created and documented.
 """
 
 # -----------------------------------------------------------------------------
-# FILE SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-using
-    Revise,
-    DataStructures,
-    DrWatson
+using Revise
+using DCCR
+
+# -----------------------------------------------------------------------------
+# ADDITIONAL DEPENDENCIES
+# -----------------------------------------------------------------------------
+
+using DataStructures
+
+# -----------------------------------------------------------------------------
+# OPTIONS
+# -----------------------------------------------------------------------------
 
 # Experiment save directory name
 experiment_top = "8_data_balance"
 
-# Run the common setup methods (data paths, etc.)
-include(projectdir("src", "setup.jl"))
-
 # -----------------------------------------------------------------------------
-# SCRIPT
+# EXPERIMENT
 # -----------------------------------------------------------------------------
 
 # Manually entered sizes of the data
