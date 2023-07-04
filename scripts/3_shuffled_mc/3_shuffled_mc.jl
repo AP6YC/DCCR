@@ -84,6 +84,10 @@ sim_params = Dict{String, Any}(
     local_sim(dict) = DCCR.shuffled_mc(dict, data, opts["opts_DDVFA"])
 end
 
+# -----------------------------------------------------------------------------
+# EXPERIMENT
+# -----------------------------------------------------------------------------
+
 # Log the simulation scale
 @info "START: $(dict_list_count(sim_params)) simulations across $(nprocs())."
 
@@ -96,6 +100,12 @@ dicts = dict_list(sim_params)
 
 # Parallel map the sims
 pmap(local_sim, dicts)
+
+println("--- Simulation complete ---")
+
+# -----------------------------------------------------------------------------
+# CLEANUP
+# -----------------------------------------------------------------------------
 
 # Close the workers after simulation
 if pargs["procs"] > 0
