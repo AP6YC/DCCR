@@ -23,4 +23,4 @@ mkpath(configs_dir())
 include("set_pyenv.jl")
 
 # Include the common functions and structs for l2 experiments
-include("lib_l2/lib.jl")
+include("lib/l2/lib.jl")

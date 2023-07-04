@@ -76,14 +76,8 @@ ENV["GKSwstype"] = 100
 # INCLUDES
 # -----------------------------------------------------------------------------
 
-# Exported constant for the version of the project
-include("version.jl")
-
-# C3 library code
-include("lib_c3/lib.jl")
-
-# Lifelong learning library code
-include("lib_l2/lib.jl")
+# Aggregate of all library code
+include("lib/lib.jl")
 
 # -----------------------------------------------------------------------------
 # EXPORTS
