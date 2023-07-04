@@ -75,6 +75,7 @@ ddvfa_opts = opts_DDVFA(
     similarity = :single,
     display = false,
 )
+
 # Construct the agent from the scenario
 agent = DDVFAAgent(
     ddvfa_opts,

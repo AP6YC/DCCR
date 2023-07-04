@@ -12,4 +12,4 @@ A collection of l2-specific experiment function and struct definitions.
 # INCLUDES
 # -----------------------------------------------------------------------------
 
-include("lib_l2/lib_l2.jl")
+include("lib_l2/lib.jl")
