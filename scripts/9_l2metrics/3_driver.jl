@@ -9,22 +9,30 @@ Runs the l2 condensed scenario specified by the gen_scenario.jl file.
 """
 
 # -----------------------------------------------------------------------------
-# SETUP
+# PREAMBLE
 # -----------------------------------------------------------------------------
 
-# Load dependencies
-using
-    DrWatson,
-    AdaptiveResonance
+using Revise
+using DCCR
+
+# -----------------------------------------------------------------------------
+# ADDITIONAL DEPENDENCIES
+# -----------------------------------------------------------------------------
+
+using AdaptiveResonance
+
+# -----------------------------------------------------------------------------
+# OPTIONS
+# -----------------------------------------------------------------------------
 
 # Experiment save directory name
 experiment_top = "9_l2metrics"
 
 # DCCR project files
-include(projectdir("src", "setup.jl"))
+# include(projectdir("src", "setup.jl"))
 
 # Special l2 setup for this experiment (setting the pyenv, etc.)
-include(projectdir("src", "setup_l2.jl"))
+include(DCCR.projectdir("src", "setup_l2.jl"))
 
 # Load the l2logger PyCall dependency
 l2logger = pyimport("l2logger.l2logger")

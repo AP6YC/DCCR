@@ -14,7 +14,7 @@ Special setup for l2logger and l2metrics experiments.
 # -----------------------------------------------------------------------------
 
 # Point to the configs folder for the given experiment
-configs_dir(args...) = projectdir("work", "configs", experiment_top, args...)
+configs_dir(args...) = DCCR.projectdir("work", "configs", experiment_top, args...)
 
 # Make the config folder for the experiment if it does not exist
 mkpath(configs_dir())
