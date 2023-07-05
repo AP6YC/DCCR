@@ -19,7 +19,10 @@ using DCCR
 # ADDITIONAL DEPENDENCIES
 # -----------------------------------------------------------------------------
 
+# using DataFrames
 using DrWatson      # collect_results!
+using StatsBase
+using Plots
 
 # -----------------------------------------------------------------------------
 # OPTIONS

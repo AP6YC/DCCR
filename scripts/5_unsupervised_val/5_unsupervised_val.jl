@@ -21,7 +21,9 @@ using DCCR
 # ADDITIONAL DEPENDENCIES
 # -----------------------------------------------------------------------------
 
+using AdaptiveResonance
 using DataFrames
+using Latexify
 
 # -----------------------------------------------------------------------------
 # OPTIONS

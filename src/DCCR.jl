@@ -27,18 +27,11 @@ module DCCR
 # Usings/imports for the whole package declared once
 using Reexport              # Reexport submodule exports
 
-# Reexport tools used in experiment scripts
-@reexport using AdaptiveResonance   # ART algorithms, DDVFA, FuzzyART, etc.
-@reexport using Printf              # Formatted number printing
-@reexport using DataFrames          # DataFrame
-@reexport using Latexify            # latexify
-@reexport using Random              # Random subsequence
-@reexport using StatsBase           # mean
-@reexport using Plots               # Plotting
-
 # Full usings (which supports comma-separated import notation)
 using
+    AdaptiveResonance,      # ART algorithms, DDVFA, FuzzyART, etc.
     ArgParse,               # ArgParseSettings
+    DataFrames,             # DataFrame
     DataStructures,         # Dequeue
     Dates,                  # Dates.format
     DelimitedFiles,
@@ -46,12 +39,16 @@ using
     DrWatson,               # Scientific project commands
     JLD2,                   # JLD2.load
     JSON,                   # JSON file load/save
+    # Latexify,               # latexify
     Logging,                # Printing diagnostics
     MLBase,                 # confusmat
     MLDataUtils,            # stratifiedobs
     NumericalTypeAliases,   # RealMatrix, IntegerVector, etc.
+    Plots,                  # Plotting
+    Printf,                 # Formatted number printing
     ProgressMeter,          # Progress bars
     PyCall,                 # PyObject
+    Random,                 # Random subsequence
     StatsPlots              # groupedbar
 
 # using HDF5              # Loading .h5 activation files

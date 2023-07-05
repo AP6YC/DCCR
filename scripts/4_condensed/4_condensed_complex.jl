@@ -19,9 +19,9 @@ using DCCR
 # ADDITIONAL DEPENDENCIES
 # -----------------------------------------------------------------------------
 
-using
-    ProgressMeter,
-    JLD2
+using AdaptiveResonance
+using ProgressMeter
+using JLD2
 
 # -----------------------------------------------------------------------------
 # OPTIONS
