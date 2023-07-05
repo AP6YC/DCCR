@@ -12,6 +12,7 @@ Convenience script that serves the locally built documentation.
 # DEPENDENCIES
 # -----------------------------------------------------------------------------
 
+using Revise
 using LiveServer
 
 # -----------------------------------------------------------------------------

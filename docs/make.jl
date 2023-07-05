@@ -12,8 +12,6 @@ This file builds the documentation for the `DCCR` project using Documenter.jl an
 # DEPENDENCIES
 # -----------------------------------------------------------------------------
 
-using Revise
-
 using
     Documenter,
     DemoCards,

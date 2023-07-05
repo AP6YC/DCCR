@@ -12,6 +12,12 @@ end
 
 These pages serve as the official documentation for the `DCCR` (*Deep Clustering Context Recognition*) project.
 
+The `DCCR` project is a development workspace for experiments targeting the clustering of deep features extracted from multi-object classifiers on simulated AirSim imagery.
+Due to the open-ended nature of the research, many tools and types of experiments are involved.
+As a result, please see the relevant documentation sections about the various programming languages, tools, and experiments involved throughout the repository.
+
+This repository is developed and maintained by Sasha Petrenko <petrenkos@mst.edu> on behalf of the Missouri University of Science and Technology (MS&T) Applied Computational Intelligence Laboratory (ACIL).
+
 ## Manual Outline
 
 This documentation is split into the following sections:
