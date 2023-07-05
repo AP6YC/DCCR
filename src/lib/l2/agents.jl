@@ -19,7 +19,7 @@ abstract type Agent end
 # -----------------------------------------------------------------------------
 
 """
-DDVFA-based L2 agent.
+DDVFA-based L2 [`Agent`](@ref).
 """
 struct DDVFAAgent <: Agent
     """
@@ -33,7 +33,7 @@ struct DDVFAAgent <: Agent
     params::Dict
 
     """
-    Container for the Experience Queue.
+    Container for the [`Experience`](@ref) Queue.
     """
     scenario::ExperienceQueueContainer
 end

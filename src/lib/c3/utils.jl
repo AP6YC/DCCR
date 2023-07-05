@@ -10,13 +10,6 @@ This file contains utilities for file handling and results saving.
 # -----------------------------------------------------------------------------
 
 """
-Common doc: directory string to save to.
-"""
-const DOC_ARG_SAVE_DIR = """
-- `dir::AbstractString`: the directory to save to.
-"""
-
-"""
 Wrapper for how figures are saved in the DCCR project.
 
 # Arguments
