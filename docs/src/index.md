@@ -8,6 +8,8 @@ end
 <img src="assets/logo.png" width="300">
 ```
 
+DCCR
+
 ---
 
 These pages serve as the official documentation for the `DCCR` (*Deep Clustering Context Recognition*) project.
