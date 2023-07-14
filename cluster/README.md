@@ -1,7 +1,7 @@
 # Cluster Files
 
 This folder contains scripts and submission files for running experiments on the high-performance computing cluster at MST.
-The jobs are mainly `Slurm` submission scripts that simply run one or more of the experiment scripts in `src/experiments`.
+The jobs are mainly `Slurm` submission scripts that simply run one or more of the experiment scripts in `scripts/`.
 
 ## Useful Commands
 

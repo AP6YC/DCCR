@@ -1,10 +1,18 @@
 """
     runtests.jl
 
-The entry point to unit tests for the DCCR.jl package.
+The entry point to unit tests for the `DCCR` project.
 """
 
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------------------------------
+
 using SafeTestsets
+
+# -----------------------------------------------------------------------------
+# SAFETESTSETS
+# -----------------------------------------------------------------------------
 
 @safetestset "All Test Sets" begin
     include("test_sets.jl")

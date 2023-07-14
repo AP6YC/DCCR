@@ -2,7 +2,7 @@
     test_sets.jl
 
 # Description
-The main collection of tests for the DCCR.jl package.
+The main collection of tests for the `DCCR` project.
 This file loads common utilities and aggregates all other unit tests files.
 """
 
@@ -14,10 +14,6 @@ using
     Logging,
     DCCR,
     Test
-
-@testset "Boilerplate" begin
-    @assert 1 == 1
-end
 
 @testset "DCCR" begin
     # Parse arguments
@@ -37,5 +33,4 @@ end
 
     # # Load the data names and class labels from the selection
     # data_dirs, class_labels = DCCR.get_orbit_names(opts["data_selection"])
-
 end
