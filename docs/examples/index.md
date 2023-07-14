@@ -17,6 +17,4 @@ These examples are separated into the following sections:
 
 Icons used for the covers of these demo cards are attributed to the following sites:
 
-- [Lab icons created by Prosymbols - Flaticon](https://www.flaticon.com/free-icons/lab) ([experiment_748518](https://www.flaticon.com/free-icon/experiment_748518))
-- [Iris icons created by Freepik - Flaticon](https://www.flaticon.com/free-icons/iris) ([iris_4139395](https://www.flaticon.com/free-icon/iris_4139395))
-- [Grammar icons created by Freepik - Flaticon](https://www.flaticon.com/free-icons/grammar) ([grammar_6749514](https://www.flaticon.com/free-icon/grammar_6749514))
+- [Official Julia logo graphics](https://github.com/JuliaLang/julia-logo-graphics)
