@@ -1,8 +1,8 @@
 """
-    lib_c3.jl
+    data.jl
 
 # Description
-Collects all of the C3 library code.
+Definitions for the training and testing dataset containers for the project.
 """
 
 # -----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ Constructs a DataSplitCombined from an existing DataSplit by consolidating the t
 - `data::DataSplit`: the [`DataSplit`](@ref) struct for consolidating validation [`Features`](@ref) and [`Labels`](@ref) into the training data.
 """
 function DataSplitCombined(data::DataSplit)
-    # Consolidate trainind and validation, and return the struct in one step
+    # Consolidate training and validation, and return the struct in one step
     return DataSplitCombined(
         LabeledDataset(data.train, data.val),
         data.test,
