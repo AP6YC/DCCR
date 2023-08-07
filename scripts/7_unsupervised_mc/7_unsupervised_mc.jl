@@ -77,13 +77,13 @@ sim_params = Dict{String, Any}(
 
     # Load the orbits
     @info "Worker $(myid()): loading data"
-    data = load_orbits(data_dir, data_dirs, opts["scaling"])
+    data = DCCR.load_orbits(data_dir, data_dirs, opts["scaling"])
 
     # Create a combine dataset for unsupervised_mc
-    combined_data = DataSplitCombined(data)
+    combined_data = DCCR.DataSplitCombined(data)
 
     # Define a single-parameter function for pmap
-    local_sim(dict) = unsupervised_mc(dict, combined_data, opts["opts_DDVFA"])
+    local_sim(dict) = DCCR.unsupervised_mc(dict, combined_data, opts["opts_DDVFA"])
 end
 
 # -----------------------------------------------------------------------------

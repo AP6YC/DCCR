@@ -170,8 +170,10 @@ Loads the provided options YAML file.
 function load_opts(file::AbstractString)
     # Point to the default location of the file
     full_path = projectdir("opts", file)
+
     # Load the YAML options file as a string-keyed dictionary
     file_opts = YAML.load_file(full_path, dicttype=Dict{String, Any})
+
     # Return the dictionary
     return file_opts
 end
@@ -188,6 +190,8 @@ function load_sim_opts(file::AbstractString="default.yml")
 
     # Parse the DDVFA options
     dd = opts_dict["opts_DDVFA"]
+
+    # Instantiate the options
     opts = opts_DDVFA(
         gamma = dd["gamma"],
         gamma_ref = dd["gamma_ref"],
