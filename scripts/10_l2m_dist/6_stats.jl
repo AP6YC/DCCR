@@ -12,6 +12,7 @@ using
     CSV,
     DrWatson,
     DataFrames,
+    Latexify,
     Statistics
 
 experiment_top = "10_l2m_dist"
