@@ -1,3 +1,7 @@
+# ------------------------------------------------ #
+# PROJECT IGNORES
+# ------------------------------------------------ #
+
 # Logging ignores
 scripts/9_l2metrics/l2logger_template/logs_simple/
 
@@ -26,6 +30,8 @@ work/**
 # Ignore the unpacking directory
 data/unpacked/**
 !data/unpacked/.gitkeep
+
+data/teledyne-data/
 
 # Except the shuffled Monte Carlo results
 # !work/results/3_shuffled_mc/sweep/*
