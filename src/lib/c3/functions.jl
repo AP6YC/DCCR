@@ -473,14 +473,14 @@ function get_n_categories(ddvfa::DDVFA, n_classes::Int)
 end
 
 """
-Wrapper of `stratifiedobs`, returns a manual train/test x/y split from a data matrix and labels using MLDataUtils.
+Wrapper of `splitobs`, returns a manual train/test x/y split from a data matrix and labels using MLDataUtils.
 
 # Arguments
 - `data::RealMatrix`: the feature data to split into training and testing.
 - `targets::IntegerVector`: the labels corresponding to the data to split into training and testing.
 """
 function get_manual_split(data::RealMatrix, targets::IntegerVector)
-    (X_train, y_train), (X_test, y_test) = stratifiedobs((data, targets))
+    (X_train, y_train), (X_test, y_test) = splitobs((data, targets))
     return (X_train, y_train), (X_test, y_test)
 end
 

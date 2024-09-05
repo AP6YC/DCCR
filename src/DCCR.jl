@@ -42,7 +42,7 @@ using
     # Latexify,               # latexify
     Logging,                # Printing diagnostics
     MLBase,                 # confusmat
-    MLDataUtils,            # stratifiedobs
+    MLUtils,                # splitobs
     NumericalTypeAliases,   # RealMatrix, IntegerVector, etc.
     Plots,                  # Plotting
     Printf,                 # Formatted number printing
